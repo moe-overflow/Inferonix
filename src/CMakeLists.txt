@@ -3,6 +3,14 @@ include(${CMAKE_SOURCE_DIR}/cmake/cmake_package_manager.cmake)
 set(
         SOURCE_FILES
 
+        Interface/application.cpp
+        Interface/application.hpp
+        Interface/callback_functions.cpp
+        Interface/callback_functions.hpp
+        Interface/main.hpp
+        Interface/window.cpp
+        Interface/window.hpp
+
         Renderer/buffer.hpp
         Renderer/index_buffer.cpp
         Renderer/renderer.cpp
