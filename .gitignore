@@ -1,0 +1,21 @@
+.idea
+
+.vs
+*.user
+*.sln
+*.vcxproj
+*.filters
+
+.vscode
+
+cmake-*
+*.make
+Makefile
+
+
+# output/bin directories
+bin
+build/*
+out/*
+
+
