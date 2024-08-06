@@ -2,7 +2,18 @@ include(${CMAKE_SOURCE_DIR}/cmake/cmake_package_manager.cmake)
 
 set(
         SOURCE_FILES
-        main.cpp
+
+        Renderer/buffer.hpp
+        Renderer/index_buffer.cpp
+        Renderer/renderer.cpp
+        Renderer/renderer.hpp
+        Renderer/shader.cpp
+        Renderer/shader.hpp
+        Renderer/shader_program.cpp
+        Renderer/shader_program.hpp
+        Renderer/vertex_array.hpp
+        Renderer/vertex_array.cpp
+        Renderer/vertex_buffer.cpp
 )
 
 add_library(
