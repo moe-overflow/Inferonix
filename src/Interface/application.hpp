@@ -21,11 +21,17 @@ namespace Engine::Interface
         application(application&&) = delete;
 		~application() = default;
 		void run();
-
-    private:
+		
+		window* get_window() { return _window.get(); }
+		renderer* get_renderer() { return _renderer.get(); }
+    
+	protected:
         std::unique_ptr<window> _window;
         std::unique_ptr<renderer> _renderer;
 
     };
 
+
 }
+
+Engine::Interface::application* create_app();

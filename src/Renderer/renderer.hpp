@@ -22,21 +22,20 @@ namespace Engine::Renderer
         render_entity(  std::unique_ptr<shader_program> program,
                     std::unique_ptr<vertex_array> array,
                     std::unique_ptr<vertex_buffer> vertex_buffer,
-                    std::unique_ptr<index_buffer> index_buffer )
-                :
+                    std::unique_ptr<index_buffer> index_buffer ) :
             ShaderProgram(std::move(program)),
             VertexArray(std::move(array)),
             VertexBuffer(std::move(vertex_buffer)),
-            IndexBuffer(std::move(index_buffer)) {}
+            IndexBuffer(std::move(index_buffer)) 
+        {}
 
 
         explicit render_entity(const render_entity_data& data)
                 : ShaderProgram(std::make_unique<shader_program>()),
                   VertexArray(std::make_unique<vertex_array>()),
                   VertexBuffer(std::make_unique<vertex_buffer>(data.vertices.size() * sizeof(float), data.vertices.data())),
-                  IndexBuffer(std::make_unique<index_buffer>(data.indices.size() * sizeof(int), data.indices.data())) {
-
-        }
+                  IndexBuffer(std::make_unique<index_buffer>(data.indices.size() * sizeof(int), data.indices.data())) 
+        {}
 
         // Prevent copying
         render_entity(const render_entity&) = delete;
@@ -82,6 +81,7 @@ namespace Engine::Renderer
         renderer();
         ~renderer() = default;
         void render();
+        void set_render_entity(const std::vector<render_entity_data>& data);
         static void set_clear_color(float r, float g, float b, float a);
         static void clear();
         static void log_info();

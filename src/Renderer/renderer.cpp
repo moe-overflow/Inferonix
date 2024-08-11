@@ -4,30 +4,11 @@
 
 using namespace Engine::Renderer;
 
-renderer::renderer() : _render_entities(std::make_unique<std::vector<render_entity>>())
+renderer::renderer() 
+     : _render_entities(std::make_unique<std::vector<render_entity>>())
 {
     log_info();
-
-    std::vector<render_entity_data> data =
-    {
-            {
-                    {
-                            -0.75f,  0.00f, 0.0f,
-                             0.75f,  0.00f, 0.0f,
-                             0.00f,  0.75f, 0.0f,
-                             0.00f, -0.75f, 0.0f
-                    },
-                    {
-                            0, 1, 2,
-                            0, 1, 3
-                    }
-            }
-    };
-
-    for (const auto& entity : data) {
-        _render_entities->emplace_back(create_render_entity(entity));
-    }
-
+    
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -46,11 +27,19 @@ void renderer::render()
         glDrawElements(GL_TRIANGLES,
                       static_cast<int>(entity.IndexBuffer->count()),
                       GL_UNSIGNED_INT,
-                      nullptr); // todo indices => variable
+                      nullptr
+        ); // todo indices => variable
         entity.VertexArray->unbind();
         entity.ShaderProgram->unuse();
     }
 
+}
+
+void renderer::set_render_entity(const std::vector<render_entity_data>& data)
+{
+    for (const auto& entity : data) {
+        _render_entities->emplace_back(create_render_entity(entity));
+    }
 }
 
 void renderer::set_clear_color(float r, float g, float b, float a) {
@@ -66,7 +55,7 @@ void renderer::log_info() {
     spdlog::info("GPU vendor: {}", reinterpret_cast<char const*> (glGetString(GL_VENDOR)));
     spdlog::info("GPU renderer: {}", reinterpret_cast<char const*> (glGetString(GL_RENDERER)));
     spdlog::info("GPU version: {}", reinterpret_cast<char const*> (glGetString(GL_VERSION)));
-    spdlog::info("shading language: {}", reinterpret_cast<char const*> (glGetString(GL_SHADING_LANGUAGE_VERSION)));
+    spdlog::info("Shading language: {}", reinterpret_cast<char const*> (glGetString(GL_SHADING_LANGUAGE_VERSION)));
 
     int nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
