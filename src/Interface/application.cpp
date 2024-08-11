@@ -4,7 +4,7 @@
 
 #include <memory>
 
-using namespace Engine::Interface;
+using namespace Inferonix::Interface;
 
 
 application::application() :

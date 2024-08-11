@@ -4,7 +4,7 @@
 #include <cmath>
 #include <spdlog/spdlog.h>
 
-using namespace Engine::Renderer;
+using namespace Inferonix::Renderer;
 
 shader_program::shader_program() : // todo: pass path as param
     _vertex_shader(std::make_unique<shader>(shader_type::VERTEX, "shaders/vertex_shader.glsl")),

@@ -5,7 +5,7 @@
 #include <string_view>
 #include <memory>
 
-namespace Engine::Renderer
+namespace Inferonix::Renderer
 {
 
     enum shader_type : GLenum

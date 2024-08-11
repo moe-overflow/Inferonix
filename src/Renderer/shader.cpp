@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <spdlog/spdlog.h>
 
-using namespace Engine::Renderer;
+using namespace Inferonix::Renderer;
 
 shader::shader(shader_type type, const char* path) :
         _type { type },

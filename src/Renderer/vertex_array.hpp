@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <memory>
 
-namespace Engine::Renderer
+namespace Inferonix::Renderer
 {
 
     class vertex_array

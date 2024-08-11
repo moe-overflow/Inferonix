@@ -5,7 +5,7 @@
 #include "spdlog/spdlog.h"
 #include <glad/glad.h>
 
-using namespace Engine::Interface;
+using namespace Inferonix::Interface;
 
 window::window(int width, int height) :
     _width{ width },
@@ -24,7 +24,7 @@ void window::init()
     if(!_initialized)
         throw std::runtime_error("GLFW initialization failed!");
 
-     ("GLFW was initialized successfully"); // todo
+    spdlog::info("GLFW was initialized successfully"); // todo
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);

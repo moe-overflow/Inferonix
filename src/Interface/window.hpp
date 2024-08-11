@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace Engine::Interface
+namespace Inferonix::Interface
 {
 	class window
 	{

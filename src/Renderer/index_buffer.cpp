@@ -1,6 +1,6 @@
 #include "buffer.hpp"
 
-using namespace Engine::Renderer;
+using namespace Inferonix::Renderer;
 
 
 index_buffer::index_buffer(size_t count, const void * indices)

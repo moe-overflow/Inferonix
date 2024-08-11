@@ -2,7 +2,7 @@
 
 #include "window.hpp"
 
-namespace Engine::Interface {
+namespace Inferonix::Interface {
 
     void framebuffer_size_callback(GLFWwindow *window, int width, int height);
     void process_input(window &window);

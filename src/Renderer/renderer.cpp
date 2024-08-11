@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-using namespace Engine::Renderer;
+using namespace Inferonix::Renderer;
 
 renderer::renderer() 
      : _render_entities(std::make_unique<std::vector<render_entity>>())

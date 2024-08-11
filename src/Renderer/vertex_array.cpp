@@ -1,7 +1,7 @@
 #include "buffer.hpp"
 #include "vertex_array.hpp"
 
-using namespace Engine::Renderer;
+using namespace Inferonix::Renderer;
 
 vertex_array::vertex_array() : _id( std::make_unique<uint32_t>(0))
 {

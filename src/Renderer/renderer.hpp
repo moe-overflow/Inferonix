@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-namespace Engine::Renderer
+namespace Inferonix::Renderer
 {
     struct render_entity_data
     {

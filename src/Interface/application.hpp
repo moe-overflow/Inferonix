@@ -5,9 +5,9 @@
 
 #include <memory>
 
-using namespace Engine::Renderer;
+using namespace Inferonix::Renderer;
 
-namespace Engine::Interface
+namespace Inferonix::Interface
 {
 
     static constexpr int WIDTH = 1920;
@@ -34,4 +34,4 @@ namespace Engine::Interface
 
 }
 
-Engine::Interface::application* create_app();
+Inferonix::Interface::application* create_app();

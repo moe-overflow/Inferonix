@@ -1,6 +1,6 @@
 #include "buffer.hpp"
 
-using namespace Engine::Renderer;
+using namespace Inferonix::Renderer;
 
 vertex_buffer::vertex_buffer(size_t size, const void *vertex_data) : buffer(), _size(size)  { }
 

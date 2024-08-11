@@ -5,7 +5,7 @@
 #include <string>
 #include <memory>
 
-namespace Engine::Renderer
+namespace Inferonix::Renderer
 {
 
     class shader_program

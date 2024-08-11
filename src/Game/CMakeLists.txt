@@ -1,6 +1,7 @@
 
 add_executable(game
-        "game.cpp"
+        game.cpp
+        game.hpp
 )
 
 set_target_properties(game
@@ -15,7 +16,7 @@ target_include_directories(
 )
 
 target_link_libraries(game
-        PUBLIC engine
+        PUBLIC inferonix
 )
 
 add_custom_command(TARGET game POST_BUILD

@@ -4,7 +4,7 @@
 #include <vector>
 #include <glad/glad.h>
 
-namespace Engine::Renderer
+namespace Inferonix::Renderer
 {
 
     class buffer

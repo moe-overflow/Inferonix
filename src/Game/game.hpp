@@ -6,7 +6,7 @@
 namespace Game
 {
 
-	class game : public Engine::Interface::application
+	class game : public Inferonix::Interface::application
 	{
 	public:
 		game();
@@ -16,7 +16,7 @@ namespace Game
 	
 }
 
-Engine::Interface::application* create_app()
+Inferonix::Interface::application* create_app()
 {
 	return new Game::game();
 }

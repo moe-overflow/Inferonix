@@ -5,7 +5,7 @@
 
 #include <memory>
 
-using namespace Engine::Interface;
+using namespace Inferonix::Interface;
 
 
 int main(int argc, char** argv)
