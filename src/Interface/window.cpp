@@ -24,7 +24,7 @@ void window::init()
     if(!_initialized)
         throw std::runtime_error("GLFW initialization failed!");
 
-    spdlog::info("GLFW was initialized successfully"); // todo
+    spdlog::info("GLFW was initialized successfully");
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -37,6 +37,7 @@ void window::create()
 {
     init();
     _instance = glfwCreateWindow(_width, _height, "Engine", nullptr, nullptr);
+    set_input_pointer_functions(_instance);
 
 	if (_instance == nullptr)
 	{
@@ -94,4 +95,19 @@ void window::close()
 {
     glfwSetWindowShouldClose(_instance, GLFW_TRUE);
 }
+
+void window::set_input_pointer_functions(GLFWwindow *window)
+{
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    glfwSetKeyCallback(window, key_callback);
+
+    glfwSetCursorPosCallback(window, cursor_callback);
+    glfwSetCursorEnterCallback(window, pointer_enter_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+
+    glfwSetWindowSizeCallback(window, window_resize_callback);
+    glfwSetWindowCloseCallback(window, window_close_callback);
+}
+
 

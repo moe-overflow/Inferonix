@@ -34,4 +34,4 @@ namespace Inferonix::Interface
 
 }
 
-Inferonix::Interface::application* create_app();
+extern Inferonix::Interface::application* create_app();

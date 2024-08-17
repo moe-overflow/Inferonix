@@ -1,7 +1,7 @@
 include(${CMAKE_SOURCE_DIR}/cmake/cmake_package_manager.cmake)
 
 set(
-        SOURCE_FILES
+        INTERFACE_SOURCE_FILES
 
         Interface/application.cpp
         Interface/application.hpp
@@ -10,6 +10,11 @@ set(
         Interface/main.hpp
         Interface/window.cpp
         Interface/window.hpp
+
+)
+
+set(
+        RENDERER_SOURCE_FILES
 
         Renderer/buffer.hpp
         Renderer/index_buffer.cpp
@@ -22,6 +27,24 @@ set(
         Renderer/vertex_array.hpp
         Renderer/vertex_array.cpp
         Renderer/vertex_buffer.cpp
+)
+
+set(
+        EVENTSYSTEM_SOURCE_FILES
+
+        EventSystem/event.hpp
+        EventSystem/event_handler.hpp
+        EventSystem/key_event.hpp
+        EventSystem/mouse_event.hpp
+        EventSystem/window_event.hpp
+)
+
+set(
+        SOURCE_FILES
+        ${INTERFACE_SOURCE_FILES}
+        ${RENDERER_SOURCE_FILES}
+        ${EVENTSYSTEM_SOURCE_FILES}
+
 )
 
 add_library(

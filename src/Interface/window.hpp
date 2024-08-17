@@ -3,9 +3,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "../EventSystem/event_handler.hpp"
+
 namespace Inferonix::Interface
 {
-	class window
+    class window : public EventSystem::event_handler
 	{
 
 	public:
