@@ -3,11 +3,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "../EventSystem/event.hpp"
 #include "../EventSystem/event_handler.hpp"
 
 namespace Inferonix::Interface
 {
-    class window : public EventSystem::event_handler
+    class window
 	{
 
 	public:
@@ -22,8 +23,10 @@ namespace Inferonix::Interface
         void poll_events();
         [[nodiscard]] bool key_pressed(int key);
         void close();
-
-	private:
+        
+        static void handle_event(Inferonix::EventSystem::event& event);
+	
+    private:
         bool _initialized = false;
         GLFWwindow* _instance = nullptr;
         int _width, _height;

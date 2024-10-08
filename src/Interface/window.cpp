@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 
 using namespace Inferonix::Interface;
+using namespace Inferonix::EventSystem;
 
 window::window(int width, int height) :
     _width{ width },
@@ -110,4 +111,7 @@ void window::set_input_pointer_functions(GLFWwindow *window)
     glfwSetWindowCloseCallback(window, window_close_callback);
 }
 
-
+void window::handle_event(event &event)
+{
+    event_handler::get()->dispatch(event);
+}
