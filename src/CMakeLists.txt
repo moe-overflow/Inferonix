@@ -27,6 +27,7 @@ set(
         Renderer/vertex_array.hpp
         Renderer/vertex_array.cpp
         Renderer/vertex_buffer.cpp
+        Renderer/transform.hpp
 )
 
 set(
@@ -74,12 +75,14 @@ CPMAddPackage(
 )
 
 ##
+CPMAddPackage("gh:g-truc/glm#0.9.9.8")
 
 target_link_libraries(
         ${PROJECT_NAME}
         PUBLIC glfw
         PUBLIC glad
         PUBLIC spdlog::spdlog
+        PUBLIC glm::glm
 )
 
 target_include_directories(
