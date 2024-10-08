@@ -1,99 +1,49 @@
 #pragma once
 
-#include "key_event.hpp"
-#include "window_event.hpp"
-#include "mouse_event.hpp"
+#include <memory>
+#include <vector>
 
-#include <string>
-#include <spdlog/spdlog.h>
+#include "event_listener.hpp"
 
 namespace Inferonix::EventSystem
 {
-	class event_handler
-	{
-	public:
-			
-		static void handle_key_event(key_event& e)
-		{
-			switch (e.get_type())
-			{
-                case key_event_type::key_pressed_event:
-                {
-                    spdlog::info("Key pressed {}", e.get_key_code());
-                    break;
-                }
-                case key_event_type::key_released_event:
-                {
-                    spdlog::info("Key released {}", e.get_key_code());
-                    break;
-                }
-                case key_event_type::key_repeat_event:
-                {
-                    spdlog::info("Key repeated {}", e.get_key_code());
-                    break;
-                }
-                default:
-                    break;
-                }
-		}
+    class event_handler
+    {
+    public:
 
-		static void handle_mouse_event(mouse_event& e)
-		{
-			switch (e.get_type())
-			{
-				case mouse_event_type::mouse_pointer_moved:
-				{
-					auto *casted_e = dynamic_cast<mouse_cursor_moved*>(&e);
-                    spdlog::info("MOUSE CURSOR MOVED TO: ({}, {})", casted_e->get_x(), casted_e->get_y());
-					break;
-			
-				}
-				case mouse_event_type::mouse_pointer_entered:
-				{
+        event_handler() = default;
 
-					auto *casted_e = dynamic_cast<mouse_cursor_entered*>(&e);
-					const std::string state(casted_e->is_within_window() ? "ENTERED" : "LEFT");
+        event_handler& operator=(const event_handler&) = delete;
+        event_handler(const event_handler&) = delete;
 
-                    spdlog::info("MOUSE CURSOR HAS {} THE WINDOW", state);
-					break;
-				}
-				case mouse_event_type::mouse_button_clicked:
-				{
-                    spdlog::info("MOUSE CURSOR CLICKED");
-					break;
-				}
-				case mouse_event_type::mouse_button_released:
-				{
-                    spdlog::info("MOUSE CURSOR RELEASED");
-					break;
-				}				
-				{
-				default: 
-					break;
-				}
-			}
-		}
+        inline static std::shared_ptr<event_handler> get()
+        {
+            static std::shared_ptr<event_handler> event_system_instance {new event_handler };
+            return event_system_instance;
+        }
 
-		static void handle_window_event(window_event& e)
-		{
-			switch (e.get_type())
-			{
-				case window_event_type::window_resize:
-				{
-                    spdlog::info("WINDOW RESIZE ({}, {})", e.get_x(), e.get_y());
-					break;
-				}
-				case window_event_type::window_close:
-				{
-                    spdlog::info("WINDOW CLOSED");
-					break;
-				} 
-				{
-				default:
-					break;
-				}
-			}
-		}
-	};
+        inline void dispatch(event& event)
+        {
+            for(auto& event_listener : _event_listeners) 
+            {
+                event_listener->on_event(event);
+            }
+        }
 
+        inline void subscribe(const std::shared_ptr<event_listener>& event_listener)
+        {
+            _event_listeners.push_back(event_listener);
+        }
+
+        inline void unsubscribe(event_listener* event_listener)
+        {
+            // todo: implement me
+        }
+
+    private:
+        std::vector<std::shared_ptr<event_listener>> _event_listeners;
+
+
+    };
 }
+

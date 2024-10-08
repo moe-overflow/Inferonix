@@ -12,7 +12,7 @@ namespace Inferonix::EventSystem
 	};
 
 
-	class window_event : event
+	class window_event : public event
 	{
 	public:
 		window_event(window_event_type type, int x, int y) : _type(type), _x(x), _y(y)
@@ -21,7 +21,7 @@ namespace Inferonix::EventSystem
 		explicit window_event(window_event_type type) : _type(type), _x(-1), _y(-1)
 		{}
 
-		window_event_type get_type() { return _type; }
+		[[nodiscard]] window_event_type get_type() { return _type; }
 		[[nodiscard]] int get_x() const { return _x; }
 		[[nodiscard]] int get_y() const { return _y; }
 

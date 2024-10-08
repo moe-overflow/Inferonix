@@ -15,7 +15,7 @@ namespace Inferonix::EventSystem
 	};
 
 
-	class mouse_event : event 
+	class mouse_event : public event 
 	{
 	public:
 
@@ -43,7 +43,6 @@ namespace Inferonix::EventSystem
 		int _button_code;
 	};
 
-							
 
 	class mouse_cursor_entered : public mouse_event
 	{

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "window.hpp"
+#include "EventSystem/event_handler.hpp"
+#include "EventSystem/event.hpp"
 
 namespace Inferonix::Interface {
 

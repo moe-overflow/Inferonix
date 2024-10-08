@@ -1,4 +1,7 @@
 #include "callback_functions.hpp"
+#include "EventSystem/window_event.hpp"
+#include "EventSystem/key_event.hpp"
+#include "EventSystem/mouse_event.hpp"
 
 using namespace Inferonix::EventSystem;
 
@@ -22,13 +25,13 @@ namespace Inferonix::Interface
     void window_close_callback(GLFWwindow* window)
     {
         window_event e(window_event_type::window_close);
-        window::handle_window_event(e);
+        window::handle_event(e);
     }
 
     void window_resize_callback(GLFWwindow* window, int width, int height)
     {
         window_event e(window_event_type::window_resize, width, height);
-        window::handle_window_event(e);
+        window::handle_event(e);
     }
 
     void key_callback(GLFWwindow* window,
@@ -59,7 +62,7 @@ namespace Inferonix::Interface
         }
 
         key_event e (key, type);
-        window::handle_key_event(e);
+        window::handle_event(e);
 
     }
 
@@ -74,7 +77,7 @@ namespace Inferonix::Interface
             e = mouse_button(mouse_event_type::mouse_button_released, button);
 
 
-        window::handle_mouse_event(e);
+        window::handle_event(e);
 
     }
 
@@ -83,7 +86,7 @@ namespace Inferonix::Interface
         mouse_cursor_moved e(mouse_event_type::mouse_pointer_moved,
                                      static_cast<int>(x),
                                      static_cast<int>(y));
-        window::handle_mouse_event(e);
+        window::handle_event(e);
     }
 
     void pointer_enter_callback(GLFWwindow* window, int entered)
@@ -110,7 +113,7 @@ namespace Inferonix::Interface
         }
 
         Inferonix::EventSystem::mouse_cursor_entered e(type, in_window);
-        window::handle_mouse_event(e);
+        window::handle_event(e);
 
     }
 

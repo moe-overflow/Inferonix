@@ -14,7 +14,7 @@ namespace Inferonix::EventSystem
 	};
 
 
-	class key_event : event
+	class key_event : public event
 	{
 	public:
 		key_event(const int key_code, key_event_type type)
