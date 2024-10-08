@@ -5,6 +5,9 @@
 #include <string>
 #include <memory>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace Inferonix::Renderer
 {
 
@@ -20,6 +23,7 @@ namespace Inferonix::Renderer
         void link();
         void check_errors() const;
         void set_uniform(const std::string& name, float r, float g, float b) const;
+        void set_uniform(const std::string& name, glm::mat4 mat) const;
         [[nodiscard]] uint32_t get() const { return *_id; }
         void set_dynamic_color(const std::string& uniform_name) const;
 
