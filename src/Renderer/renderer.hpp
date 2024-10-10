@@ -13,6 +13,8 @@
 #include "transform.hpp"
 #include <spdlog/spdlog.h>
 
+#include "../Scene/camera.hpp"
+
 namespace Inferonix::Renderer
 {
     struct render_entity_data
@@ -24,7 +26,7 @@ namespace Inferonix::Renderer
 
         virtual ~render_entity_data() = default;
 
-        virtual void update(float delta_time){}
+        virtual void update(float delta_time) = 0;
 
     };
 
@@ -63,6 +65,7 @@ namespace Inferonix::Renderer
 
     private:
         std::vector<std::shared_ptr<render_entity>> _render_entities;
+        std::shared_ptr<Scene::camera> _main_camera;
 
     };
 }

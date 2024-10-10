@@ -14,8 +14,6 @@ application::application() :
 
 void application::run()
 {
-    _renderer->set_clear_color(0.0f, 0.0f, 0.0f, 1.0f);
-
     while (!_window->should_close())
     {
         _window->poll_events();

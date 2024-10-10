@@ -42,10 +42,16 @@ set(
 )
 
 set(
+        SCENE_SOURCE_FILES
+        Scene/camera.hpp
+)
+
+set(
         SOURCE_FILES
         ${INTERFACE_SOURCE_FILES}
         ${RENDERER_SOURCE_FILES}
         ${EVENTSYSTEM_SOURCE_FILES}
+        ${SCENE_SOURCE_FILES}
 
 )
 
