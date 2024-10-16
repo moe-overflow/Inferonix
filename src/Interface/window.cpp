@@ -7,10 +7,12 @@
 
 using namespace Inferonix::Interface;
 using namespace Inferonix::EventSystem;
+using namespace std::chrono;
 
 window::window(int width, int height) :
     _width{ width },
-    _height{ height }
+    _height{ height },
+    _last_frame_time (steady_clock::now())
 {
     create();
     _initialized = true;
@@ -114,4 +116,12 @@ void window::set_input_pointer_functions(GLFWwindow *window)
 void window::handle_event(event &event)
 {
     event_handler::get()->dispatch(event);
+}
+
+float window::get_delta_time()
+{
+    delta_time_point current_frame_time = steady_clock::now();
+    duration<float> duration = current_frame_time - _last_frame_time;
+    _last_frame_time = current_frame_time;
+    return duration.count();
 }

@@ -29,6 +29,8 @@ namespace Inferonix::Scene
             update_view();
         }
 
+        virtual void update(float delta_time) = 0;
+
         void set_position(const glm::vec3& position)
         {
             _settings._position = position;
@@ -44,7 +46,7 @@ namespace Inferonix::Scene
         [[nodiscard]] auto get_projection() const { return _projection_matrix; }
         [[nodiscard]] auto get_view() const { return _view_matrix; }
 
-
+        [[nodiscard]] auto get_settings() const { return _settings; }
 
     private:
 

@@ -65,6 +65,9 @@ namespace Inferonix::Renderer
         static void log_info();
         static std::shared_ptr<render_entity> create_render_entity(std::shared_ptr<render_entity_data>);
 
+        [[nodiscard]] std::shared_ptr<Scene::camera> get_camera() { return _main_camera; }
+        void set_camera(const std::shared_ptr<Scene::camera>& camera) { _main_camera = camera; }
+
     private:
         std::vector<std::shared_ptr<render_entity>> _render_entities;
         std::shared_ptr<Scene::camera> _main_camera;

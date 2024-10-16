@@ -36,6 +36,9 @@ renderer::renderer(std::shared_ptr<Interface::window> window) :
 
 void renderer::render()
 {
+    auto delta_time = _window_instance->get_delta_time();
+    _main_camera->update(delta_time);
+
     for(const auto& entity : _render_entities)
     {
         entity->ShaderProgram->use();
@@ -47,7 +50,7 @@ void renderer::render()
             entity->ShaderProgram->set_uniform("myColor", 0.5f, 0.5f, 0.5f);
 
         // todo: pass delta parameter correctly
-        entity->RenderEntityData->update(1);
+        entity->RenderEntityData->update(delta_time);
 
         entity->ShaderProgram->set_uniform("model", entity->RenderEntityData->transform.get_matrix());
         entity->ShaderProgram->set_uniform("view", _main_camera->get_view());

@@ -6,8 +6,12 @@
 #include "../EventSystem/event.hpp"
 #include "../EventSystem/event_handler.hpp"
 
+#include <chrono>
+
 namespace Inferonix::Interface
 {
+    using delta_time_point = std::chrono::time_point<std::chrono::steady_clock>;
+
     class window
 	{
 
@@ -25,15 +29,21 @@ namespace Inferonix::Interface
         void close();
         
         static void handle_event(Inferonix::EventSystem::event& event);
-	
+
+        [[nodiscard]] float get_delta_time();
+
     private:
         bool _initialized = false;
         GLFWwindow* _instance = nullptr;
         int _width, _height;
 
-		void set_input_pointer_functions(GLFWwindow* window);
+        delta_time_point _last_frame_time {};
 
 
-	};
+    private:
+        void set_input_pointer_functions(GLFWwindow* window);
+
+
+    };
 
 }
