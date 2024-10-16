@@ -6,7 +6,8 @@
 
 using namespace Inferonix::Renderer;
 
-renderer::renderer()
+renderer::renderer(std::shared_ptr<Interface::window> window) :
+    _window_instance(std::move(window))
 {
     log_info();
 

@@ -5,11 +5,12 @@
 #include <memory>
 
 using namespace Inferonix::Interface;
-
+using namespace Inferonix::Renderer;
 
 application::application() :
-    _window(std::make_unique<window>(WIDTH, HEIGHT)), _renderer(std::make_unique<renderer>())
-{ }
+    _window(std::make_unique<window>(WIDTH, HEIGHT)),
+    _renderer(std::make_unique<renderer>(_window))
+{}
 
 
 void application::run()

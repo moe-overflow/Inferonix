@@ -5,7 +5,6 @@
 
 #include <memory>
 
-using namespace Inferonix::Renderer;
 
 namespace Inferonix::Interface
 {
@@ -23,11 +22,13 @@ namespace Inferonix::Interface
 		void run();
 		
 		window* get_window() { return _window.get(); }
-		renderer* get_renderer() { return _renderer.get(); }
-    
+		Renderer::renderer* get_renderer() { return _renderer.get(); }
+
+
 	protected:
-        std::unique_ptr<window> _window;
-        std::unique_ptr<renderer> _renderer;
+        std::shared_ptr<Interface::window> _window;
+        std::shared_ptr<Renderer::renderer> _renderer;
+
 
     };
 

@@ -14,6 +14,8 @@
 #include <spdlog/spdlog.h>
 
 #include "../Scene/camera.hpp"
+#include "Interface/window.hpp"
+
 
 namespace Inferonix::Renderer
 {
@@ -54,7 +56,7 @@ namespace Inferonix::Renderer
     class renderer
     {
     public:
-        renderer();
+        explicit renderer(std::shared_ptr<Interface::window> window);
         ~renderer() = default;
         void render();
         void add_render_entity(const std::shared_ptr<render_entity_data>& data);
@@ -67,5 +69,6 @@ namespace Inferonix::Renderer
         std::vector<std::shared_ptr<render_entity>> _render_entities;
         std::shared_ptr<Scene::camera> _main_camera;
 
+        std::shared_ptr<Interface::window> _window_instance{};
     };
 }
