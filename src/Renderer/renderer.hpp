@@ -9,49 +9,15 @@
 #include <utility>
 #include <vector>
 
-
 #include "transform.hpp"
 #include <spdlog/spdlog.h>
 
 #include "../Scene/camera.hpp"
 #include "Interface/window.hpp"
-
+#include "render_entity.hpp"
 
 namespace Inferonix::Renderer
 {
-    struct render_entity_data
-    {
-        std::vector<float> vertices;
-        std::vector<int> indices;
-        transform transform{};
-        bool dynamically_colored;
-
-        virtual ~render_entity_data() = default;
-
-        virtual void update(float delta_time) = 0;
-
-    };
-
-    struct render_entity
-    {
-        std::unique_ptr<shader_program> ShaderProgram;
-        std::unique_ptr<vertex_array> VertexArray;
-        std::unique_ptr<vertex_buffer> VertexBuffer;
-        std::unique_ptr<index_buffer> IndexBuffer;
-
-        std::shared_ptr<render_entity_data> RenderEntityData;
-
-
-        render_entity() = default;
-        ~render_entity() = default;
-
-        render_entity(const render_entity&) = delete;
-        render_entity& operator=(const render_entity&) = delete;
-
-        render_entity(render_entity&&) = default;
-        render_entity& operator=(render_entity&&) = default;
-    };
-
 
     class renderer
     {

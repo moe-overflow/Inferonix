@@ -28,6 +28,7 @@ set(
         Renderer/vertex_array.cpp
         Renderer/vertex_buffer.cpp
         Renderer/transform.hpp
+        Renderer/render_entity.hpp
 )
 
 set(
