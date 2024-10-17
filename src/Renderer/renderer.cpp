@@ -1,7 +1,6 @@
 #include "renderer.hpp"
 
 #include <spdlog/spdlog.h>
-#include <Game/game.hpp>
 #include <utility>
 
 using namespace Inferonix::Renderer;
@@ -9,7 +8,6 @@ using namespace Inferonix::Renderer;
 renderer::renderer(std::shared_ptr<Interface::window> window) :
     _window_instance(std::move(window))
 {
-
 
     log_info();
 
@@ -20,10 +18,7 @@ renderer::renderer(std::shared_ptr<Interface::window> window) :
     // for debugging
     glEnable(GL_DEBUG_OUTPUT);
 
-    // set_clear_color(0.1f, 0.5f, 0.7f, 1.0f);
-
-    // todo:
-    // _main_camera = std::make_shared<Scene::camera>(camera_settings);
+    set_clear_color(0.1f, 0.5f, 0.7f, 1.0f);
 
 }
 

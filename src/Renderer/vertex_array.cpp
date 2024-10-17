@@ -16,7 +16,6 @@ void vertex_array::bind() const
 
 void vertex_array::unbind() const
 {
-    spdlog::info("Unbinding vertex array with id: {}", _id);
     glBindVertexArray(0);
 }
 
