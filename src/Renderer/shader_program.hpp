@@ -17,6 +17,13 @@ namespace Inferonix::Renderer
     public:
         shader_program();
         ~shader_program();
+
+        shader_program(const shader_program&) = delete;
+        shader_program(shader_program&& other) noexcept;
+
+        shader_program& operator=(const shader_program&) = delete;
+        shader_program& operator=(shader_program&& other) noexcept;
+
         void use() const;
         void unuse() const;
         void attach_shaders();

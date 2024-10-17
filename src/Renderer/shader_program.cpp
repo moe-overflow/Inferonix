@@ -33,6 +33,24 @@ shader_program::~shader_program()
     glDeleteProgram(*_id);
 }
 
+shader_program::shader_program(shader_program&& other) noexcept :
+    _id(std::move(other._id)),
+    _vertex_shader(std::move(other._vertex_shader)),
+    _fragment_shader(std::move(other._fragment_shader))
+{}
+
+shader_program& shader_program::operator=(shader_program&& other) noexcept
+{
+    if(this != &other)
+    {
+        using std::swap;
+        swap(_id, other._id);
+        swap(_vertex_shader, other._vertex_shader);
+        swap(_fragment_shader, other._fragment_shader);
+    }
+    return *this;
+}
+
 void shader_program::use() const
 {
     glUseProgram(*_id);

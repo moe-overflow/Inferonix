@@ -47,7 +47,26 @@ namespace Inferonix::Renderer
         render_entity(const render_entity&) = delete;
         render_entity& operator=(const render_entity&) = delete;
 
-        render_entity(render_entity&&) = default;
-        render_entity& operator=(render_entity&&) = default;
+        render_entity(render_entity&& other) noexcept :
+            ShaderProgram(std::move(other.ShaderProgram)),
+            VertexArray(std::move(other.VertexArray)),
+            VertexBuffer(std::move(other.VertexBuffer)),
+            IndexBuffer(std::move(other.IndexBuffer)),
+            RenderEntityData(std::move(other.RenderEntityData))
+        {}
+
+        render_entity& operator=(render_entity&& other) noexcept
+        {
+            if(this != &other)
+            {
+                using std::swap;
+                swap(ShaderProgram, other.ShaderProgram);
+                swap(VertexArray, other.VertexArray);
+                swap(VertexBuffer, other.VertexBuffer);
+                swap(IndexBuffer, other.IndexBuffer);
+                swap(RenderEntityData, other.RenderEntityData);
+            }
+            return *this;
+        }
     };
 }

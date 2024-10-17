@@ -14,7 +14,10 @@ namespace Inferonix::Renderer
 
     public:
         vertex_array();
-        //~index_buffer() override;
+        ~vertex_array() = default;
+
+        vertex_array(const vertex_array& other) = delete;
+        vertex_array& operator=(const vertex_array& other) = delete;
 
         vertex_array(vertex_array&& other) noexcept : _id(std::move(other._id)) { other._id.reset(); };
         vertex_array& operator=(vertex_array&& other) noexcept {

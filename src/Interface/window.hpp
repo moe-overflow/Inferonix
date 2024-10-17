@@ -32,6 +32,15 @@ namespace Inferonix::Interface
 
         [[nodiscard]] float get_delta_time();
 
+    public:
+        window(const window&) = delete;
+        window(window&&) = delete;
+
+        window& operator=(const window&) = delete;
+        window& operator=(window&&) = delete;
+
+        ~window() = default;
+
     private:
         bool _initialized = false;
         GLFWwindow* _instance = nullptr;

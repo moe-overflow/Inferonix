@@ -18,8 +18,13 @@ namespace Inferonix::Interface
 		application();
         application(application const&) = delete;
         application(application&&) = delete;
+
+        application& operator=(const application&) = delete;
+        application& operator=(application&&) = delete;
+
 		~application() = default;
-		void run();
+
+        void run();
 		
 		window* get_window() { return _window.get(); }
 		Renderer::renderer* get_renderer() { return _renderer.get(); }

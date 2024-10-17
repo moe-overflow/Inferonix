@@ -22,13 +22,20 @@ namespace Inferonix::Renderer
     public:
         shader() = delete;
         explicit shader(shader_type type, const char* src);
-        shader(shader const&) = delete;
-        shader(shader&&) = delete;
+
         ~shader();
+
+        shader(const shader&) = delete;
+        shader(shader&& other) noexcept;
+
+        shader& operator=(const shader&) = delete;
+        shader& operator=(shader&& other) noexcept;
+
         static std::string read_from_file(const std::string& path);
         void create();
         [[nodiscard]] GLuint get() const;
         void check_errors() const;
+
 
     private:
 

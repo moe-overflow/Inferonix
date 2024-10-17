@@ -23,7 +23,29 @@ shader::~shader(){
     glDeleteShader(*_id);
 }
 
-void shader::create(){
+shader::shader(shader&& other) noexcept :
+        _id(std::move(other._id)),
+        _src_stream(std::move(other._src_stream)),
+        _src(other._src),
+        _type(other._type)
+{}
+
+shader& shader::operator=(shader&& other) noexcept
+{
+    if(this != &other)
+    {
+        using std::swap;
+        swap(_id, other._id);
+        swap(_src_stream, other._src_stream);
+        swap(_src, other._src);
+        swap(_type, other._type);
+    }
+    return *this;
+}
+
+
+void shader::create()
+{
     glShaderSource(*_id, 1, &_src, nullptr);
     glCompileShader(*_id);
 

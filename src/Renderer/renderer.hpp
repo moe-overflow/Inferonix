@@ -23,7 +23,15 @@ namespace Inferonix::Renderer
     {
     public:
         explicit renderer(std::shared_ptr<Interface::window> window);
+
+        renderer(const renderer&) = delete;
+        renderer(renderer&&) = delete;
+
+        renderer& operator=(const renderer&) = delete;
+        renderer& operator=(renderer&&) = delete;
+
         ~renderer() = default;
+
         void render();
         void add_render_entity(const std::shared_ptr<render_entity_data>& data);
         static void set_clear_color(float r, float g, float b, float a);
