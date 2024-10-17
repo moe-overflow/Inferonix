@@ -11,39 +11,38 @@ namespace Inferonix::Renderer
     {
     public:
 
-        virtual ~buffer() { if (_id) glDeleteBuffers(1, _id.get() ); }
+        virtual ~buffer() { if (_id) glDeleteBuffers(1, &_id ); }
+
         virtual void bind() const = 0;
         virtual void unbind() const = 0;
 
 
-        [[nodiscard]] inline uint32_t &get() const { return *_id; }
+        [[nodiscard]] inline uint32_t &get() { return _id; }
 
     protected:
-        //buffer() = default;
-        buffer() : _id(std::make_unique<uint32_t>(0)) { glGenBuffers(1, _id.get() ); }
-        std::unique_ptr<uint32_t> _id;
+
+        buffer() : _id(0) { glGenBuffers(1, &_id); }
+        uint32_t _id;
 
     };
 
-    class vertex_buffer : buffer
+    class vertex_buffer : public buffer
     {
     public:
         vertex_buffer() = delete;
-        //vertex_buffer();
-        explicit vertex_buffer(size_t size, const void *vertex_data);
+        explicit vertex_buffer(size_t size);
+
         ~vertex_buffer() override = default;
-        vertex_buffer(const vertex_buffer& other);
-        vertex_buffer& operator=(const vertex_buffer& other);
 
         void bind() const override;
         void unbind() const override;
 
-        void buffer_data(size_t size, const void * positions) const;
+        static void buffer_data(size_t size, const void * positions);
 
         [[nodiscard]] size_t size() const { return _size; }
 
     private:
-        uint32_t _size{};
+        uint32_t _size;
 
     };
 
@@ -51,18 +50,15 @@ namespace Inferonix::Renderer
     {
     public:
         index_buffer() = delete;
-        index_buffer(size_t count, const void* indices);
+        index_buffer(int64_t count, const void* indices);
         ~index_buffer() override = default;
-        index_buffer(const index_buffer& other);
-
-        index_buffer& operator=(const index_buffer& other);
 
         void bind() const override;
         void unbind() const override;
 
-        void buffer_data(size_t count, const void * indices);
+        void buffer_data(int64_t count, const void* indices);
 
-        [[nodiscard]] size_t count() const { return _count; }
+        [[nodiscard]] int64_t count() const { return _count; }
 
     private:
         int64_t _count{};
@@ -81,7 +77,7 @@ namespace Inferonix::Renderer
             switch (type)
             {
                 case NONE: return 0;
-                case FLOAT: return 4;
+                case FLOAT:
                 case UINT: return 4;
                 case UBYTE: return 1;
                 default: return 0;

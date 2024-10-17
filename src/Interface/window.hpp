@@ -12,19 +12,28 @@ namespace Inferonix::Interface
 {
     using delta_time_point = std::chrono::time_point<std::chrono::steady_clock>;
 
+    struct window_settings
+    {
+        int width, height;
+        std::string title;
+        bool full_screen;
+        bool v_sync;
+    };
+
     class window
 	{
 
-	public:
-		window(int width, int height);
-		~window();
+    public:
+        explicit window(const window_settings& window_settings);
+
+
         void init();
 		void create();
 		void destroy();
         GLFWwindow& get();
         [[nodiscard]] bool should_close() const;
         void swap_buffers();
-        void poll_events();
+        static void poll_events();
         [[nodiscard]] bool key_pressed(int key);
         void close();
         
@@ -44,13 +53,14 @@ namespace Inferonix::Interface
     private:
         bool _initialized = false;
         GLFWwindow* _instance = nullptr;
-        int _width, _height;
+//        int _width, _height;
+        window_settings _settings;
 
         delta_time_point _last_frame_time {};
 
 
     private:
-        void set_input_pointer_functions(GLFWwindow* window);
+        static void set_input_pointer_functions(GLFWwindow* window);
 
 
     };

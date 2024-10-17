@@ -42,7 +42,7 @@ namespace Inferonix::Renderer
         shader_type _type;
         std::unique_ptr<uint32_t> _id;
         std::unique_ptr<std::string> _src_stream;
-        const char* _src;
+        const char* _src{};
 
     };
 }

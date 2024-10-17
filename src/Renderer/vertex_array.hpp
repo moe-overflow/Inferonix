@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <glad/glad.h>
 #include <GL/gl.h>
 #include <algorithm>
@@ -16,18 +15,6 @@ namespace Inferonix::Renderer
         vertex_array();
         ~vertex_array() = default;
 
-        vertex_array(const vertex_array& other) = delete;
-        vertex_array& operator=(const vertex_array& other) = delete;
-
-        vertex_array(vertex_array&& other) noexcept : _id(std::move(other._id)) { other._id.reset(); };
-        vertex_array& operator=(vertex_array&& other) noexcept {
-            if (this != &other) { // Self-assignment check
-                _id = std::move(other._id);
-                other._id.reset();
-            }
-            return *this;
-        }
-
         void bind() const;
         void unbind() const;
 
@@ -35,7 +22,7 @@ namespace Inferonix::Renderer
         void set_index_buffer(const index_buffer& index_buffer) const;
 
     private:
-        std::unique_ptr<uint32_t> _id;
+        uint32_t _id;
 
     };
 

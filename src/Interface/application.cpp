@@ -2,14 +2,20 @@
 #include "callback_functions.hpp"
 #include "main.hpp"
 
-#include <memory>
-
 using namespace Inferonix::Interface;
 using namespace Inferonix::Renderer;
 
+window_settings editor_window_settings{
+    .width = 1920,
+    .height = 1080,
+    .title = "Inferonix Engine",
+    .full_screen = false,
+    .v_sync = false
+};
+
 application::application() :
-    _window(std::make_unique<window>(WIDTH, HEIGHT)),
-    _renderer(std::make_unique<renderer>(_window))
+    _window(std::make_shared<window>(editor_window_settings) ),
+    _renderer(std::make_shared<renderer>(_window))
 {}
 
 

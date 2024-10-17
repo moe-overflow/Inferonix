@@ -9,6 +9,8 @@ using namespace Inferonix::Renderer;
 renderer::renderer(std::shared_ptr<Interface::window> window) :
     _window_instance(std::move(window))
 {
+
+
     log_info();
 
     // todo: reserve place for vector?
@@ -18,19 +20,10 @@ renderer::renderer(std::shared_ptr<Interface::window> window) :
     // for debugging
     glEnable(GL_DEBUG_OUTPUT);
 
-    set_clear_color(0.1f, 0.5f, 0.7f, 1.0f);
+    // set_clear_color(0.1f, 0.5f, 0.7f, 1.0f);
 
     // todo:
-    Scene::camera_settings camera_settings{};
-    camera_settings._fov = 45.0f;
-    camera_settings._aspect_ratio = 16.0f / 9.0f;
-    camera_settings.near_plane = 0.1f;
-    camera_settings.far_plane = 100.0f;
-    camera_settings._position = glm::vec3(0.0f, 0.0f, 5.0f);
-    camera_settings._orientation = glm::vec3(0.0f, 0.0f, -1.0f);
-    camera_settings._up_vector = glm::vec3(0.0f, 1.0f, 0.0f);
-
-    _main_camera = std::make_shared<Scene::camera>(camera_settings);
+    // _main_camera = std::make_shared<Scene::camera>(camera_settings);
 
 }
 
@@ -44,18 +37,17 @@ void renderer::render()
         entity->ShaderProgram->use();
         entity->VertexArray->bind();
 
+        // todo: remove to render entity properties
         if(entity->RenderEntityData->dynamically_colored)
             entity->ShaderProgram->set_dynamic_color("myColor");
         else
             entity->ShaderProgram->set_uniform("myColor", 0.5f, 0.5f, 0.5f);
 
-        // todo: pass delta parameter correctly
         entity->RenderEntityData->update(delta_time);
 
         entity->ShaderProgram->set_uniform("model", entity->RenderEntityData->transform.get_matrix());
         entity->ShaderProgram->set_uniform("view", _main_camera->get_view());
         entity->ShaderProgram->set_uniform("projection", _main_camera->get_projection());
-
 
         glDrawElements(
             GL_TRIANGLES,
@@ -64,11 +56,9 @@ void renderer::render()
             nullptr
         );
 
-
         entity->VertexArray->unbind();
         entity->ShaderProgram->unuse();
     }
-
 }
 
 void renderer::add_render_entity(const std::shared_ptr<render_entity_data>& data)
@@ -108,8 +98,7 @@ std::shared_ptr<render_entity> renderer::create_render_entity(std::shared_ptr<re
 
     entity->VertexBuffer = std::make_unique<vertex_buffer>
     (
-        entity->RenderEntityData->vertices.size() * sizeof(float),
-        entity->RenderEntityData->vertices.data()
+        entity->RenderEntityData->vertices.size() * sizeof(float)
     );
 
     entity->IndexBuffer = std::make_unique<index_buffer>
@@ -131,7 +120,7 @@ std::shared_ptr<render_entity> renderer::create_render_entity(std::shared_ptr<re
     (
         entity->RenderEntityData->indices.size() * sizeof(int),
         entity->RenderEntityData->indices.data()
-    ); // todo: redundant (see ctor)
+    );
 
     vertex_buffer_layout layout1;
     layout1.push(shader_data_type::FLOAT, 3);

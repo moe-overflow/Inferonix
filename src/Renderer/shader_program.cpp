@@ -111,7 +111,7 @@ void shader_program::set_dynamic_color(const std::string& uniform_name) const
 
     auto green = static_cast<float>(cos(static_cast<double>(time_value)) * 0.5 + 0.5);
     auto blue = static_cast<float>(sin(static_cast<double>(time_value)) * 0.5 + 0.5);
-    auto red = blue * green;
+    auto red = 1.0f;
 
     set_uniform(uniform_name, red, green, blue);
 

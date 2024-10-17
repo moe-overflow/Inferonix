@@ -10,8 +10,8 @@ namespace Inferonix::Scene
 
         float _fov;
         float _aspect_ratio;
-        float near_plane;
-        float far_plane;
+        float _near_plane;
+        float _far_plane;
 
         glm::vec3 _position;
         glm::vec3 _orientation;
@@ -64,8 +64,8 @@ namespace Inferonix::Scene
             _projection_matrix = glm::perspective(
                     glm::radians(_settings._fov),
                     _settings._aspect_ratio,
-                    _settings.near_plane,
-                    _settings.far_plane
+                    _settings._near_plane,
+                    _settings._far_plane
             );
         }
 

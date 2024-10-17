@@ -1,4 +1,3 @@
-
 #include "shader.hpp"
 
 #include <glad/glad.h>
@@ -11,15 +10,14 @@ using namespace Inferonix::Renderer;
 shader::shader(shader_type type, const char* path) :
         _type { type },
         _id { std::make_unique<uint32_t>(glCreateShader(type)) },
-        _src_stream { std::make_unique<std::string>(read_from_file(path)) }
+        _src_stream { std::make_unique<std::string>(read_from_file(path)) },
+        _src { _src_stream->c_str() }
 {
-
-    _src = _src_stream->c_str();
     create();
 }
 
-
-shader::~shader(){
+shader::~shader()
+{
     glDeleteShader(*_id);
 }
 
@@ -53,11 +51,13 @@ void shader::create()
 
 }
 
-GLuint shader::get() const {
+GLuint shader::get() const
+{
     return *_id;
 }
 
-void shader::check_errors() const {
+void shader::check_errors() const
+{
     // Checking run time errors after calling 'glCompileShader()'
     int result;
     char message[512];
@@ -68,10 +68,12 @@ void shader::check_errors() const {
     }
 }
 
-std::string shader::read_from_file(const std::string& path) {
+std::string shader::read_from_file(const std::string& path)
+{
     std::ifstream source;
     std::string shader_code;
-    try {
+    try
+    {
         spdlog::info("Reading shaders source from file {}", path);
         bool found = std::filesystem::exists(path);
         if (!found)
@@ -84,7 +86,8 @@ std::string shader::read_from_file(const std::string& path) {
 
         return shader_code;
 
-    } catch (const std::ifstream::failure& e) {
+    } catch (const std::ifstream::failure& e)
+    {
         spdlog::error("Error occurred while reading shaders from disk: {}", e.what());
     }
     return "";

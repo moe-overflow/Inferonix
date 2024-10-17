@@ -9,17 +9,13 @@ using namespace Inferonix::Interface;
 using namespace Inferonix::EventSystem;
 using namespace std::chrono;
 
-window::window(int width, int height) :
-    _width{ width },
-    _height{ height },
+window::window(const window_settings&  window_settings) :
+    _settings(window_settings),
     _last_frame_time (steady_clock::now())
 {
     create();
     _initialized = true;
 }
-
-window::~window()
-{ }
 
 void window::init()
 {
@@ -39,7 +35,7 @@ void window::init()
 void window::create()
 {
     init();
-    _instance = glfwCreateWindow(_width, _height, "Engine", nullptr, nullptr);
+    _instance = glfwCreateWindow(_settings.width, _settings.height, _settings.title.c_str(), nullptr, nullptr);
     set_input_pointer_functions(_instance);
 
 	if (_instance == nullptr)

@@ -10,7 +10,7 @@ using namespace Inferonix::Interface;
 
 int main(int argc, char** argv)
 {
-    auto engine = create_app(); // std::make_unique<application>();
+    auto engine = create_app();
     engine->run();
 
 }
