@@ -1,16 +1,18 @@
 #include "window.hpp"
-#include "callback_functions.hpp"
 
 #include <stdexcept>
 #include "spdlog/spdlog.h"
-#include <glad/glad.h>
+
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 
 using namespace Inferonix::Interface;
 using namespace Inferonix::EventSystem;
 using namespace std::chrono;
 
-window::window(const window_settings&  window_settings) :
-    _settings(window_settings),
+window::window(window_settings&  window_settings) :
+    _settings(std::move(window_settings)),
+    _instance(nullptr),
     _last_frame_time (steady_clock::now())
 {
     create();

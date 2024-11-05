@@ -8,8 +8,9 @@ set(
         Interface/callback_functions.cpp
         Interface/callback_functions.hpp
         Interface/main.hpp
-        Interface/window.cpp
-        Interface/window.hpp
+        Interface/Window/window.cpp
+        Interface/Window/window.hpp
+        Interface/Window/callbacks.cpp
 
 )
 

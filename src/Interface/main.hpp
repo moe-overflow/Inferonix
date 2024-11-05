@@ -1,6 +1,6 @@
 #pragma once
 
-#include "window.hpp"
+#include "Window/window.hpp"
 #include "application.hpp"
 
 #include <memory>

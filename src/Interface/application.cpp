@@ -1,5 +1,4 @@
 #include "application.hpp"
-#include "callback_functions.hpp"
 #include "main.hpp"
 
 using namespace Inferonix::Interface;
@@ -24,12 +23,10 @@ void application::run()
     while (!_window->should_close())
     {
         _window->poll_events();
-
-        process_input(*_window);
+        _window->swap_buffers();
 
         _renderer->clear();
         _renderer->render();
 
-        _window->swap_buffers();
     }
 }

@@ -1,12 +1,11 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include "../EventSystem/event.hpp"
-#include "../EventSystem/event_handler.hpp"
+#include "EventSystem/event.hpp"
+#include "EventSystem/event_handler.hpp"
 
 #include <chrono>
+
+class GLFWwindow;
 
 namespace Inferonix::Interface
 {
@@ -21,16 +20,15 @@ namespace Inferonix::Interface
     };
 
     class window
-	{
+    {
 
     public:
-        explicit window(const window_settings& window_settings);
-
+        explicit window(window_settings& window_settings);
 
         void init();
-		void create();
-		void destroy();
-        GLFWwindow& get();
+        void create();
+        void destroy();
+
         [[nodiscard]] bool should_close() const;
         void swap_buffers();
         static void poll_events();
@@ -40,6 +38,8 @@ namespace Inferonix::Interface
         static void handle_event(Inferonix::EventSystem::event& event);
 
         [[nodiscard]] float get_delta_time();
+
+        void process_input();
 
     public:
         window(const window&) = delete;
@@ -52,8 +52,7 @@ namespace Inferonix::Interface
 
     private:
         bool _initialized = false;
-        GLFWwindow* _instance = nullptr;
-//        int _width, _height;
+        GLFWwindow* _instance;
         window_settings _settings;
 
         delta_time_point _last_frame_time {};
