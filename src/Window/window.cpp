@@ -3,17 +3,12 @@
 #include <stdexcept>
 #include "spdlog/spdlog.h"
 
-
-
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 #include "EventSystem/window_event.hpp"
 #include "EventSystem/key_event.hpp"
 #include "EventSystem/mouse_event.hpp"
-
-#include "../Input/input_helper.hpp"
-#include "../Input/key_codes.hpp"
 
 
 using namespace Inferonix::Window;
@@ -152,7 +147,7 @@ namespace
             int mods)
     {
         key_event_type type = key_event_type::none;
-        auto key = input::glfw_to_key(glfw_key);
+        auto key = *input::glfw_to_key(glfw_key);
 
         switch(action)
         {
