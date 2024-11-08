@@ -2,6 +2,9 @@
 
 #include "event.hpp"
 
+#include "../Input/input.hpp"
+#include "../Input/key_codes.hpp"
+
 namespace Inferonix::EventSystem
 {
 	enum class key_event_type
@@ -17,15 +20,15 @@ namespace Inferonix::EventSystem
 	class key_event : public event
 	{
 	public:
-		key_event(const int key_code, key_event_type type)
-			: _key_code(key_code), _type(type)
+		key_event(Input::key key, key_event_type type)
+			: _key(key), _type(type)
 		{}
 
-		[[nodiscard]] int get_key_code() const { return _key_code; }
+		[[nodiscard]] Input::key get_key() const { return _key; }
 		[[nodiscard]] key_event_type get_type() const { return _type; }
 
 	private:
-		int _key_code;
+		Input::key _key;
 		key_event_type _type;
 		
 	};

@@ -13,7 +13,7 @@
 #include <spdlog/spdlog.h>
 
 #include "../Scene/camera.hpp"
-#include "Interface/window.hpp"
+#include "../Window/window.hpp"
 
 namespace Inferonix::Renderer
 {

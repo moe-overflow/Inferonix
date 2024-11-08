@@ -1,14 +1,13 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include "../EventSystem/event.hpp"
-#include "../EventSystem/event_handler.hpp"
+#include "EventSystem/event.hpp"
+#include "EventSystem/event_handler.hpp"
 
 #include <chrono>
 
-namespace Inferonix::Interface
+class GLFWwindow;
+
+namespace Inferonix::Window
 {
     using delta_time_point = std::chrono::time_point<std::chrono::steady_clock>;
 
@@ -21,16 +20,24 @@ namespace Inferonix::Interface
     };
 
     class window
-	{
+    {
 
     public:
-        explicit window(const window_settings& window_settings);
+        explicit window(window_settings& window_settings);
+
+        window(const window&) = delete;
+        window(window&&) = delete;
+
+        window& operator=(const window&) = delete;
+        window& operator=(window&&) = delete;
+
+        ~window() = default;
 
 
         void init();
-		void create();
-		void destroy();
-        GLFWwindow& get();
+        void create();
+        void destroy();
+
         [[nodiscard]] bool should_close() const;
         void swap_buffers();
         static void poll_events();
@@ -41,19 +48,12 @@ namespace Inferonix::Interface
 
         [[nodiscard]] float get_delta_time();
 
-    public:
-        window(const window&) = delete;
-        window(window&&) = delete;
+        void process_input();
 
-        window& operator=(const window&) = delete;
-        window& operator=(window&&) = delete;
-
-        ~window() = default;
 
     private:
         bool _initialized = false;
-        GLFWwindow* _instance = nullptr;
-//        int _width, _height;
+        GLFWwindow* _instance;
         window_settings _settings;
 
         delta_time_point _last_frame_time {};

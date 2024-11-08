@@ -5,7 +5,7 @@
 
 using namespace Inferonix::Renderer;
 
-renderer::renderer(std::shared_ptr<Interface::window> window) :
+renderer::renderer(std::shared_ptr<Window::window> window) :
     _window_instance(std::move(window))
 {
 
