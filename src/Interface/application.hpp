@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/Window/window.hpp"
+#include "../Window/window.hpp"
 #include "../Renderer/renderer.hpp"
 
 #include <memory>
@@ -24,7 +24,7 @@ namespace Inferonix::Interface
         void run();
 		
 	protected:
-        std::shared_ptr<Interface::window> _window;
+        std::shared_ptr<Window::window> _window;
         std::shared_ptr<Renderer::renderer> _renderer;
 
     };

@@ -5,13 +5,16 @@ set(
 
         Interface/application.cpp
         Interface/application.hpp
-        Interface/callback_functions.cpp
-        Interface/callback_functions.hpp
         Interface/main.hpp
-        Interface/Window/window.cpp
-        Interface/Window/window.hpp
-        Interface/Window/callbacks.cpp
 
+)
+
+set(
+        WINDOW_SOURCE_FILES
+
+        Window/window.cpp
+        Window/window.hpp
+        Window/callbacks.cpp
 )
 
 set(
@@ -51,6 +54,7 @@ set(
 set(
         SOURCE_FILES
         ${INTERFACE_SOURCE_FILES}
+        ${WINDOW_SOURCE_FILES}
         ${RENDERER_SOURCE_FILES}
         ${EVENTSYSTEM_SOURCE_FILES}
         ${SCENE_SOURCE_FILES}

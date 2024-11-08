@@ -1,7 +1,7 @@
 #include "application.hpp"
 #include "main.hpp"
 
-using namespace Inferonix::Interface;
+using namespace Inferonix::Window;
 using namespace Inferonix::Renderer;
 
 window_settings editor_window_settings{

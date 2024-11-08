@@ -7,7 +7,7 @@
 
 class GLFWwindow;
 
-namespace Inferonix::Interface
+namespace Inferonix::Window
 {
     using delta_time_point = std::chrono::time_point<std::chrono::steady_clock>;
 

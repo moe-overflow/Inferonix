@@ -6,7 +6,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-using namespace Inferonix::Interface;
+using namespace Inferonix::Window;
 using namespace Inferonix::EventSystem;
 using namespace std::chrono;
 
@@ -50,7 +50,6 @@ void window::create()
     spdlog::info("Window was created successfully");
 
 	glfwMakeContextCurrent(_instance);
-    glfwSetFramebufferSizeCallback(_instance, framebuffer_size_callback);
 
     // After making context, glad is going to be initialized:
 	// maybe assertion?! from return value of gladLL (int)
@@ -82,10 +81,6 @@ void window::destroy()
     _instance = nullptr;
 }
 
-GLFWwindow& window::get()
-{
-    return *_instance;
-}
 
 bool window::key_pressed(int key)
 {
@@ -95,20 +90,6 @@ bool window::key_pressed(int key)
 void window::close()
 {
     glfwSetWindowShouldClose(_instance, GLFW_TRUE);
-}
-
-void window::set_input_pointer_functions(GLFWwindow *window)
-{
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    glfwSetKeyCallback(window, key_callback);
-
-    glfwSetCursorPosCallback(window, cursor_callback);
-    glfwSetCursorEnterCallback(window, pointer_enter_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-
-    glfwSetWindowSizeCallback(window, window_resize_callback);
-    glfwSetWindowCloseCallback(window, window_close_callback);
 }
 
 void window::handle_event(event &event)
@@ -122,4 +103,9 @@ float window::get_delta_time()
     duration<float> duration = current_frame_time - _last_frame_time;
     _last_frame_time = current_frame_time;
     return duration.count();
+}
+
+void window::process_input()
+{
+    // todo: implement me
 }
