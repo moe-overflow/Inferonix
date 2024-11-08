@@ -25,6 +25,15 @@ namespace Inferonix::Window
     public:
         explicit window(window_settings& window_settings);
 
+        window(const window&) = delete;
+        window(window&&) = delete;
+
+        window& operator=(const window&) = delete;
+        window& operator=(window&&) = delete;
+
+        ~window() = default;
+
+
         void init();
         void create();
         void destroy();
@@ -41,14 +50,6 @@ namespace Inferonix::Window
 
         void process_input();
 
-    public:
-        window(const window&) = delete;
-        window(window&&) = delete;
-
-        window& operator=(const window&) = delete;
-        window& operator=(window&&) = delete;
-
-        ~window() = default;
 
     private:
         bool _initialized = false;

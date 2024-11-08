@@ -12,9 +12,8 @@ set(
 set(
         WINDOW_SOURCE_FILES
 
-        Window/window.cpp
         Window/window.hpp
-        Window/callbacks.cpp
+        Window/window.cpp
 )
 
 set(
