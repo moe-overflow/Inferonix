@@ -9,21 +9,24 @@
 namespace Inferonix::Interface
 {
 
-	class application
-	{
-	public:
-		application();
+    class application
+    {
+    public:
+        application();
+
         application(application const&) = delete;
+
         application(application&&) = delete;
 
-        application& operator=(const application&) = delete;
-        application& operator=(application&&) = delete;
+        application &operator=(const application&) = delete;
 
-		~application() = default;
+        application &operator=(application&&) = delete;
+
+        ~application() = default;
 
         void run();
-		
-	protected:
+
+    protected:
         std::shared_ptr<Window::window> _window;
         std::shared_ptr<Renderer::renderer> _renderer;
 
@@ -31,4 +34,4 @@ namespace Inferonix::Interface
 
 }
 
-extern Inferonix::Interface::application* create_app();
+extern Inferonix::Interface::application *create_app();
