@@ -16,7 +16,7 @@ using namespace Inferonix::EventSystem;
 using namespace std::chrono;
 using namespace Inferonix::Input;
 
-window::window(window_settings&  window_settings) :
+window::window(window_settings& window_settings) :
     _settings(std::move(window_settings)),
     _instance(nullptr),
     _last_frame_time (steady_clock::now())

@@ -1,8 +1,10 @@
 #include "application.hpp"
 #include "main.hpp"
 
-using namespace Inferonix::Window;
-using namespace Inferonix::Renderer;
+using namespace Inferonix;
+using namespace Window;
+using namespace Renderer;
+using namespace UI;
 
 window_settings editor_window_settings{
     .width = 1920,
@@ -14,8 +16,11 @@ window_settings editor_window_settings{
 
 application::application() :
     _window(std::make_shared<window>(editor_window_settings) ),
-    _renderer(std::make_shared<renderer>(_window))
-{}
+    _renderer(std::make_shared<renderer>(_window)),
+    _ui_manager(std::make_shared<ui_manager>(_window))
+{
+    _ui_manager->init();
+}
 
 
 void application::run()
@@ -28,5 +33,9 @@ void application::run()
         _renderer->clear();
         _renderer->render();
 
+        _ui_manager->display_ui();
+
     }
+
+    _ui_manager->terminate();
 }

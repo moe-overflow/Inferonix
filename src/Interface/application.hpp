@@ -2,6 +2,7 @@
 
 #include "../Window/window.hpp"
 #include "../Renderer/renderer.hpp"
+#include "../UI/ui_manager.hpp"
 
 #include <memory>
 
@@ -29,6 +30,7 @@ namespace Inferonix::Interface
     protected:
         std::shared_ptr<Window::window> _window;
         std::shared_ptr<Renderer::renderer> _renderer;
+        std::shared_ptr<UI::ui_manager> _ui_manager;
 
     };
 

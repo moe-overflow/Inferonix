@@ -26,10 +26,10 @@ namespace Inferonix::Window
         explicit window(window_settings& window_settings);
 
         window(const window&) = delete;
-        window(window&&) = delete;
+        window(window&&) = default;
 
         window& operator=(const window&) = delete;
-        window& operator=(window&&) = delete;
+        window& operator=(window&&) = default;
 
         ~window() = default;
 
@@ -50,6 +50,8 @@ namespace Inferonix::Window
 
         void process_input();
 
+        [[nodiscard]] inline GLFWwindow* get_glfw_context() const { return _instance; }
+        [[nodiscard]] inline window_settings get_settings() const { return _settings; }
 
     private:
         bool _initialized = false;
