@@ -1,5 +1,6 @@
 #include "application.hpp"
 #include "main.hpp"
+#include "UI/Panels/main_panel.hpp"
 
 using namespace Inferonix;
 using namespace Window;
@@ -25,6 +26,7 @@ application::application() :
 
 void application::run()
 {
+    _ui_manager->add_panel(std::make_unique<UI::main_panel>());
     while (!_window->should_close())
     {
         _window->poll_events();
