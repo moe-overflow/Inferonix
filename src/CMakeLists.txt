@@ -11,13 +11,9 @@ add_library(
 )
 
 
-target_link_libraries(
-        ${PROJECT_NAME}
-        PUBLIC glfw
-        PUBLIC glad
-        PUBLIC spdlog::spdlog
-        PUBLIC glm::glm
-)
+include(${CMAKE_SOURCE_DIR}/deps.cmake)
+find_packages()
+link_libs(${CMAKE_PROJECT_NAME})
 
 target_include_directories(
         ${PROJECT_NAME}

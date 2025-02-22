@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "inferonix",
+  "version": "0.1",
+  "builtin-baseline": "1d0f0a396cf00af25fbcb5550917c25ac64aa240",
+  "dependencies": [
+    {
+      "name": "glfw3",
+      "version>=": "3.4#1"
+    },
+    {
+      "name": "glad",
+      "version>=": "0.1.36"
+    },
+    {
+      "name": "spdlog",
+      "version>=": "1.15.1"
+    },
+    {
+      "name": "imgui",
+      "version>=": "1.91.8",
+      "default-features": false,
+      "features": [
+        "docking-experimental",
+        "glfw-binding",
+        "opengl3-binding"
+      ]
+    },
+    {
+      "name": "glm",
+      "version>=": "1.0.1#3"
+    }
+  ]
+
+}
