@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "transform.hpp"
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 #include "../Scene/camera.hpp"
 #include "../Window/window.hpp"

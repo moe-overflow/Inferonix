@@ -1,7 +1,7 @@
 #include "input.hpp"
 
 #include <optional>
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 using namespace Inferonix::Input;
 

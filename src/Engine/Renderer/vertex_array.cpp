@@ -1,6 +1,6 @@
 #include "buffer.hpp"
 #include "vertex_array.hpp"
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 using namespace Inferonix::Renderer;
 

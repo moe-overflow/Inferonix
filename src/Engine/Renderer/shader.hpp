@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 #include <string>
 #include <string_view>
 #include <memory>

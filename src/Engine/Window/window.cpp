@@ -6,9 +6,9 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "EventSystem/window_event.hpp"
-#include "EventSystem/key_event.hpp"
-#include "EventSystem/mouse_event.hpp"
+#include "../EventSystem/window_event.hpp"
+#include "../EventSystem/key_event.hpp"
+#include "../EventSystem/mouse_event.hpp"
 
 
 using namespace Inferonix::Window;

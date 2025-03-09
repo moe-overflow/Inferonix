@@ -1,6 +1,6 @@
 #include "renderer.hpp"
 
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 #include <utility>
 
 using namespace Inferonix::Renderer;

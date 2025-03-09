@@ -2,7 +2,7 @@
 
 #include "GLFW/glfw3.h"
 #include <cmath>
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 using namespace Inferonix::Renderer;
 

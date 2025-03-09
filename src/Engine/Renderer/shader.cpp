@@ -1,9 +1,9 @@
 #include "shader.hpp"
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 #include <fstream>
 #include <filesystem>
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 using namespace Inferonix::Renderer;
 

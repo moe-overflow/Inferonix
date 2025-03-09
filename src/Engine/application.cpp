@@ -1,5 +1,5 @@
 #include "application.hpp"
-#include "main.hpp"
+#include "Workbench/Main/main.hpp"
 
 using namespace Inferonix::Window;
 using namespace Inferonix::Renderer;

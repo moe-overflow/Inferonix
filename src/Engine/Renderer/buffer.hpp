@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <vector>
-#include <glad/glad.h>
+#include "glad/glad.h"
 
 namespace Inferonix::Renderer
 {
