@@ -10,20 +10,23 @@ namespace Inferonix::Scene
     struct camera_settings
     {
 
-        float _fov;
-        float _aspect_ratio;
-        float _near_plane;
-        float _far_plane;
+        float _fov = 45.0f;
+        float _aspect_ratio = 16.0f / 9.0f;
+        float _near_plane = 0.1f;
+        float _far_plane = 100.0f;
 
-        glm::vec3 _position;
-        glm::vec3 _orientation;
-        glm::vec3 _up_vector;
+        glm::vec3 _position = glm::vec3(0.0f, 0.0f, 5.0f);
+        glm::vec3 _orientation = glm::vec3(0.0f, 0.0f, -1.0f);
+        glm::vec3 _up_vector = glm::vec3(0.0f, 1.0f, 0.0f);
 
     };
 
     class camera
     {
     public:
+        camera() : camera(camera_settings())
+        { };
+
         explicit camera(const camera_settings& settings)
             : _settings(settings)
         {
@@ -31,7 +34,7 @@ namespace Inferonix::Scene
             update_view();
         }
 
-        virtual void update(float delta_time) = 0;
+        virtual void update(float delta_time) {};
 
         void set_position(const glm::vec3& position)
         {

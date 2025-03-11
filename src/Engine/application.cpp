@@ -1,8 +1,9 @@
 #include "application.hpp"
-#include "Workbench/Main/main.hpp"
 
+using namespace Inferonix;
 using namespace Inferonix::Window;
 using namespace Inferonix::Renderer;
+using namespace Inferonix::Project;
 
 window_settings editor_window_settings{
     .width = 1920,
@@ -14,8 +15,17 @@ window_settings editor_window_settings{
 
 application::application() :
     _window(std::make_shared<window>(editor_window_settings) ),
-    _renderer(std::make_shared<renderer>(_window))
-{}
+    _renderer(std::make_shared<renderer>(_window)),
+    _project(std::make_unique<project>())
+{
+    _renderer->set_camera(_project->get_main_camera());
+
+    for(const auto& entity_data : _project->get_entities_data())
+    {
+        _renderer->add_render_entity(entity_data);
+        EventSystem::event_handler::get()->subscribe(entity_data);
+    }
+}
 
 
 void application::run()

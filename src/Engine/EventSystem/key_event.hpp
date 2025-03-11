@@ -2,8 +2,8 @@
 
 #include "event.hpp"
 
-#include "Engine/Input/input.hpp"
-#include "Engine/Input/key_codes.hpp"
+#include "Input/input.hpp"
+#include "Input/key_codes.hpp"
 
 namespace Inferonix::EventSystem
 {

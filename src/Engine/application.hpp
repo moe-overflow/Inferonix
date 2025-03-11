@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Engine/Window/window.hpp"
-#include "Engine/Renderer/renderer.hpp"
-
 #include <memory>
 
+#include "Window/window.hpp"
+#include "Renderer/renderer.hpp"
+#include "Project/project.hpp"
 
-namespace Inferonix::Interface
+namespace Inferonix
 {
 
     class application
@@ -29,9 +29,7 @@ namespace Inferonix::Interface
     protected:
         std::shared_ptr<Window::window> _window;
         std::shared_ptr<Renderer::renderer> _renderer;
-
+        std::unique_ptr<Project::project> _project;
     };
 
 }
-
-extern Inferonix::Interface::application *create_app();
