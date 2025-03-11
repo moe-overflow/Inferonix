@@ -5,7 +5,7 @@ file(
 )
 
 add_library(
-        ${CMAKE_PROJECT_NAME}
+        InferonixEngine
         STATIC
         ${SOURCE_FILES}
 )
@@ -13,10 +13,10 @@ add_library(
 
 include(${CMAKE_SOURCE_DIR}/deps.cmake)
 find_packages()
-link_libs(${CMAKE_PROJECT_NAME})
+link_libs(InferonixEngine)
 
 target_include_directories(
-        ${PROJECT_NAME}
+        InferonixEngine
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
