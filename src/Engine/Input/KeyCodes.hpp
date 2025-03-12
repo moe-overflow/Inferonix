@@ -14,6 +14,7 @@ namespace Inferonix::InputSystem
         A,
         S,
         D,
+        Q,
         SPACE,
         ESC,
         R_CTRL,
@@ -23,7 +24,12 @@ namespace Inferonix::InputSystem
         ENTER,
         TAB,
         NUM1,
-        NUM2
+        NUM2,
+        F1,
+        I,
+        J,
+        L,
+        K
     };
 
 

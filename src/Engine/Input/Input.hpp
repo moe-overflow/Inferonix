@@ -16,16 +16,14 @@ namespace Inferonix::InputSystem
 
         Input& operator=(Input const&) = delete;
 
-        static bool is_key_down(Key key);
+        static bool IsKeyDown(Key key);
 
-        static void set_key_down(Key key);
+        static void SetKeyDown(Key key);
 
-        static void set_key_up(Key key);
+        static void SetKeyUp(Key key);
 
-
-        static std::optional<Key> glfw_to_key(int glfw_key_code);
 
     private:
-        static std::unordered_map<Key, bool> keys;
+        static std::unordered_map<Key, bool> _keys;
     };
 } // namespace Inferonix::InputSystem

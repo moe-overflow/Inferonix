@@ -43,7 +43,7 @@ void Window::Create()
 {
     Init();
     _instance = glfwCreateWindow(_settings.Width, _settings.Height, _settings.Title.c_str(), nullptr, nullptr);
-    set_input_pointer_functions(_instance);
+    SetInputPointerFunctions(_instance);
 
     if (_instance == nullptr)
     {
@@ -109,39 +109,77 @@ float Window::GetDeltaTime()
 // GLFW callback functions
 namespace
 {
-    void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+    std::optional<Key> GlfwToKey(int glfw_key_code)
+    {
+        switch (glfw_key_code)
+        {
+            case GLFW_KEY_W:
+                return Key::W;
+            case GLFW_KEY_A:
+                return Key::A;
+            case GLFW_KEY_S:
+                return Key::S;
+            case GLFW_KEY_D:
+                return Key::D;
+            case GLFW_KEY_UP:
+                return Key::UP;
+            case GLFW_KEY_DOWN:
+                return Key::DOWN;
+            case GLFW_KEY_LEFT:
+                return Key::LEFT;
+            case GLFW_KEY_RIGHT:
+                return Key::RIGHT;
+            case GLFW_KEY_Q:
+                return Key::Q;
+            case GLFW_KEY_J:
+                return Key::J;
+            case GLFW_KEY_K:
+                return Key::K;
+            case GLFW_KEY_L:
+                return Key::L;
+            case GLFW_KEY_I:
+                return Key::I;
+            case GLFW_KEY_F1:
+                return Key::F1;
+            default:
+                spdlog::warn("GLFW key code {} not known", glfw_key_code);
+        }
+        return std::nullopt;
+    }
+
+    void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
     {
         glViewport(0, 0, width, height);
     }
 
-    void window_close_callback(GLFWwindow* window)
+    void WindowCloseCallback(GLFWwindow* window)
     {
         WindowEvent e(WindowEventType::WindowClose);
         Window::HandleEvent(e);
     }
 
-    void window_resize_callback(GLFWwindow* window, int width, int height)
+    void WindowResizeCallback(GLFWwindow* window, int width, int height)
     {
         WindowEvent e(WindowEventType::WindowResize, width, height);
         Window::HandleEvent(e);
     }
 
-    void key_callback(GLFWwindow* window, int glfw_key, int scan_code, int action, int mods)
+    void KeyCallback(GLFWwindow* window, int glfw_key, int scan_code, int action, int mods)
     {
         KeyEventType type = KeyEventType::None;
-        auto key = *Input::glfw_to_key(glfw_key);
+        auto key = *GlfwToKey(glfw_key);
 
         switch (action)
         {
             case GLFW_PRESS:
                 type = KeyEventType::KeyPressedEvent;
-                Input::set_key_down(key);
+                Input::SetKeyDown(key);
 
                 break;
 
             case GLFW_REPEAT:
                 type = KeyEventType::KeyRepeatEvent;
-                Input::set_key_up(key);
+                Input::SetKeyUp(key);
                 break;
 
             case GLFW_RELEASE:
@@ -157,42 +195,42 @@ namespace
         Window::HandleEvent(e);
     }
 
-    void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+    void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
         MouseButton e;
 
         if (action == GLFW_PRESS)
-            e = MouseButton(mouse_event_type::mouse_button_clicked, button);
+            e = MouseButton(MouseEventType::MouseButtonClicked, button);
 
         else if (action == GLFW_RELEASE)
-            e = MouseButton(mouse_event_type::mouse_button_released, button);
+            e = MouseButton(MouseEventType::MouseButtonReleased, button);
 
 
         Window::HandleEvent(e);
     }
 
-    void cursor_callback(GLFWwindow* window, double x, double y)
+    void CursorCallback(GLFWwindow* window, double x, double y)
     {
-        MouseCursorMoved e(mouse_event_type::mouse_pointer_moved, static_cast<int>(x), static_cast<int>(y));
+        MouseCursorMoved e(MouseEventType::MousePointerMoved, static_cast<int>(x), static_cast<int>(y));
         Window::HandleEvent(e);
     }
 
-    void pointer_enter_callback(GLFWwindow* window, int entered)
+    void PointerEnterCallback(GLFWwindow* window, int entered)
     {
-        Inferonix::EventSystem::mouse_event_type type = Inferonix::EventSystem::mouse_event_type::none;
+        Inferonix::EventSystem::MouseEventType type = Inferonix::EventSystem::MouseEventType::None;
         bool in_window = false;
 
         switch (entered)
         {
             case 1:
             {
-                type = Inferonix::EventSystem::mouse_event_type::mouse_pointer_entered;
+                type = Inferonix::EventSystem::MouseEventType::MousePointerEntered;
                 in_window = true;
                 break;
             }
             case 0:
             {
-                type = Inferonix::EventSystem::mouse_event_type::mouse_pointer_entered;
+                type = Inferonix::EventSystem::MouseEventType::MousePointerEntered;
                 in_window = false;
                 break;
             }
@@ -206,16 +244,16 @@ namespace
 } // namespace
 
 
-void Window::set_input_pointer_functions(GLFWwindow* glfw_window)
+void Window::SetInputPointerFunctions(GLFWwindow* glfw_window)
 {
-    glfwSetFramebufferSizeCallback(glfw_window, framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(glfw_window, FramebufferSizeCallback);
 
-    glfwSetKeyCallback(glfw_window, key_callback);
+    glfwSetKeyCallback(glfw_window, KeyCallback);
 
-    glfwSetCursorPosCallback(glfw_window, cursor_callback);
-    glfwSetCursorEnterCallback(glfw_window, pointer_enter_callback);
-    glfwSetMouseButtonCallback(glfw_window, mouse_button_callback);
+    glfwSetCursorPosCallback(glfw_window, CursorCallback);
+    glfwSetCursorEnterCallback(glfw_window, PointerEnterCallback);
+    glfwSetMouseButtonCallback(glfw_window, MouseButtonCallback);
 
-    glfwSetWindowSizeCallback(glfw_window, window_resize_callback);
-    glfwSetWindowCloseCallback(glfw_window, window_close_callback);
+    glfwSetWindowSizeCallback(glfw_window, WindowResizeCallback);
+    glfwSetWindowCloseCallback(glfw_window, WindowCloseCallback);
 }

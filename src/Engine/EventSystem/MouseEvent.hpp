@@ -4,13 +4,13 @@
 
 namespace Inferonix::EventSystem
 {
-    enum class mouse_event_type
+    enum class MouseEventType
     {
-        none = 0,
-        mouse_button_clicked,
-        mouse_button_released,
-        mouse_pointer_moved,
-        mouse_pointer_entered
+        None = 0,
+        MouseButtonClicked,
+        MouseButtonReleased,
+        MousePointerMoved,
+        MousePointerEntered
 
     };
 
@@ -18,26 +18,26 @@ namespace Inferonix::EventSystem
     class MouseEvent : public Event
     {
     public:
-        MouseEvent() : _type(mouse_event_type::none) { }
+        MouseEvent() : _type(MouseEventType::None) { }
 
-        explicit MouseEvent(mouse_event_type type) : _type(type) { }
+        explicit MouseEvent(MouseEventType type) : _type(type) { }
 
-        [[nodiscard]] mouse_event_type GetType() const
+        [[nodiscard]] MouseEventType GetType() const
         {
             return _type;
         }
 
 
     public:
-        mouse_event_type _type;
+        MouseEventType _type;
     };
 
     class MouseButton : public MouseEvent
     {
     public:
-        MouseButton(mouse_event_type type, int button) : MouseEvent(type), _button_code(button) { }
+        MouseButton(MouseEventType type, int button) : MouseEvent(type), _button_code(button) { }
 
-        MouseButton() : MouseEvent(mouse_event_type::none), _button_code(-1) { }
+        MouseButton() : MouseEvent(MouseEventType::None), _button_code(-1) { }
 
     private:
         int _button_code;
@@ -47,7 +47,7 @@ namespace Inferonix::EventSystem
     class MouseCursorEntered : public MouseEvent
     {
     public:
-        MouseCursorEntered(mouse_event_type type, bool in) : MouseEvent(type), _cursor_within_window(in) { }
+        MouseCursorEntered(MouseEventType type, bool in) : MouseEvent(type), _cursor_within_window(in) { }
 
         [[nodiscard]] bool IsWithinWindow() const
         {
@@ -61,7 +61,7 @@ namespace Inferonix::EventSystem
     class MouseCursorMoved : public MouseEvent
     {
     public:
-        MouseCursorMoved(mouse_event_type type, int x, int y) : MouseEvent(type), _x(x), _y(y) { }
+        MouseCursorMoved(MouseEventType type, int x, int y) : MouseEvent(type), _x(x), _y(y) { }
 
     private:
         int _x, _y;

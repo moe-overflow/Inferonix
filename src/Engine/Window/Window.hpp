@@ -60,7 +60,7 @@ namespace Inferonix::Window
 
 
     private:
-        static void set_input_pointer_functions(GLFWwindow* window);
+        static void SetInputPointerFunctions(GLFWwindow* glfw_window);
     };
 
 } // namespace Inferonix::Window
