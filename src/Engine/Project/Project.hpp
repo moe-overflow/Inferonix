@@ -6,6 +6,7 @@
 #include "../Scene/Camera.hpp"
 #include "DemoCamera.hpp"
 #include "DemoEntity.hpp"
+#include "DemoEntity2.hpp"
 
 namespace Inferonix::Project
 {
@@ -15,7 +16,8 @@ namespace Inferonix::Project
         Project()
         {
             _main_camera = std::make_shared<DemoCamera>();
-            _demo_entities.push_back(std::make_shared<DemoEntity>());
+            AddEntityData<DemoEntity>();
+            AddEntityData<DemoEntity2>();
         }
 
         [[nodiscard]] std::shared_ptr<Scene::Camera> GetMainCamera()
@@ -23,15 +25,25 @@ namespace Inferonix::Project
             return _main_camera;
         }
 
-        [[nodiscard]] std::vector<std::shared_ptr<DemoEntity>> const& GetEntitiesData() const
+        [[nodiscard]] std::vector<std::shared_ptr<Renderer::RenderEntityData>> const& GetEntitiesData() const
         {
             return _demo_entities;
         }
 
-    private:
+        template<typename T, typename... Args>
+        T& AddEntityData(Args&&... args)
+        {
+            auto entity = std::make_shared<T>(std::forward<Args>(args)...);
+            T& ref = *entity;
+            _demo_entities.emplace_back(std::move(entity));
+            return ref;
+        }
+
+
+        private:
         std::shared_ptr<DemoCamera> _main_camera;
 
-        std::vector<std::shared_ptr<DemoEntity>> _demo_entities;
+        std::vector<std::shared_ptr<Renderer::RenderEntityData>> _demo_entities;
 
         // std::vector<std::shared_ptr<Scene::Camera>> _secondary_cameras;
     };

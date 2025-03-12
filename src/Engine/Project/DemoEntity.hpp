@@ -8,13 +8,14 @@
 namespace Inferonix::Project
 {
 
-    class DemoEntity : public Renderer::RenderEntityData, public EventSystem::EventListener
+    class DemoEntity : public Renderer::RenderEntityData
     {
     public:
         DemoEntity()
         {
             MeshInstance = std::make_shared<Renderer::Mesh>(RESOURCES_PATH "/models/Monkey.obj");
             DynamicallyColored = true;
+            Transform.Position = {2, 3, 1};
         }
 
         void Update(float delta_time) override
@@ -25,16 +26,16 @@ namespace Inferonix::Project
             float const player_speed = 1.F;
             float const rotate_speed = 30.F;
 
-            if (Input::is_key_down(Key::UP))
+            if (Input::IsKeyDown(Key::UP))
                 Transform.Translate(glm::vec3(0.0f, player_speed * delta_time, 0.0f));
-            else if (Input::is_key_down(Key::LEFT))
+            else if (Input::IsKeyDown(Key::LEFT))
                 Transform.Translate(glm::vec3(-player_speed * delta_time, 0.0f, 0.0f));
-            else if (Input::is_key_down(Key::DOWN))
+            else if (Input::IsKeyDown(Key::DOWN))
                 Transform.Translate(glm::vec3(0.0f, -player_speed * delta_time, 0.0f));
-            else if (Input::is_key_down(Key::RIGHT))
+            else if (Input::IsKeyDown(Key::RIGHT))
                 Transform.Translate(glm::vec3(player_speed * delta_time, 0.0f, 0.0f));
 
-            Transform.Rotate(glm::vec3(0.F, rotate_speed * delta_time, 0.F));
+            Transform.Rotate(glm::vec3(rotate_speed * delta_time, rotate_speed * delta_time, rotate_speed * delta_time));
         }
 
 
@@ -46,9 +47,9 @@ namespace Inferonix::Project
             {
                 auto key = type->GetKey();
                 if (type->GetType() == EventSystem::KeyEventType::KeyPressedEvent)
-                    Input::set_key_down(key);
+                    Input::SetKeyDown(key);
                 else if (type->GetType() == EventSystem::KeyEventType::KeyReleasedEvent)
-                    Input::set_key_up(key);
+                    Input::SetKeyUp(key);
             }
         }
     };

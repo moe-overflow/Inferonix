@@ -18,7 +18,7 @@
 
 namespace Inferonix::Renderer
 {
-    class Renderer
+    class Renderer : public EventSystem::EventListener
     {
     public:
         explicit Renderer(std::shared_ptr<Window::Window> window);
@@ -55,9 +55,14 @@ namespace Inferonix::Renderer
             _main_camera = camera;
         }
 
+        void OnEvent(EventSystem::Event& event) override;
+
     private:
         std::vector<std::shared_ptr<RenderEntity>> _render_entities;
         std::shared_ptr<Scene::Camera> _main_camera;
         std::shared_ptr<Window::Window> _window_instance{};
+
+        bool _wireframe_mode{ false };
+
     };
 } // namespace Inferonix::Renderer

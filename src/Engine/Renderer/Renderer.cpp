@@ -1,6 +1,7 @@
 #include "Renderer.hpp"
 
 #include "spdlog/spdlog.h"
+#include "EventSystem/KeyEvent.hpp"
 #include <utility>
 
 using namespace Inferonix::Renderer;
@@ -124,4 +125,15 @@ std::shared_ptr<RenderEntity> Renderer::CreateRenderEntity(std::shared_ptr<Rende
     entity->VertexArray->Unbind();
 
     return entity;
+}
+void Renderer::OnEvent(Inferonix::EventSystem::Event& event)
+{
+    if (auto type = dynamic_cast<EventSystem::KeyEvent*>(&event))
+    {
+        if(type->GetKey() == InputSystem::Key::F1 && type->GetType() == EventSystem::KeyEventType::KeyPressedEvent)
+        {
+            _wireframe_mode = !_wireframe_mode;
+            glPolygonMode(GL_FRONT_AND_BACK, _wireframe_mode ? GL_LINE : GL_FILL);
+        }
+    }
 }

@@ -18,14 +18,13 @@
 
 namespace Inferonix::Renderer
 {
-    struct RenderEntityData
+    struct RenderEntityData : public EventSystem::EventListener
     {
         std::shared_ptr<Mesh> MeshInstance;
         Transform Transform{};
         bool DynamicallyColored;
-        // bool PolygonMode;
 
-        virtual ~RenderEntityData() = default;
+        ~RenderEntityData() override = default;
 
         virtual void Update(float delta_time) = 0;
     };

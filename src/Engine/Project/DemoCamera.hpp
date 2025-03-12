@@ -24,11 +24,11 @@ namespace Inferonix::Project
                 auto key = type->GetKey();
                 if (type->GetType() == Inferonix::EventSystem::KeyEventType::KeyPressedEvent)
                 {
-                    Input::set_key_down(key);
+                    Input::SetKeyDown(key);
                 }
                 else if (type->GetType() == Inferonix::EventSystem::KeyEventType::KeyReleasedEvent)
                 {
-                    Input::set_key_up(key);
+                    Input::SetKeyUp(key);
                 }
             }
         }
@@ -43,13 +43,13 @@ namespace Inferonix::Project
             glm::vec3 right = glm::normalize(glm::cross(orientation, GetSettings().UpVector));
 
 
-            if (Input::is_key_down(Key::W))
+            if (Input::IsKeyDown(Key::W))
                 SetPosition(position + orientation * camera_speed * delta);
-            if (Input::is_key_down(Key::S))
+            if (Input::IsKeyDown(Key::S))
                 SetPosition(position - orientation * camera_speed * delta);
-            if (Input::is_key_down(Key::A))
+            if (Input::IsKeyDown(Key::A))
                 SetPosition(position - right * camera_speed * delta);
-            if (Input::is_key_down(Key::D))
+            if (Input::IsKeyDown(Key::D))
                 SetPosition(position + right * camera_speed * delta);
         }
     };

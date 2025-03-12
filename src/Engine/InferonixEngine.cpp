@@ -17,6 +17,7 @@ InferonixEngine::InferonixEngine()
       _project(std::make_unique<Project::Project>())
 {
     _renderer->SetCamera(_project->GetMainCamera());
+    EventSystem::EventHandler::Get()->Subscribe(_renderer);
 
     for (auto const& entity_data : _project->GetEntitiesData())
     {
