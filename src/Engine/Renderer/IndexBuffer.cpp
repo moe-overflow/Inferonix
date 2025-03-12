@@ -17,5 +17,10 @@ void IndexBuffer::Unbind() const
 
 void IndexBuffer::BufferData(int64_t count, void const* indices)
 {
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(count), indices, GL_STATIC_DRAW);
+    glBufferData(
+            GL_ELEMENT_ARRAY_BUFFER,
+            static_cast<GLsizeiptr>(count * sizeof(unsigned int)),
+            indices,
+            GL_STATIC_DRAW
+    );
 }

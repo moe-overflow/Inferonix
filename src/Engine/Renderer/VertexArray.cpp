@@ -37,7 +37,7 @@ void VertexArray::AddVertexBuffer(VertexBuffer const& vertex_buffer, VertexBuffe
                 VertexBufferElement::ToGlType(element.type),
                 element.normalized ? GL_TRUE : GL_FALSE,
                 static_cast<GLsizei>(layout.GetStride()),
-                reinterpret_cast<void const*>(0)
+                reinterpret_cast<void const*>(offset)
         );
         offset += element.size * VertexBufferElement::GetTypeSize(element.type);
     }

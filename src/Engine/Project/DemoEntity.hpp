@@ -13,8 +13,7 @@ namespace Inferonix::Project
     public:
         DemoEntity()
         {
-            Vertices = { -.5f, -.5f, .0f, .5f, -.5f, .0f, .0f, .5f, .0f };
-            Indices = { 0, 1, 2 };
+            MeshInstance = std::make_shared<Renderer::Mesh>(RESOURCES_PATH "/models/Monkey.obj");
             DynamicallyColored = true;
         }
 
@@ -35,7 +34,7 @@ namespace Inferonix::Project
             else if (Input::is_key_down(Key::RIGHT))
                 Transform.Translate(glm::vec3(player_speed * delta_time, 0.0f, 0.0f));
 
-            Transform.Rotate(glm::vec3(0.0f, rotate_speed * delta_time, 0.0f));
+            Transform.Rotate(glm::vec3(0.F, rotate_speed * delta_time, 0.F));
         }
 
 

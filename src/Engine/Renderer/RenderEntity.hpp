@@ -14,13 +14,13 @@
 
 #include "../Scene/Camera.hpp"
 #include "../Window/Window.hpp"
+#include "Mesh.hpp"
 
 namespace Inferonix::Renderer
 {
     struct RenderEntityData
     {
-        std::vector<float> Vertices;
-        std::vector<int> Indices;
+        std::shared_ptr<Mesh> MeshInstance;
         Transform Transform{};
         bool DynamicallyColored;
         // bool PolygonMode;

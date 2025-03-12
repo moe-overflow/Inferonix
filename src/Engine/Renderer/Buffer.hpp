@@ -44,7 +44,7 @@ namespace Inferonix::Renderer
         void Bind() const override;
         void Unbind() const override;
 
-        static void BufferData(size_t size, void const* positions);
+        void BufferData(size_t size, void const* positions);
 
         [[nodiscard]] size_t Size() const
         {

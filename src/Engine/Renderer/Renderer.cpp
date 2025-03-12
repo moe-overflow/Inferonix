@@ -84,33 +84,44 @@ std::shared_ptr<RenderEntity> Renderer::CreateRenderEntity(std::shared_ptr<Rende
     entity->RenderEntityData = std::move(data);
 
     entity->ShaderProgram = std::make_unique<ShaderProgram>();
+
+    /**/
+
     entity->VertexArray = std::make_unique<VertexArray>();
 
-    entity->VertexBuffer = std::make_unique<VertexBuffer>(entity->RenderEntityData->Vertices.size() * sizeof(float));
+    entity->VertexBuffer = std::make_unique<VertexBuffer>(entity->RenderEntityData->MeshInstance->GetVertices().size() * sizeof(Vertex));
 
-    entity->IndexBuffer = std::make_unique<IndexBuffer>(
-            entity->RenderEntityData->Indices.size() * sizeof(int),
-            entity->RenderEntityData->Indices.data()
+    entity->IndexBuffer =
+            std::make_unique<IndexBuffer>(entity->RenderEntityData->MeshInstance->GetIndices().size() * sizeof(unsigned int),
+            entity->RenderEntityData->MeshInstance->GetIndices().data()
     );
+
+    /**/
 
     entity->VertexArray->Bind();
     entity->VertexBuffer->Bind();
+
     entity->VertexBuffer->BufferData(
-            entity->RenderEntityData->Vertices.size() * sizeof(float),
-            entity->RenderEntityData->Vertices.data()
+            entity->RenderEntityData->MeshInstance->GetVertices().size() * sizeof(Vertex),
+            entity->RenderEntityData->MeshInstance->GetVertices().data()
     );
 
     entity->IndexBuffer->Bind();
+
     entity->IndexBuffer->BufferData(
-            entity->RenderEntityData->Indices.size() * sizeof(int),
-            entity->RenderEntityData->Indices.data()
+            entity->RenderEntityData->MeshInstance->GetIndices().size() * sizeof(unsigned int),
+            entity->RenderEntityData->MeshInstance->GetIndices().data()
     );
 
-    VertexBufferLayout layout1;
-    layout1.Push(ShaderDatatype::FLOAT, 3);
-    entity->VertexArray->AddVertexBuffer(*entity->VertexBuffer, layout1);
+    VertexBufferLayout layout;
+    layout.Push(ShaderDatatype::FLOAT, 3); // position
+    layout.Push(ShaderDatatype::FLOAT, 3); // normal
+    entity->VertexArray->AddVertexBuffer(*entity->VertexBuffer, layout);
+
+    entity->VertexArray->SetIndexBuffer(*entity->IndexBuffer);
 
     entity->VertexBuffer->Unbind();
+    entity->VertexArray->Unbind();
 
     return entity;
 }

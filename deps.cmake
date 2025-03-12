@@ -6,7 +6,7 @@ function(find_packages)
     find_package(glad CONFIG REQUIRED)
     find_package(spdlog CONFIG REQUIRED)
     find_package(imgui CONFIG REQUIRED)
-
+    find_package(assimp CONFIG REQUIRED)
 endfunction()
 
 function(link_libs target)
@@ -17,5 +17,6 @@ function(link_libs target)
             PRIVATE glad::glad
             PRIVATE imgui::imgui
             PRIVATE spdlog::spdlog_header_only
+            PRIVATE assimp::assimp
     )
 endfunction()
