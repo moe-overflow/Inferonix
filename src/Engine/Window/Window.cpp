@@ -9,6 +9,8 @@
 #include "../EventSystem/KeyEvent.hpp"
 #include "../EventSystem/MouseEvent.hpp"
 #include "../EventSystem/WindowEvent.hpp"
+#include "../Input/KeyCodes.hpp"
+#include "../Input/Input.hpp"
 
 using namespace Inferonix::Window;
 using namespace Inferonix::EventSystem;
@@ -143,8 +145,8 @@ namespace
                 return Key::F1;
             default:
                 spdlog::warn("GLFW key code {} not known", glfw_key_code);
+                return std::nullopt;
         }
-        return std::nullopt;
     }
 
     void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -166,20 +168,23 @@ namespace
 
     void KeyCallback(GLFWwindow* window, int glfw_key, int scan_code, int action, int mods)
     {
-        KeyEventType type = KeyEventType::None;
-        auto key = *GlfwToKey(glfw_key);
+        KeyEventType type;
+        const auto key = GlfwToKey(glfw_key);
+
+        if (!key)
+            return;
 
         switch (action)
         {
             case GLFW_PRESS:
                 type = KeyEventType::KeyPressedEvent;
-                Input::SetKeyDown(key);
+                Input::SetKeyDown(*key);
 
                 break;
 
             case GLFW_REPEAT:
                 type = KeyEventType::KeyRepeatEvent;
-                Input::SetKeyUp(key);
+                Input::SetKeyUp(*key);
                 break;
 
             case GLFW_RELEASE:
@@ -187,11 +192,11 @@ namespace
                 break;
 
             default:
-
-                break;
+                spdlog::warn("Key code {} not known", glfw_key);
+                return;
         }
 
-        KeyEvent e(key, type);
+        KeyEvent e(*key, type);
         Window::HandleEvent(e);
     }
 

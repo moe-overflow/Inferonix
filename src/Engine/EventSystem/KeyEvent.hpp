@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Event.hpp"
+#include "../Input/KeyCodes.hpp"
 
-#include "Input/Input.hpp"
-#include "Input/KeyCodes.hpp"
 
 namespace Inferonix::EventSystem
 {
@@ -20,7 +19,7 @@ namespace Inferonix::EventSystem
     class KeyEvent : public Event
     {
     public:
-        KeyEvent(InputSystem::Key key, KeyEventType type) : _key(key), _type(type) { }
+        KeyEvent(InputSystem::Key key, KeyEventType type) : _key(key), _type(type) {}
 
         [[nodiscard]] InputSystem::Key GetKey() const
         {
