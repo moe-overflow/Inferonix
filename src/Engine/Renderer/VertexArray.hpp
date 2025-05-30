@@ -1,9 +1,6 @@
 #pragma once
 
 #include "Buffer.hpp"
-#include "glad/glad.h"
-#include <algorithm>
-#include <gl/GL.h>
 #include <memory>
 
 namespace Inferonix::Renderer

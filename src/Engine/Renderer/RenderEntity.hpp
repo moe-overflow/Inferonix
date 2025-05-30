@@ -20,9 +20,9 @@ namespace Inferonix::Renderer
 {
     struct RenderEntityData : public EventSystem::EventListener
     {
-        std::shared_ptr<Mesh> MeshInstance;
-        Transform Transform{};
-        bool DynamicallyColored;
+        std::shared_ptr<Mesh> mesh_instance;
+        Transform transform{};
+        bool dynamically_colored;
 
         ~RenderEntityData() override = default;
 
@@ -31,12 +31,12 @@ namespace Inferonix::Renderer
 
     struct RenderEntity
     {
-        std::unique_ptr<ShaderProgram> ShaderProgram;
-        std::unique_ptr<VertexArray> VertexArray;
-        std::unique_ptr<VertexBuffer> VertexBuffer;
-        std::unique_ptr<IndexBuffer> IndexBuffer;
+        std::unique_ptr<ShaderProgram> shaderProgram;
+        std::unique_ptr<VertexArray> vertexArray;
+        std::unique_ptr<VertexBuffer> vertexBuffer;
+        std::unique_ptr<IndexBuffer> indexBuffer;
 
-        std::shared_ptr<RenderEntityData> RenderEntityData;
+        std::shared_ptr<RenderEntityData> renderEntityData;
 
 
         RenderEntity() = default;
@@ -46,11 +46,11 @@ namespace Inferonix::Renderer
         RenderEntity& operator=(RenderEntity const&) = delete;
 
         RenderEntity(RenderEntity&& other) noexcept
-            : ShaderProgram(std::move(other.ShaderProgram)),
-              VertexArray(std::move(other.VertexArray)),
-              VertexBuffer(std::move(other.VertexBuffer)),
-              IndexBuffer(std::move(other.IndexBuffer)),
-              RenderEntityData(std::move(other.RenderEntityData))
+            : shaderProgram(std::move(other.shaderProgram)),
+              vertexArray(std::move(other.vertexArray)),
+              vertexBuffer(std::move(other.vertexBuffer)),
+              indexBuffer(std::move(other.indexBuffer)),
+              renderEntityData(std::move(other.renderEntityData))
         {
         }
 
@@ -59,11 +59,11 @@ namespace Inferonix::Renderer
             if (this != &other)
             {
                 using std::swap;
-                swap(ShaderProgram, other.ShaderProgram);
-                swap(VertexArray, other.VertexArray);
-                swap(VertexBuffer, other.VertexBuffer);
-                swap(IndexBuffer, other.IndexBuffer);
-                swap(RenderEntityData, other.RenderEntityData);
+                swap(shaderProgram, other.shaderProgram);
+                swap(vertexArray, other.vertexArray);
+                swap(vertexBuffer, other.vertexBuffer);
+                swap(indexBuffer, other.indexBuffer);
+                swap(renderEntityData, other.renderEntityData);
             }
             return *this;
         }

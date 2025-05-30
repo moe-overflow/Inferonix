@@ -13,9 +13,9 @@ namespace Inferonix::Project
     public:
         DemoEntity()
         {
-            MeshInstance = std::make_shared<Renderer::Mesh>(RESOURCES_PATH "/models/Monkey.obj");
-            DynamicallyColored = true;
-            Transform.Position = {2, 3, 1};
+            mesh_instance = std::make_shared<Renderer::Mesh>(RESOURCES_PATH "/models/Monkey.obj");
+            dynamically_colored = true;
+            transform.Position = {2, 3, 1};
         }
 
         void Update(float delta_time) override
@@ -27,15 +27,15 @@ namespace Inferonix::Project
             float const rotate_speed = 30.F;
 
             if (Input::IsKeyDown(Key::UP))
-                Transform.Translate(glm::vec3(0.0f, player_speed * delta_time, 0.0f));
+                transform.Translate(glm::vec3(0.0f, player_speed * delta_time, 0.0f));
             else if (Input::IsKeyDown(Key::LEFT))
-                Transform.Translate(glm::vec3(-player_speed * delta_time, 0.0f, 0.0f));
+                transform.Translate(glm::vec3(-player_speed * delta_time, 0.0f, 0.0f));
             else if (Input::IsKeyDown(Key::DOWN))
-                Transform.Translate(glm::vec3(0.0f, -player_speed * delta_time, 0.0f));
+                transform.Translate(glm::vec3(0.0f, -player_speed * delta_time, 0.0f));
             else if (Input::IsKeyDown(Key::RIGHT))
-                Transform.Translate(glm::vec3(player_speed * delta_time, 0.0f, 0.0f));
+                transform.Translate(glm::vec3(player_speed * delta_time, 0.0f, 0.0f));
 
-            Transform.Rotate(glm::vec3(rotate_speed * delta_time, rotate_speed * delta_time, rotate_speed * delta_time));
+            transform.Rotate(glm::vec3(rotate_speed * delta_time, rotate_speed * delta_time, rotate_speed * delta_time));
         }
 
 

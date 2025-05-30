@@ -1,15 +1,7 @@
 #pragma once
 
-#include "Buffer.hpp"
-#include "GLFW/glfw3.h"
-#include "ShaderProgram.hpp"
-#include "VertexArray.hpp"
-
-#include <cmath>
-#include <utility>
 #include <vector>
 
-#include "Transform.hpp"
 #include "spdlog/spdlog.h"
 
 #include "../Scene/Camera.hpp"
@@ -31,9 +23,9 @@ namespace Inferonix::Renderer
 
         Renderer& operator=(Renderer&&) = delete;
 
-        ~Renderer() = default;
+        ~Renderer() override = default;
 
-        void Render();
+        void Render() const;
 
         void AddRenderEntity(std::shared_ptr<RenderEntityData> const& data);
 

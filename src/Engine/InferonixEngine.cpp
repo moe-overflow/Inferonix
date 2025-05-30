@@ -5,11 +5,11 @@ using namespace Inferonix::Window;
 using namespace Inferonix::Renderer;
 using namespace Inferonix::Project;
 
-WindowSettings workbench_window_settings{ .Width = 1920,
-                                          .Height = 1080,
-                                          .Title = "Inferonix Engine",
-                                          .FullScreen = false,
-                                          .VSync = false };
+WindowSettings workbench_window_settings{ .width = 1920,
+                                          .height = 1080,
+                                          .title = "Inferonix Engine",
+                                          .full_screen = false,
+                                          .v_sync = false };
 
 InferonixEngine::InferonixEngine()
     : _window(std::make_shared<Window::Window>(workbench_window_settings)),

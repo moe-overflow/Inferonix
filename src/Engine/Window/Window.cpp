@@ -44,7 +44,7 @@ void Window::Init()
 void Window::Create()
 {
     Init();
-    _instance = glfwCreateWindow(_settings.Width, _settings.Height, _settings.Title.c_str(), nullptr, nullptr);
+    _instance = glfwCreateWindow(_settings.width, _settings.height, _settings.title.c_str(), nullptr, nullptr);
     SetInputPointerFunctions(_instance);
 
     if (_instance == nullptr)

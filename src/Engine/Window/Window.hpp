@@ -13,10 +13,10 @@ namespace Inferonix::Window
 
     struct WindowSettings
     {
-        int Width, Height;
-        std::string Title;
-        bool FullScreen;
-        bool VSync;
+        int width, height;
+        std::string title;
+        bool full_screen;
+        bool v_sync;
     };
 
     class Window

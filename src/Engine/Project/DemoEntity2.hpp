@@ -13,8 +13,8 @@ namespace Inferonix::Project
     public:
         DemoEntity2()
         {
-            MeshInstance = std::make_shared<Renderer::Mesh>(RESOURCES_PATH "/models/Cylinder.obj");
-            DynamicallyColored = true;
+            mesh_instance = std::make_shared<Renderer::Mesh>(RESOURCES_PATH "/models/Cylinder.obj");
+            dynamically_colored = true;
         }
 
         void Update(float delta_time) override
@@ -26,15 +26,15 @@ namespace Inferonix::Project
             float const rotate_speed = 30.F;
 
             if (Input::IsKeyDown(Key::I))
-                Transform.Translate(glm::vec3(0.0f, player_speed * delta_time, 0.0f));
+                transform.Translate(glm::vec3(0.0f, player_speed * delta_time, 0.0f));
             else if (Input::IsKeyDown(Key::J))
-                Transform.Translate(glm::vec3(-player_speed * delta_time, 0.0f, 0.0f));
+                transform.Translate(glm::vec3(-player_speed * delta_time, 0.0f, 0.0f));
             else if (Input::IsKeyDown(Key::K))
-                Transform.Translate(glm::vec3(0.0f, -player_speed * delta_time, 0.0f));
+                transform.Translate(glm::vec3(0.0f, -player_speed * delta_time, 0.0f));
             else if (Input::IsKeyDown(Key::L))
-                Transform.Translate(glm::vec3(player_speed * delta_time, 0.0f, 0.0f));
+                transform.Translate(glm::vec3(player_speed * delta_time, 0.0f, 0.0f));
 
-            Transform.Rotate(glm::vec3(0.F, rotate_speed * delta_time, 0.F));
+            transform.Rotate(glm::vec3(0.F, rotate_speed * delta_time, 0.F));
         }
 
 

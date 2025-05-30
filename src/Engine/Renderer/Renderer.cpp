@@ -21,32 +21,32 @@ Renderer::Renderer(std::shared_ptr<Window::Window> window) : _window_instance(st
     SetClearColor(0.1f, 0.5f, 0.7f, 1.0f);
 }
 
-void Renderer::Render()
+void Renderer::Render() const
 {
-    auto delta_time = _window_instance->GetDeltaTime();
+    auto const delta_time = _window_instance->GetDeltaTime();
     _main_camera->Update(delta_time);
 
     for (auto const& entity : _render_entities)
     {
-        entity->ShaderProgram->Use();
-        entity->VertexArray->Bind();
+        entity->shaderProgram->Use();
+        entity->vertexArray->Bind();
 
         // todo: remove to Render entity properties
-        if (entity->RenderEntityData->DynamicallyColored)
-            entity->ShaderProgram->SetDynamicColor("myColor");
+        if (entity->renderEntityData->dynamically_colored)
+            entity->shaderProgram->SetDynamicColor("myColor");
         else
-            entity->ShaderProgram->SetUniform("myColor", 0.5f, 0.5f, 0.5f);
+            entity->shaderProgram->SetUniform("myColor", 0.5f, 0.5f, 0.5f);
 
-        entity->RenderEntityData->Update(delta_time);
+        entity->renderEntityData->Update(delta_time);
 
-        entity->ShaderProgram->SetUniform("model", entity->RenderEntityData->Transform.GetMatrix());
-        entity->ShaderProgram->SetUniform("view", _main_camera->GetView());
-        entity->ShaderProgram->SetUniform("projection", _main_camera->GetProjection());
+        entity->shaderProgram->SetUniform("model", entity->renderEntityData->transform.GetMatrix());
+        entity->shaderProgram->SetUniform("view", _main_camera->GetView());
+        entity->shaderProgram->SetUniform("projection", _main_camera->GetProjection());
 
-        glDrawElements(GL_TRIANGLES, static_cast<int>(entity->IndexBuffer->Count()), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(entity->indexBuffer->Count()), GL_UNSIGNED_INT, nullptr);
 
-        entity->VertexArray->Unbind();
-        entity->ShaderProgram->Unuse();
+        entity->vertexArray->Unbind();
+        entity->shaderProgram->Unuse();
     }
 }
 
@@ -82,51 +82,51 @@ std::shared_ptr<RenderEntity> Renderer::CreateRenderEntity(std::shared_ptr<Rende
 {
     auto entity = std::make_shared<RenderEntity>();
 
-    entity->RenderEntityData = std::move(data);
+    entity->renderEntityData = std::move(data);
 
-    entity->ShaderProgram = std::make_unique<ShaderProgram>();
+    entity->shaderProgram = std::make_unique<ShaderProgram>();
 
     /**/
 
-    entity->VertexArray = std::make_unique<VertexArray>();
+    entity->vertexArray = std::make_unique<VertexArray>();
 
-    entity->VertexBuffer = std::make_unique<VertexBuffer>(entity->RenderEntityData->MeshInstance->GetVertices().size() * sizeof(Vertex));
+    entity->vertexBuffer = std::make_unique<VertexBuffer>(entity->renderEntityData->mesh_instance->GetVertices().size() * sizeof(Vertex));
 
-    entity->IndexBuffer =
-            std::make_unique<IndexBuffer>(entity->RenderEntityData->MeshInstance->GetIndices().size() * sizeof(unsigned int),
-            entity->RenderEntityData->MeshInstance->GetIndices().data()
+    entity->indexBuffer = std::make_unique<IndexBuffer>(
+        entity->renderEntityData->mesh_instance->GetIndices().size() * sizeof(unsigned int),
+        entity->renderEntityData->mesh_instance->GetIndices().data()
     );
 
     /**/
 
-    entity->VertexArray->Bind();
-    entity->VertexBuffer->Bind();
+    entity->vertexArray->Bind();
+    entity->vertexBuffer->Bind();
 
-    entity->VertexBuffer->BufferData(
-            entity->RenderEntityData->MeshInstance->GetVertices().size() * sizeof(Vertex),
-            entity->RenderEntityData->MeshInstance->GetVertices().data()
+    entity->vertexBuffer->BufferData(
+            entity->renderEntityData->mesh_instance->GetVertices().size() * sizeof(Vertex),
+            entity->renderEntityData->mesh_instance->GetVertices().data()
     );
 
-    entity->IndexBuffer->Bind();
+    entity->indexBuffer->Bind();
 
-    entity->IndexBuffer->BufferData(
-            entity->RenderEntityData->MeshInstance->GetIndices().size() * sizeof(unsigned int),
-            entity->RenderEntityData->MeshInstance->GetIndices().data()
+    entity->indexBuffer->BufferData(
+            entity->renderEntityData->mesh_instance->GetIndices().size() * sizeof(unsigned int),
+            entity->renderEntityData->mesh_instance->GetIndices().data()
     );
 
     VertexBufferLayout layout;
     layout.Push(ShaderDatatype::FLOAT, 3); // position
     layout.Push(ShaderDatatype::FLOAT, 3); // normal
-    entity->VertexArray->AddVertexBuffer(*entity->VertexBuffer, layout);
+    entity->vertexArray->AddVertexBuffer(*entity->vertexBuffer, layout);
 
-    entity->VertexArray->SetIndexBuffer(*entity->IndexBuffer);
+    entity->vertexArray->SetIndexBuffer(*entity->indexBuffer);
 
-    entity->VertexBuffer->Unbind();
-    entity->VertexArray->Unbind();
+    entity->vertexBuffer->Unbind();
+    entity->vertexArray->Unbind();
 
     return entity;
 }
-void Renderer::OnEvent(Inferonix::EventSystem::Event& event)
+void Renderer::OnEvent(EventSystem::Event& event)
 {
     if (auto type = dynamic_cast<EventSystem::KeyEvent*>(&event))
     {
