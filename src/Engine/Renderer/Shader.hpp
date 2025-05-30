@@ -36,7 +36,7 @@ namespace Inferonix::Renderer
 
         static std::string ReadFromFile(std::string const& path);
 
-        void Create();
+        void Create() const;
 
         [[nodiscard]] GLuint Get() const;
 

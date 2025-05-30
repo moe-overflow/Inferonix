@@ -76,7 +76,7 @@ void Window::PollEvents()
     glfwPollEvents();
 }
 
-void Window::SwapBuffers()
+void Window::SwapBuffers() const
 {
     glfwSwapBuffers(_instance);
 }
@@ -87,20 +87,20 @@ void Window::Destroy()
     _instance = nullptr;
 }
 
-void Window::Close()
+void Window::Close() const
 {
     glfwSetWindowShouldClose(_instance, GLFW_TRUE);
 }
 
-void Window::HandleEvent(Inferonix::EventSystem::Event& event)
+void Window::HandleEvent(Event& event)
 {
     EventHandler::Get()->Dispatch(event);
 }
 
 float Window::GetDeltaTime()
 {
-    delta_time_point current_frame_time = steady_clock::now();
-    duration<float> duration = current_frame_time - _last_frame_time;
+    delta_time_point const current_frame_time = steady_clock::now();
+    duration<float> const duration = current_frame_time - _last_frame_time;
     _last_frame_time = current_frame_time;
     return duration.count();
 }
@@ -149,24 +149,29 @@ namespace
         }
     }
 
-    void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+    void FramebufferSizeCallback([[maybe_unused]] GLFWwindow* window, int const width, int const height)
     {
         glViewport(0, 0, width, height);
     }
 
-    void WindowCloseCallback(GLFWwindow* window)
+    void WindowCloseCallback([[maybe_unused]] GLFWwindow* window)
     {
         WindowEvent e(WindowEventType::WindowClose);
         Window::HandleEvent(e);
     }
 
-    void WindowResizeCallback(GLFWwindow* window, int width, int height)
+    void WindowResizeCallback([[maybe_unused]]GLFWwindow* window, int width, int height)
     {
         WindowEvent e(WindowEventType::WindowResize, width, height);
         Window::HandleEvent(e);
     }
 
-    void KeyCallback(GLFWwindow* window, int glfw_key, int scan_code, int action, int mods)
+    void KeyCallback(
+        [[maybe_unused]] GLFWwindow* window,
+        int glfw_key,
+        [[maybe_unused]] int scan_code,
+        int const action,
+        [[maybe_unused]] int mods)
     {
         KeyEventType type;
         const auto key = GlfwToKey(glfw_key);
@@ -200,7 +205,11 @@ namespace
         Window::HandleEvent(e);
     }
 
-    void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+    void MouseButtonCallback(
+        [[maybe_unused]] GLFWwindow* window,
+        int const button,
+        int const action,
+        [[maybe_unused]]int mods)
     {
         MouseButton e;
 
@@ -214,28 +223,31 @@ namespace
         Window::HandleEvent(e);
     }
 
-    void CursorCallback(GLFWwindow* window, double x, double y)
+    void CursorCallback(
+        [[maybe_unused]] GLFWwindow* window,
+        double const x,
+        double const y)
     {
         MouseCursorMoved e(MouseEventType::MousePointerMoved, static_cast<int>(x), static_cast<int>(y));
         Window::HandleEvent(e);
     }
 
-    void PointerEnterCallback(GLFWwindow* window, int entered)
+    void PointerEnterCallback([[maybe_unused]] GLFWwindow* window, int const entered)
     {
-        Inferonix::EventSystem::MouseEventType type = Inferonix::EventSystem::MouseEventType::None;
+        auto type = MouseEventType::None;
         bool in_window = false;
 
         switch (entered)
         {
             case 1:
             {
-                type = Inferonix::EventSystem::MouseEventType::MousePointerEntered;
+                type = MouseEventType::MousePointerEntered;
                 in_window = true;
                 break;
             }
             case 0:
             {
-                type = Inferonix::EventSystem::MouseEventType::MousePointerEntered;
+                type = MouseEventType::MousePointerEntered;
                 in_window = false;
                 break;
             }
@@ -243,7 +255,7 @@ namespace
                 break;
         }
 
-        Inferonix::EventSystem::MouseCursorEntered e(type, in_window);
+        MouseCursorEntered e(type, in_window);
         Window::HandleEvent(e);
     }
 } // namespace

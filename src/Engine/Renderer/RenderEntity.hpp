@@ -1,18 +1,14 @@
 #pragma once
 
 #include "Buffer.hpp"
-#include "GLFW/glfw3.h"
 #include "ShaderProgram.hpp"
 #include "VertexArray.hpp"
-
-#include <cmath>
 #include <utility>
 #include <vector>
 
 #include "Transform.hpp"
 #include "spdlog/spdlog.h"
 
-#include "../Scene/Camera.hpp"
 #include "../Window/Window.hpp"
 #include "Mesh.hpp"
 

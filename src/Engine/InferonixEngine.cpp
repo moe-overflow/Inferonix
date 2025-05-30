@@ -27,7 +27,7 @@ InferonixEngine::InferonixEngine()
 }
 
 
-void InferonixEngine::run()
+void InferonixEngine::run() const
 {
     while (!_window->ShouldClose())
     {

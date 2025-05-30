@@ -20,7 +20,7 @@ namespace Inferonix::Renderer
         virtual void Unbind() const = 0;
 
 
-        [[nodiscard]] inline uint32_t& Get()
+        [[nodiscard]] uint32_t& Get()
         {
             return _id;
         }
@@ -33,7 +33,7 @@ namespace Inferonix::Renderer
         uint32_t _id;
     };
 
-    class VertexBuffer : public Buffer
+    class VertexBuffer final : public Buffer
     {
     public:
         VertexBuffer() = delete;
@@ -129,16 +129,16 @@ namespace Inferonix::Renderer
     public:
         VertexBufferLayout() : _stride(0) { }
 
-        [[nodiscard]] inline std::vector<VertexBufferElement> GetElements() const
+        [[nodiscard]] std::vector<VertexBufferElement> GetElements() const
         {
             return _elements;
         }
-        [[nodiscard]] inline unsigned int GetStride() const
+        [[nodiscard]] unsigned int GetStride() const
         {
             return _stride;
         }
 
-        void Push(ShaderDatatype type, uint32_t count)
+        void Push(ShaderDatatype const type, uint32_t const count)
         {
             _elements.push_back({ type, count, false });
             _stride += count * VertexBufferElement::GetTypeSize(type);

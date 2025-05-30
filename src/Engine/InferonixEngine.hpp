@@ -9,7 +9,7 @@
 namespace Inferonix
 {
 
-    class InferonixEngine
+    class InferonixEngine final
     {
     public:
         InferonixEngine();
@@ -24,7 +24,7 @@ namespace Inferonix
 
         ~InferonixEngine() = default;
 
-        void run();
+        void run() const;
 
     protected:
         std::shared_ptr<Window::Window> _window;

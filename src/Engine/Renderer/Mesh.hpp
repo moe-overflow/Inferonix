@@ -17,13 +17,13 @@ namespace Inferonix::Renderer
     {
 
     public:
-        Mesh(std::string const& path)
+        explicit Mesh(std::string const& path)
         {
             spdlog::info("Loading Mesh {}", path);
 
             Assimp::Importer importer{};
 
-            uint32_t const flags = { aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices };
+            constexpr uint32_t flags = { aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices };
 
             auto* const scene = importer.ReadFile(path, flags);
 
@@ -45,7 +45,7 @@ namespace Inferonix::Renderer
 
             for (uint64_t i{ 0 }; i < mesh->mNumFaces; i++)
             {
-                aiFace face = mesh->mFaces[i];
+                aiFace const face = mesh->mFaces[i];
                 for (uint64_t j{ 0 }; j < face.mNumIndices; j++)
                     _indices.push_back(face.mIndices[j]);
             }

@@ -12,14 +12,14 @@ namespace Inferonix::EventSystem
     };
 
 
-    class WindowEvent : public Event
+    class WindowEvent final : public Event
     {
     public:
-        WindowEvent(WindowEventType type, int x, int y) : _type(type), _x(x), _y(y) { }
+        WindowEvent(WindowEventType const& type, int const x, int const y) : _type(type), _x(x), _y(y) { }
 
-        explicit WindowEvent(WindowEventType type) : _type(type), _x(-1), _y(-1) { }
+        explicit WindowEvent(WindowEventType const type) : _type(type), _x(-1), _y(-1) { }
 
-        [[nodiscard]] WindowEventType GetType()
+        [[nodiscard]] WindowEventType GetType() const
         {
             return _type;
         }

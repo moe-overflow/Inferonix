@@ -7,7 +7,7 @@
 
 using namespace Inferonix::Renderer;
 
-Shader::Shader(ShaderType type, char const* path)
+Shader::Shader(ShaderType const type, char const* path)
     : _type{ type },
       _id{ std::make_unique<uint32_t>(glCreateShader(type)) },
       _src_stream{ std::make_unique<std::string>(ReadFromFile(path)) }
@@ -40,9 +40,9 @@ Shader& Shader::operator=(Shader&& other) noexcept
 }
 
 
-void Shader::Create()
+void Shader::Create() const
 {
-    auto src = _src_stream->c_str();
+    auto const src = _src_stream->c_str();
     glShaderSource(*_id, 1, &src, nullptr);
     glCompileShader(*_id);
 
@@ -69,13 +69,13 @@ void Shader::CheckErrors() const
 
 std::string Shader::ReadFromFile(std::string const& path)
 {
-    std::ifstream source;
-    std::string shader_code;
     try
     {
+        std::string shader_code;
+        std::ifstream source;
         spdlog::info("Reading shaders source from file {}", path);
-        bool found = std::filesystem::exists(path);
-        if (!found)
+
+        if (!std::filesystem::exists(path))
             spdlog::error("Shader file could not be found!");
         source.open(path);
         std::stringstream source_stream;

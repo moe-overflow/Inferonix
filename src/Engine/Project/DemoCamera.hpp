@@ -7,9 +7,9 @@
 
 namespace Inferonix::Project
 {
-    float const camera_speed = 10.0f;
+    constexpr float camera_speed = 10.0f;
 
-    class DemoCamera : public Inferonix::Scene::Camera, public Inferonix::EventSystem::EventListener
+    class DemoCamera final : public Scene::Camera, public EventSystem::EventListener
     {
 
     public:
@@ -19,28 +19,28 @@ namespace Inferonix::Project
         {
             using namespace Inferonix::InputSystem;
 
-            if (auto type = dynamic_cast<Inferonix::EventSystem::KeyEvent*>(&event))
+            if (auto const type = dynamic_cast<EventSystem::KeyEvent*>(&event))
             {
-                auto key = type->GetKey();
-                if (type->GetType() == Inferonix::EventSystem::KeyEventType::KeyPressedEvent)
+                auto const key = type->GetKey();
+                if (type->GetType() == EventSystem::KeyEventType::KeyPressedEvent)
                 {
                     Input::SetKeyDown(key);
                 }
-                else if (type->GetType() == Inferonix::EventSystem::KeyEventType::KeyReleasedEvent)
+                else if (type->GetType() == EventSystem::KeyEventType::KeyReleasedEvent)
                 {
                     Input::SetKeyUp(key);
                 }
             }
         }
 
-        void Update(float delta) override
+        void Update(float const delta) override
         {
             using namespace Inferonix::InputSystem;
 
-            auto position = GetSettings().Position;
-            auto orientation = GetSettings().Orientation;
+            auto const position = GetSettings().position;
+            auto const orientation = GetSettings().orientation;
 
-            glm::vec3 right = glm::normalize(glm::cross(orientation, GetSettings().UpVector));
+            glm::vec3 const right = glm::normalize(glm::cross(orientation, GetSettings().up_vector));
 
 
             if (Input::IsKeyDown(Key::W))

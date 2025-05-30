@@ -3,7 +3,7 @@
 using namespace Inferonix::Renderer;
 
 
-IndexBuffer::IndexBuffer(int64_t count, void const* indices) : Buffer(), _count(count) { }
+IndexBuffer::IndexBuffer(int64_t const count, void const* indices) : Buffer(), _count(count) { }
 
 void IndexBuffer::Bind() const
 {
@@ -15,7 +15,7 @@ void IndexBuffer::Unbind() const
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void IndexBuffer::BufferData(int64_t count, void const* indices)
+void IndexBuffer::BufferData(int64_t const count, void const* indices)
 {
     glBufferData(
             GL_ELEMENT_ARRAY_BUFFER,

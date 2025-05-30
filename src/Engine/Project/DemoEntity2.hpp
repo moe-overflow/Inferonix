@@ -8,7 +8,7 @@
 namespace Inferonix::Project
 {
 
-    class DemoEntity2 : public  Renderer::RenderEntityData
+    class DemoEntity2 final : public  Renderer::RenderEntityData
     {
     public:
         DemoEntity2()
@@ -19,11 +19,10 @@ namespace Inferonix::Project
 
         void Update(float delta_time) override
         {
-            using namespace Inferonix::InputSystem;
+            using namespace InputSystem;
 
-
-            float const player_speed = 1.F;
-            float const rotate_speed = 30.F;
+            constexpr float player_speed = 1.F;
+            constexpr float rotate_speed = 30.F;
 
             if (Input::IsKeyDown(Key::I))
                 transform.Translate(glm::vec3(0.0f, player_speed * delta_time, 0.0f));
@@ -42,9 +41,9 @@ namespace Inferonix::Project
         {
             using namespace InputSystem;
 
-            if (auto type = dynamic_cast<EventSystem::KeyEvent*>(&event))
+            if (auto const type = dynamic_cast<EventSystem::KeyEvent*>(&event))
             {
-                auto key = type->GetKey();
+                auto const key = type->GetKey();
                 if (type->GetType() == EventSystem::KeyEventType::KeyPressedEvent)
                     Input::SetKeyDown(key);
                 else if (type->GetType() == EventSystem::KeyEventType::KeyReleasedEvent)

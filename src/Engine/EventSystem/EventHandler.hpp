@@ -16,24 +16,24 @@ namespace Inferonix::EventSystem
 
         EventHandler(EventHandler const&) = delete;
 
-        inline static std::shared_ptr<EventHandler> Get()
+        static std::shared_ptr<EventHandler> Get()
         {
             static std::shared_ptr<EventHandler> event_system_instance{ new EventHandler };
             return event_system_instance;
         }
 
-        inline void Dispatch(Event& event)
+        void Dispatch(Event& event) const
         {
             for (auto& event_listener : _event_listeners)
                 event_listener->OnEvent(event);
         }
 
-        inline void Subscribe(std::shared_ptr<EventListener> const& event_listener)
+        void Subscribe(std::shared_ptr<EventListener> const& event_listener)
         {
             _event_listeners.push_back(event_listener);
         }
 
-        inline void Unsubscribe(EventListener* event_listener)
+        void Unsubscribe(EventListener* event_listener)
         {
             // todo: implement me
         }

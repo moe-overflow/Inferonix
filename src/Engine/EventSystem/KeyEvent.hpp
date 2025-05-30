@@ -19,7 +19,7 @@ namespace Inferonix::EventSystem
     class KeyEvent : public Event
     {
     public:
-        KeyEvent(InputSystem::Key key, KeyEventType type) : _key(key), _type(type) {}
+        KeyEvent(InputSystem::Key const& key, KeyEventType const type) : _key(key), _type(type) {}
 
         [[nodiscard]] InputSystem::Key GetKey() const
         {

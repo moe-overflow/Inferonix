@@ -16,11 +16,11 @@ namespace Inferonix::InputSystem
 
         Input& operator=(Input const&) = delete;
 
-        static bool IsKeyDown(Key key);
+        static bool IsKeyDown(Key const& key);
 
-        static void SetKeyDown(Key key);
+        static void SetKeyDown(Key const& key);
 
-        static void SetKeyUp(Key key);
+        static void SetKeyUp(Key const& key);
 
 
     private:

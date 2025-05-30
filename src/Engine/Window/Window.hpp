@@ -39,12 +39,12 @@ namespace Inferonix::Window
         void Destroy();
 
         [[nodiscard]] bool ShouldClose() const;
-        void SwapBuffers();
+        void SwapBuffers() const;
         static void PollEvents();
         //[[nodiscard]] bool key_pressed(int key);
-        void Close();
+        void Close() const;
 
-        static void HandleEvent(Inferonix::EventSystem::Event& event);
+        static void HandleEvent(EventSystem::Event& event);
 
         [[nodiscard]] float GetDeltaTime();
 

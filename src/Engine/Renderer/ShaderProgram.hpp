@@ -1,12 +1,10 @@
 #pragma once
 
 #include "Shader.hpp"
-#include "glad/glad.h"
 #include <memory>
 #include <string>
 
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
 namespace Inferonix::Renderer
 {
@@ -35,9 +33,9 @@ namespace Inferonix::Renderer
 
         void Unuse() const;
 
-        void AttachShaders();
+        void AttachShaders() const;
 
-        void Link();
+        void Link() const;
 
         void CheckErrors() const;
 

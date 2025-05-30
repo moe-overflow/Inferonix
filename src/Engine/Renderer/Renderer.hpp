@@ -10,7 +10,7 @@
 
 namespace Inferonix::Renderer
 {
-    class Renderer : public EventSystem::EventListener
+    class Renderer final : public EventSystem::EventListener
     {
     public:
         explicit Renderer(std::shared_ptr<Window::Window> window);

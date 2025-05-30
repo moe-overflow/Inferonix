@@ -60,13 +60,13 @@ void ShaderProgram::Unuse() const
     glUseProgram(0);
 }
 
-void ShaderProgram::AttachShaders()
+void ShaderProgram::AttachShaders() const
 {
     glAttachShader(*_id, _vertex_shader->Get());
     glAttachShader(*_id, _fragment_shader->Get());
 }
 
-void ShaderProgram::Link()
+void ShaderProgram::Link() const
 {
     glLinkProgram(*_id);
 }

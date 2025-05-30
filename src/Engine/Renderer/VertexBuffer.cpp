@@ -2,7 +2,7 @@
 
 using namespace Inferonix::Renderer;
 
-VertexBuffer::VertexBuffer(size_t size) : Buffer(), _size(size) { }
+VertexBuffer::VertexBuffer(size_t const size) : Buffer(), _size(size) { }
 
 void VertexBuffer::Bind() const
 {
@@ -14,7 +14,7 @@ void VertexBuffer::Unbind() const
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer::BufferData(size_t size, void const* positions)
+void VertexBuffer::BufferData(size_t const size, void const* positions)
 {
     glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(size), positions, GL_STATIC_DRAW);
 }

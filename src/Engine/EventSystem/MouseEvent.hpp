@@ -32,10 +32,10 @@ namespace Inferonix::EventSystem
         MouseEventType _type;
     };
 
-    class MouseButton : public MouseEvent
+    class MouseButton final : public MouseEvent
     {
     public:
-        MouseButton(MouseEventType type, int button) : MouseEvent(type), _button_code(button) { }
+        MouseButton(MouseEventType const& type, int const button) : MouseEvent(type), _button_code(button) { }
 
         MouseButton() : MouseEvent(MouseEventType::None), _button_code(-1) { }
 
@@ -44,10 +44,10 @@ namespace Inferonix::EventSystem
     };
 
 
-    class MouseCursorEntered : public MouseEvent
+    class MouseCursorEntered final : public MouseEvent
     {
     public:
-        MouseCursorEntered(MouseEventType type, bool in) : MouseEvent(type), _cursor_within_window(in) { }
+        MouseCursorEntered(MouseEventType const& type, bool const in) : MouseEvent(type), _cursor_within_window(in) { }
 
         [[nodiscard]] bool IsWithinWindow() const
         {
@@ -58,10 +58,10 @@ namespace Inferonix::EventSystem
         bool _cursor_within_window;
     };
 
-    class MouseCursorMoved : public MouseEvent
+    class MouseCursorMoved final : public MouseEvent
     {
     public:
-        MouseCursorMoved(MouseEventType type, int x, int y) : MouseEvent(type), _x(x), _y(y) { }
+        MouseCursorMoved(MouseEventType const& type, int const x, int const y) : MouseEvent(type), _x(x), _y(y) { }
 
     private:
         int _x, _y;
