@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [ main, dev, feature/* ]
+
+  pull_request:
+    branches: [ main, dev, feature/* ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Update and install dependencies
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm gcc cmake make git
+          git clone https://github.com/microsoft/vcpkg.git 
+          cd vcpkg/
+          ./bootstrap-vcpkg.sh
+        shell: bash
+
+      - name: Set VCPKG_ROOT env var
+        run: echo "VCPKG_ROOT=$(pwd)/vcpkg" >> $GITHUB_ENV
+
+      - name: Build project
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build .
+        shell: bash
