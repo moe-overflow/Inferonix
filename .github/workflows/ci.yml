@@ -29,7 +29,16 @@ jobs:
             pkgconf \
             zip \
             unzip \
-            python
+            python \      
+            libxinerama \
+            libxcursor \
+            libxrandr \
+            libx11 \
+            libxi \
+            libxext \
+            libxss \
+            glu \
+            mesa
           
           git clone https://github.com/microsoft/vcpkg.git 
           cd vcpkg/
