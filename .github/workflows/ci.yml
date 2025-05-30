@@ -19,9 +19,18 @@ jobs:
 
       - name: Update and install dependencies
         run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm base-devel
-          pacman -S --noconfirm gcc cmake make git pkgconf zip
+          pacman -Syu --noconfirm 
+          pacman -S --noconfirm 
+            base-devel \
+            gcc \
+            cmake \
+            make \
+            git \
+            pkgconf \
+            zip \
+            unzip \
+            python
+          
           git clone https://github.com/microsoft/vcpkg.git 
           cd vcpkg/
           ./bootstrap-vcpkg.sh
