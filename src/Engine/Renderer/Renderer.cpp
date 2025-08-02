@@ -2,6 +2,8 @@
 
 #include "spdlog/spdlog.h"
 #include "EventSystem/KeyEvent.hpp"
+#include "Scene/Components.hpp"
+
 #include <utility>
 
 using namespace Inferonix::Renderer;
@@ -21,38 +23,74 @@ Renderer::Renderer(std::shared_ptr<Window::Window> window) : _window_instance(st
     SetClearColor(0.1f, 0.5f, 0.7f, 1.0f);
 }
 
-void Renderer::Render() const
+void Renderer::Render(Scene::Scene const& scene)
 {
     auto const delta_time = _window_instance->GetDeltaTime();
     _main_camera->Update(delta_time);
 
-    for (auto const& entity : _render_entities)
+    auto view = scene.GetRegistry().view<Scene::MeshComponent, Scene::TransformComponent, Scene::ShaderComponent>();
+
+    for (auto entity : view)
     {
-        entity->shaderProgram->Use();
-        entity->vertexArray->Bind();
+        if (!_render_entities.contains(entity))
+            CreateRenderEntity(entity, view.get<Scene::MeshComponent>(entity));
 
-        // todo: remove to Render entity properties
-        if (entity->renderEntityData->dynamically_colored)
-            entity->shaderProgram->SetDynamicColor("myColor");
-        else
-            entity->shaderProgram->SetUniform("myColor", 0.5f, 0.5f, 0.5f);
+        auto& render_entity = _render_entities.at(entity);
+        render_entity.shader_program.Use();
+        render_entity.vertex_buffer.Bind();
 
-        entity->renderEntityData->Update(delta_time);
+        // auto& shader = view.get<Scene::ShaderComponent>(entity);
+        // auto& transform = view.get<Scene::TransformComponent>(entity);
 
-        entity->shaderProgram->SetUniform("model", entity->renderEntityData->transform.GetMatrix());
-        entity->shaderProgram->SetUniform("view", _main_camera->GetView());
-        entity->shaderProgram->SetUniform("projection", _main_camera->GetProjection());
+        // todo: uniforms
+        // entity->shaderProgram->SetUniform("model", entity->renderEntityData->transform.GetMatrix());
+        // entity->shaderProgram->SetUniform("view", _main_camera->GetView());
+        // entity->shaderProgram->SetUniform("projection", _main_camera->GetProjection());
 
-        glDrawElements(GL_TRIANGLES, static_cast<int>(entity->indexBuffer->Count()), GL_UNSIGNED_INT, nullptr);
-
-        entity->vertexArray->Unbind();
-        entity->shaderProgram->Unuse();
+        glDrawElements(GL_TRIANGLES, static_cast<int>(render_entity.index_buffer.Count()), GL_UNSIGNED_INT, nullptr);
     }
 }
 
-void Renderer::AddRenderEntity(std::shared_ptr<RenderEntityData> const& data)
+void Renderer::CreateRenderEntity(entt::entity const& entity, Scene::MeshComponent const& mesh)
 {
-    _render_entities.emplace_back(CreateRenderEntity(data));
+    RenderEntity render_entity{};
+
+    render_entity.vertex_buffer = VertexBuffer{mesh.mesh_instance->GetVertices().size() * sizeof(Vertex)};
+
+    render_entity.index_buffer = IndexBuffer
+    {
+        static_cast<signed long int>(mesh.mesh_instance->GetIndices().size() * sizeof(unsigned int)),
+        mesh.mesh_instance->GetIndices().data()
+    };
+
+    render_entity.vertex_array.Bind();
+    render_entity.vertex_buffer.Bind();
+
+    render_entity.vertex_buffer.BufferData(
+            mesh.mesh_instance->GetVertices().size() * sizeof(Vertex), mesh.mesh_instance->GetVertices().data()
+    );
+
+    render_entity.index_buffer.Bind();
+
+    render_entity.index_buffer.BufferData(
+        mesh.mesh_instance->GetIndices().size() * sizeof(unsigned int),
+        mesh.mesh_instance->GetIndices().data()
+    );
+
+    VertexBufferLayout layout;
+    layout.Push(ShaderDatatype::FLOAT, 3); // position
+    layout.Push(ShaderDatatype::FLOAT, 3); // normal
+    render_entity.vertex_array.AddVertexBuffer(render_entity.vertex_buffer, layout);
+
+    /*
+    render_entity.vertex_array.SetIndexBuffer(render_entity.index_buffer);
+    render_entity.vertex_buffer.Unbind();
+    render_entity.vertex_array.Unbind();
+    */
+
+    _render_entities[entity] = std::move{render_entity};
+
+
 }
 
 void Renderer::SetClearColor(float r, float g, float b, float a)
@@ -78,54 +116,6 @@ void Renderer::LogInfo()
     spdlog::info("Maximum number of vertex attributes supported: {}", nrAttributes);
 }
 
-std::shared_ptr<RenderEntity> Renderer::CreateRenderEntity(std::shared_ptr<RenderEntityData> data)
-{
-    auto entity = std::make_shared<RenderEntity>();
-
-    entity->renderEntityData = std::move(data);
-
-    entity->shaderProgram = std::make_unique<ShaderProgram>();
-
-    /**/
-
-    entity->vertexArray = std::make_unique<VertexArray>();
-
-    entity->vertexBuffer = std::make_unique<VertexBuffer>(entity->renderEntityData->mesh_instance->GetVertices().size() * sizeof(Vertex));
-
-    entity->indexBuffer = std::make_unique<IndexBuffer>(
-        entity->renderEntityData->mesh_instance->GetIndices().size() * sizeof(unsigned int),
-        entity->renderEntityData->mesh_instance->GetIndices().data()
-    );
-
-    /**/
-
-    entity->vertexArray->Bind();
-    entity->vertexBuffer->Bind();
-
-    entity->vertexBuffer->BufferData(
-            entity->renderEntityData->mesh_instance->GetVertices().size() * sizeof(Vertex),
-            entity->renderEntityData->mesh_instance->GetVertices().data()
-    );
-
-    entity->indexBuffer->Bind();
-
-    entity->indexBuffer->BufferData(
-            entity->renderEntityData->mesh_instance->GetIndices().size() * sizeof(unsigned int),
-            entity->renderEntityData->mesh_instance->GetIndices().data()
-    );
-
-    VertexBufferLayout layout;
-    layout.Push(ShaderDatatype::FLOAT, 3); // position
-    layout.Push(ShaderDatatype::FLOAT, 3); // normal
-    entity->vertexArray->AddVertexBuffer(*entity->vertexBuffer, layout);
-
-    entity->vertexArray->SetIndexBuffer(*entity->indexBuffer);
-
-    entity->vertexBuffer->Unbind();
-    entity->vertexArray->Unbind();
-
-    return entity;
-}
 void Renderer::OnEvent(EventSystem::Event& event)
 {
     if (auto type = dynamic_cast<EventSystem::KeyEvent*>(&event))

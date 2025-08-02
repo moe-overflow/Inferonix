@@ -29,7 +29,7 @@ namespace Inferonix
     protected:
         std::shared_ptr<Window::Window> _window;
         std::shared_ptr<Renderer::Renderer> _renderer;
-        std::unique_ptr<Project::Project> _project;
+        std::unique_ptr<Scene::Scene> _scene;
     };
 
 } // namespace Inferonix

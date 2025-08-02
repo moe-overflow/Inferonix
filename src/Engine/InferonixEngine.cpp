@@ -3,7 +3,6 @@
 using namespace Inferonix;
 using namespace Inferonix::Window;
 using namespace Inferonix::Renderer;
-using namespace Inferonix::Project;
 
 WindowSettings workbench_window_settings{ .width = 1920,
                                           .height = 1080,
@@ -14,16 +13,18 @@ WindowSettings workbench_window_settings{ .width = 1920,
 InferonixEngine::InferonixEngine()
     : _window(std::make_shared<Window::Window>(workbench_window_settings)),
       _renderer(std::make_shared<Renderer::Renderer>(_window)),
-      _project(std::make_unique<Project::Project>())
+      _scene(std::make_unique<Scene::Scene>())
 {
-    _renderer->SetCamera(_project->GetMainCamera());
+    // _renderer->SetCamera(_scene->GetMainCamera());
     EventSystem::EventHandler::Get()->Subscribe(_renderer);
 
+    /*
     for (auto const& entity_data : _project->GetEntitiesData())
     {
         _renderer->AddRenderEntity(entity_data);
         EventSystem::EventHandler::Get()->Subscribe(entity_data);
     }
+    */
 }
 
 

@@ -1,15 +1,25 @@
 #pragma once
 
-#include <vector>
-
 #include "spdlog/spdlog.h"
 
 #include "../Scene/Camera.hpp"
 #include "../Window/Window.hpp"
-#include "RenderEntity.hpp"
+#include "ShaderProgram.hpp"
+#include "VertexArray.hpp"
+#include "Buffer.hpp"
+#include "Scene/Components.hpp"
+#include "Scene/Scene.hpp"
 
 namespace Inferonix::Renderer
 {
+    struct RenderEntity
+    {
+        ShaderProgram shader_program;
+        VertexArray vertex_array;
+        VertexBuffer vertex_buffer;
+        IndexBuffer index_buffer;
+    };
+
     class Renderer final : public EventSystem::EventListener
     {
     public:
@@ -25,17 +35,13 @@ namespace Inferonix::Renderer
 
         ~Renderer() override = default;
 
-        void Render() const;
-
-        void AddRenderEntity(std::shared_ptr<RenderEntityData> const& data);
+        void Render(Scene::Scene const& scene);
 
         static void SetClearColor(float r, float g, float b, float a);
 
         static void Clear();
 
         static void LogInfo();
-
-        static std::shared_ptr<RenderEntity> CreateRenderEntity(std::shared_ptr<RenderEntityData>);
 
         [[nodiscard]] std::shared_ptr<Scene::Camera> GetCamera()
         {
@@ -49,12 +55,17 @@ namespace Inferonix::Renderer
 
         void OnEvent(EventSystem::Event& event) override;
 
+
     private:
-        std::vector<std::shared_ptr<RenderEntity>> _render_entities;
+        std::unordered_map<entt::entity, RenderEntity> _render_entities;
+
         std::shared_ptr<Scene::Camera> _main_camera;
         std::shared_ptr<Window::Window> _window_instance{};
 
         bool _wireframe_mode{ false };
+
+        void CreateRenderEntity(entt::entity const& entity, Scene::MeshComponent const& mesh);
+
 
     };
 } // namespace Inferonix::Renderer
