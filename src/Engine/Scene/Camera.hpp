@@ -15,6 +15,8 @@ namespace Inferonix::Scene
         float near_plane = 0.1f;
         float far_plane = 100.0f;
 
+        bool is_primary = false;
+
         glm::vec3 position = glm::vec3(0.0f, 0.0f, 5.0f);
         glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
         glm::vec3 up_vector = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -60,6 +62,8 @@ namespace Inferonix::Scene
         {
             return _settings;
         }
+
+        [[nodiscard]] auto IsPrimary() const{ return _settings.is_primary; }
 
     private:
         void UpdateView()

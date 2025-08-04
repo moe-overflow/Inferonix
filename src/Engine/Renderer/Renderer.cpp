@@ -25,8 +25,23 @@ Renderer::Renderer(std::shared_ptr<Window::Window> window) : _window_instance(st
 
 void Renderer::Render(Scene::Scene& scene)
 {
-    auto const delta_time = _window_instance->GetDeltaTime();
-    _main_camera->Update(delta_time);
+    //auto const delta_time = _window_instance->GetDeltaTime();
+    //_main_camera->Update(delta_time);
+
+    auto view_matrix = glm::mat4(1.0f);
+    auto projection_matrix = glm::mat4(1.0f);
+
+    auto camera_view = scene.GetRegistry().view<Scene::TransformComponent, Scene::CameraComponent>();
+    for (auto const& entity : camera_view)
+    {
+        auto& camera_component = camera_view.get<Scene::CameraComponent>(entity);
+        if (camera_component.IsPrimary())
+        {
+            view_matrix = camera_component.GetView();
+            projection_matrix = camera_component.GetProjection();
+            break;
+        }
+    }
 
 
     auto view = scene.GetRegistry().view<Scene::MeshComponent, Scene::TransformComponent>();
