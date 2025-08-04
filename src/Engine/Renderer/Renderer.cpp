@@ -23,73 +23,89 @@ Renderer::Renderer(std::shared_ptr<Window::Window> window) : _window_instance(st
     SetClearColor(0.1f, 0.5f, 0.7f, 1.0f);
 }
 
-void Renderer::Render(Scene::Scene const& scene)
+void Renderer::Render(Scene::Scene& scene)
 {
     auto const delta_time = _window_instance->GetDeltaTime();
     _main_camera->Update(delta_time);
 
-    auto view = scene.GetRegistry().view<Scene::MeshComponent, Scene::TransformComponent, Scene::ShaderComponent>();
 
+    auto view = scene.GetRegistry().view<Scene::MeshComponent, Scene::TransformComponent>();
     for (auto entity : view)
     {
-        if (!_render_entities.contains(entity))
+        auto const entity_index = static_cast<uint32_t>(entity);
+        if (entity_index >= _render_entities.size() || !_render_entities[entity_index])
             CreateRenderEntity(entity, view.get<Scene::MeshComponent>(entity));
 
-        auto& render_entity = _render_entities.at(entity);
-        render_entity.shader_program.Use();
-        render_entity.vertex_buffer.Bind();
+        auto const& render_entity = _render_entities[entity_index];
+        render_entity->shader_program->Use();
+        render_entity->vertex_array->Bind();
+
+        render_entity->shader_program->SetUniform("myColor", 0.5f, 0.5f, 0.5f);
 
         // auto& shader = view.get<Scene::ShaderComponent>(entity);
         // auto& transform = view.get<Scene::TransformComponent>(entity);
 
-        // todo: uniforms
-        // entity->shaderProgram->SetUniform("model", entity->renderEntityData->transform.GetMatrix());
-        // entity->shaderProgram->SetUniform("view", _main_camera->GetView());
-        // entity->shaderProgram->SetUniform("projection", _main_camera->GetProjection());
+        // uniforms
+        render_entity->shader_program->SetUniform(
+            "model",
+            view.get<Scene::TransformComponent>(entity).GetMatrix()
+        );
+        render_entity->shader_program->SetUniform("view", view_matrix);
+        render_entity->shader_program->SetUniform("projection", projection_matrix);
 
-        glDrawElements(GL_TRIANGLES, static_cast<int>(render_entity.index_buffer.Count()), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(render_entity->index_buffer->Count()), GL_UNSIGNED_INT, nullptr);
+
+        render_entity->vertex_array->Unbind();
+        render_entity->shader_program->Unuse();
+
     }
 }
 
-void Renderer::CreateRenderEntity(entt::entity const& entity, Scene::MeshComponent const& mesh)
+void Renderer::CreateRenderEntity(entt::entity const& entity, Scene::MeshComponent& mesh)
 {
-    RenderEntity render_entity{};
+    auto render_entity = std::make_unique<RenderEntity>(
 
-    render_entity.vertex_buffer = VertexBuffer{mesh.mesh_instance->GetVertices().size() * sizeof(Vertex)};
-
-    render_entity.index_buffer = IndexBuffer
-    {
-        static_cast<signed long int>(mesh.mesh_instance->GetIndices().size() * sizeof(unsigned int)),
-        mesh.mesh_instance->GetIndices().data()
-    };
-
-    render_entity.vertex_array.Bind();
-    render_entity.vertex_buffer.Bind();
-
-    render_entity.vertex_buffer.BufferData(
-            mesh.mesh_instance->GetVertices().size() * sizeof(Vertex), mesh.mesh_instance->GetVertices().data()
+        std::make_unique<ShaderProgram>(),
+        std::make_unique<VertexArray>(),
+        std::make_unique<VertexBuffer>(),
+        std::make_unique<IndexBuffer>
+        (
+            static_cast<long int>(mesh.GetIndices().size()),
+            mesh.GetIndices().data()
+        )
     );
 
-    render_entity.index_buffer.Bind();
+    render_entity->vertex_array->Bind();
+    render_entity->vertex_buffer->Bind();
 
-    render_entity.index_buffer.BufferData(
-        mesh.mesh_instance->GetIndices().size() * sizeof(unsigned int),
-        mesh.mesh_instance->GetIndices().data()
+    render_entity->vertex_buffer->BufferData(
+            mesh.GetVertices().size() * sizeof(Vertex), mesh.GetVertices().data()
+    );
+
+    render_entity->index_buffer->Bind();
+
+    render_entity->index_buffer->BufferData(
+        mesh.GetIndices().size() * sizeof(unsigned int),
+        mesh.GetIndices().data()
     );
 
     VertexBufferLayout layout;
     layout.Push(ShaderDatatype::FLOAT, 3); // position
     layout.Push(ShaderDatatype::FLOAT, 3); // normal
-    render_entity.vertex_array.AddVertexBuffer(render_entity.vertex_buffer, layout);
+    render_entity->vertex_array->AddVertexBuffer(*render_entity->vertex_buffer, layout);
 
-    /*
-    render_entity.vertex_array.SetIndexBuffer(render_entity.index_buffer);
-    render_entity.vertex_buffer.Unbind();
-    render_entity.vertex_array.Unbind();
-    */
 
-    _render_entities[entity] = std::move{render_entity};
+    render_entity->vertex_array->SetIndexBuffer(*render_entity->index_buffer);
+    render_entity->vertex_buffer->Unbind();
+    render_entity->vertex_array->Unbind();
 
+    /**/
+
+    auto const entity_index = static_cast<uint32_t>(entity);
+    if (entity_index >= _render_entities.size())
+        _render_entities.resize(entity_index + 1);
+
+    _render_entities[static_cast<uint32_t>(entity)] = std::move(render_entity);
 
 }
 

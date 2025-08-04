@@ -7,17 +7,17 @@
 #include "ShaderProgram.hpp"
 #include "VertexArray.hpp"
 #include "Buffer.hpp"
-#include "Scene/Components.hpp"
-#include "Scene/Scene.hpp"
+#include "../Scene/Components.hpp"
+#include "../Scene/Scene.hpp"
 
 namespace Inferonix::Renderer
 {
     struct RenderEntity
     {
-        ShaderProgram shader_program;
-        VertexArray vertex_array;
-        VertexBuffer vertex_buffer;
-        IndexBuffer index_buffer;
+        std::unique_ptr<ShaderProgram> shader_program;
+        std::unique_ptr<VertexArray> vertex_array;
+        std::unique_ptr<VertexBuffer> vertex_buffer;
+        std::unique_ptr<IndexBuffer> index_buffer;
     };
 
     class Renderer final : public EventSystem::EventListener
@@ -35,8 +35,12 @@ namespace Inferonix::Renderer
 
         ~Renderer() override = default;
 
-        void Render(Scene::Scene const& scene);
+        void Render(Scene::Scene& scene);
 
+    private:
+        void CreateRenderEntity(entt::entity const& entity, Scene::MeshComponent& mesh);
+
+    public:
         static void SetClearColor(float r, float g, float b, float a);
 
         static void Clear();
@@ -57,14 +61,13 @@ namespace Inferonix::Renderer
 
 
     private:
-        std::unordered_map<entt::entity, RenderEntity> _render_entities;
+        std::vector<std::unique_ptr<RenderEntity>> _render_entities;
 
         std::shared_ptr<Scene::Camera> _main_camera;
         std::shared_ptr<Window::Window> _window_instance{};
 
         bool _wireframe_mode{ false };
 
-        void CreateRenderEntity(entt::entity const& entity, Scene::MeshComponent const& mesh);
 
 
     };

@@ -4,6 +4,9 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
+
 namespace Inferonix::Renderer
 {
     struct Vertex

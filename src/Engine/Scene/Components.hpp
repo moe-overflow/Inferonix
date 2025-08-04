@@ -7,12 +7,8 @@
 
 namespace Inferonix::Scene
 {
-    struct MeshComponent
-    {
-        std::shared_ptr<Renderer::Mesh> mesh_instance;
-        bool dynamically_colored;
-    };
 
+    using MeshComponent = Renderer::Mesh;
     using TransformComponent = Renderer::Transform;
 
 }
