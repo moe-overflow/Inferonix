@@ -43,7 +43,6 @@ void Renderer::Render(Scene::Scene& scene)
         }
     }
 
-
     auto view = scene.GetRegistry().view<Scene::MeshComponent, Scene::TransformComponent>();
     for (auto entity : view)
     {
@@ -55,10 +54,7 @@ void Renderer::Render(Scene::Scene& scene)
         render_entity->shader_program->Use();
         render_entity->vertex_array->Bind();
 
-        render_entity->shader_program->SetUniform("myColor", 0.5f, 0.5f, 0.5f);
-
-        // auto& shader = view.get<Scene::ShaderComponent>(entity);
-        // auto& transform = view.get<Scene::TransformComponent>(entity);
+        render_entity->shader_program->SetUniform("myColor", 0.541f, 0.124f, 0.784f);
 
         // uniforms
         render_entity->shader_program->SetUniform(
@@ -76,7 +72,7 @@ void Renderer::Render(Scene::Scene& scene)
     }
 }
 
-void Renderer::CreateRenderEntity(entt::entity const& entity, Scene::MeshComponent& mesh)
+void Renderer::CreateRenderEntity(Scene::Entity const& entity, Scene::MeshComponent& mesh)
 {
     auto render_entity = std::make_unique<RenderEntity>(
 

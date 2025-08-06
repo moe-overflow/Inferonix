@@ -38,7 +38,7 @@ namespace Inferonix::Renderer
         void Render(Scene::Scene& scene);
 
     private:
-        void CreateRenderEntity(entt::entity const& entity, Scene::MeshComponent& mesh);
+        void CreateRenderEntity(Scene::Entity const& entity, Scene::MeshComponent& mesh);
 
     public:
         static void SetClearColor(float r, float g, float b, float a);

@@ -2,7 +2,6 @@
 
 #include <memory>
 
-#include "Project/Project.hpp"
 #include "Renderer/Renderer.hpp"
 #include "Window/Window.hpp"
 

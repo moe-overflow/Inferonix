@@ -33,9 +33,10 @@ void InferonixEngine::run() const
     while (!_window->ShouldClose())
     {
         _window->PollEvents();
-        _window->SwapBuffers();
 
         _renderer->Clear();
-        _renderer->Render();
+        _renderer->Render(*_scene);
+
+        _window->SwapBuffers();
     }
 }
