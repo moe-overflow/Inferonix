@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -20,9 +21,16 @@ namespace Inferonix::Renderer
     {
 
     public:
-        explicit Mesh(std::string const& path)
+        Mesh() = default;
+
+        explicit Mesh(std::string const& id, std::string const& path) : _id(id)
         {
-            spdlog::info("Loading Mesh {}", path);
+            LoadFromFile(path);
+        }
+
+        bool LoadFromFile(std::filesystem::path const& path)
+        {
+            spdlog::info(fmt::format("Loading Mesh {}", path.string()));
 
             Assimp::Importer importer{};
 
@@ -31,7 +39,10 @@ namespace Inferonix::Renderer
             auto* const scene = importer.ReadFile(path, flags);
 
             if (!scene || !scene->mRootNode)
-                throw std::runtime_error(fmt::format("Error while loading model: {}", importer.GetErrorString()));
+            {
+                spdlog::error(fmt::format("Error while loading model: {}", importer.GetErrorString()));
+                return false;
+            }
 
             aiMesh* mesh = scene->mMeshes[0];
 
@@ -43,7 +54,7 @@ namespace Inferonix::Renderer
                 };
                 _vertices.push_back(vertex);
             }
-            spdlog::info("Number of vertices: {}", mesh->mNumVertices);
+            spdlog::info(fmt::format("Number of vertices: {}", mesh->mNumVertices));
 
 
             for (uint64_t i{ 0 }; i < mesh->mNumFaces; i++)
@@ -52,7 +63,9 @@ namespace Inferonix::Renderer
                 for (uint64_t j{ 0 }; j < face.mNumIndices; j++)
                     _indices.push_back(face.mIndices[j]);
             }
-            spdlog::info("Number of indices: {}", mesh->mNumFaces);
+            spdlog::info(fmt::format("Number of indices: {}", mesh->mNumFaces));
+
+            return true;
         }
 
         [[nodiscard]] std::vector<Vertex> const& GetVertices()
@@ -67,6 +80,7 @@ namespace Inferonix::Renderer
 
 
     private:
+        std::string _id;
         std::vector<Vertex> _vertices;
         std::vector<unsigned int> _indices;
     };

@@ -15,18 +15,14 @@ namespace Inferonix::Scene
         Scene();
         ~Scene() = default;
 
-
-
         [[nodiscard]] Registry& GetRegistry() { return *_registry; }
+        [[nodiscard]] const Registry& GetRegistry() const { return *_registry; }
 
-        [[nodiscard]] const Registry& GetRegistry() const
-        {
-            return *_registry;
-        }
+        [[nodiscard]] Asset::AssetRegistry& GetAssetRegistry() { return *_asset_registry; }
+
 
     private:
         std::unique_ptr<Registry> _registry;
-
         std::unique_ptr<Asset::AssetRegistry> _asset_registry;
 
     };

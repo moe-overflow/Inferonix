@@ -1,8 +1,12 @@
 #include "InferonixEngine.hpp"
 
+#include "Utility/UUID.hpp"
+#include "Scene/Components.hpp"
+
 using namespace Inferonix;
 using namespace Inferonix::Window;
 using namespace Inferonix::Renderer;
+using namespace Inferonix::Scene;
 
 WindowSettings workbench_window_settings{ .width = 1920,
                                           .height = 1080,
@@ -18,13 +22,33 @@ InferonixEngine::InferonixEngine()
     // _renderer->SetCamera(_scene->GetMainCamera());
     EventSystem::EventHandler::Get()->Subscribe(_renderer);
 
-    /*
-    for (auto const& entity_data : _project->GetEntitiesData())
-    {
-        _renderer->AddRenderEntity(entity_data);
-        EventSystem::EventHandler::Get()->Subscribe(entity_data);
-    }
-    */
+    // Temporary: Creating hard coded scene for testing ECS
+    auto& asset_registry = _scene->GetAssetRegistry();
+    auto mesh = asset_registry.Load<Mesh>(
+        UUID::Generate(),
+        RESOURCES_PATH "models/Monkey.obj"
+    );
+
+
+    auto& registry = _scene->GetRegistry();
+    auto entity = registry.create();
+    registry.emplace<MeshComponent>(entity, *mesh.value());
+
+    Transform transform{};
+    transform.position = {0.0f, 0.0f, 0.0f};
+    registry.emplace<TransformComponent>(entity, transform);
+
+    /**/
+
+    Entity camera_entity = registry.create();
+
+    Transform camera_transform;
+    camera_transform.position = {0.0f, 0.0f, 500.0f};
+
+    registry.emplace<TransformComponent>(camera_entity, camera_transform);
+    registry.emplace<CameraComponent>(camera_entity, Camera{});
+
+
 }
 
 

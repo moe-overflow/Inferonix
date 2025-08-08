@@ -33,8 +33,10 @@ namespace Inferonix::Asset
         {
             spdlog::info("Attempting to load asset: {}", id);
 
-            if (auto const it = _assets.find(id); it == _assets.end())
-                return std::any_cast<AssetType>(it->second);
+            if (auto const it = _assets.find(id); it != _assets.end())
+            {
+                return std::any_cast<std::shared_ptr<AssetType>>(it->second);
+            }
 
             auto asset = std::make_shared<AssetType>();
             if (!asset->LoadFromFile(path))
@@ -42,7 +44,7 @@ namespace Inferonix::Asset
                 spdlog::error("Failed to load asset: {}", id);
                 return std::unexpected(std::format("Failed to load asset {}", path.string()));
             }
-            spdlog::info("Loaded asset {} from {} successfully!", id, path.string());
+            spdlog::info("Loaded asset from {} successfully!", path.string());
 
             _assets.emplace(id, asset);
             return asset;
