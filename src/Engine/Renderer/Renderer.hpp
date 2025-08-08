@@ -12,18 +12,32 @@
 
 namespace Inferonix::Renderer
 {
+    struct GraphicsProfile
+    {
+        std::string vendor = reinterpret_cast<char const*>(glGetString(GL_VENDOR));
+        std::string renderer;
+        std::string version;
+        std::string shading_language_version;
+        int nr_attributes;
+    };
+
     struct RenderEntity
     {
-        std::unique_ptr<ShaderProgram> shader_program;
-        std::unique_ptr<VertexArray> vertex_array;
-        std::unique_ptr<VertexBuffer> vertex_buffer;
-        std::unique_ptr<IndexBuffer> index_buffer;
+        ShaderProgram shader_program;
+        VertexArray vertex_array;
+        VertexBuffer vertex_buffer;
+        IndexBuffer index_buffer;
     };
 
     class Renderer final : public EventSystem::EventListener
     {
     public:
         explicit Renderer(std::shared_ptr<Window::Window> window);
+
+    private:
+        static void SetupOpenGLDebug();
+
+    public:
 
         Renderer(Renderer const&) = delete;
         Renderer(Renderer&&) = delete;
@@ -43,7 +57,7 @@ namespace Inferonix::Renderer
 
         static void Clear();
 
-        static void LogInfo();
+        void SetDeviceSpecs();
 
         [[nodiscard]] std::shared_ptr<Scene::Camera> GetCamera()
         {
@@ -66,6 +80,7 @@ namespace Inferonix::Renderer
 
         bool _wireframe_mode{ false };
 
+        GraphicsProfile _device_specs;
 
 
     };

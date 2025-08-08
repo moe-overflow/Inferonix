@@ -10,17 +10,12 @@ using namespace Inferonix::Renderer;
 
 Renderer::Renderer(std::shared_ptr<Window::Window> window) : _window_instance(std::move(window))
 {
+#ifndef NDEBUG
+    SetupOpenGLDebug();
+#endif
 
-    LogInfo();
-
-    // todo: reserve place for vector?
-
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    // for debugging
-    glEnable(GL_DEBUG_OUTPUT);
-
-    SetClearColor(0.1f, 0.5f, 0.7f, 1.0f);
+    SetDeviceSpecs();
+    SetClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void Renderer::Render(Scene::Scene& scene)
@@ -35,69 +30,52 @@ void Renderer::Render(Scene::Scene& scene)
             CreateRenderEntity(entity, view.get<Scene::MeshComponent>(entity));
 
         auto const& render_entity = _render_entities[entity_index];
-        render_entity->shader_program->Use();
-        render_entity->vertex_array->Bind();
+        render_entity->shader_program.Use();
+        render_entity->vertex_array.Bind();
 
-        render_entity->shader_program->SetUniform("myColor", 0.541f, 0.124f, 0.784f);
+        render_entity->shader_program.SetUniform("myColor", 0.541f, 0.124f, 0.784f);
 
         // uniforms
-        render_entity->shader_program->SetUniform(
+        render_entity->shader_program.SetUniform(
             "model",
             view.get<Scene::TransformComponent>(entity).GetMatrix()
         );
         render_entity->shader_program.SetUniform("view", scene.GetMainCamera()->GetView());
         render_entity->shader_program.SetUniform("projection", scene.GetMainCamera()->GetProjection());
 
-        glDrawElements(GL_TRIANGLES, static_cast<int>(render_entity->index_buffer->Count()), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(render_entity->index_buffer.Count()), GL_UNSIGNED_INT, nullptr);
 
-        render_entity->vertex_array->Unbind();
-        render_entity->shader_program->Unuse();
+        render_entity->vertex_array.Unbind();
+        render_entity->shader_program.Unuse();
 
     }
 }
 
 void Renderer::CreateRenderEntity(Scene::Entity const& entity, Scene::MeshComponent& mesh)
 {
-    auto render_entity = std::make_unique<RenderEntity>(
+    auto render_entity = std::make_unique<RenderEntity>();
 
-        std::make_unique<ShaderProgram>(),
-        std::make_unique<VertexArray>(),
-        std::make_unique<VertexBuffer>(),
-        std::make_unique<IndexBuffer>
-        (
-            static_cast<long int>(mesh.GetIndices().size()),
-            mesh.GetIndices().data()
-        )
-    );
+    render_entity->vertex_array.Bind();
+    render_entity->vertex_buffer.Bind();
 
-    render_entity->vertex_array->Bind();
-    render_entity->vertex_buffer->Bind();
+    render_entity->vertex_buffer.BufferData(mesh.GetVertices());
 
-    render_entity->vertex_buffer->BufferData(
-            mesh.GetVertices().size() * sizeof(Vertex), mesh.GetVertices().data()
-    );
-
-    render_entity->index_buffer->Bind();
-
-    render_entity->index_buffer->BufferData(
-        mesh.GetIndices().size() * sizeof(unsigned int),
-        mesh.GetIndices().data()
-    );
+    render_entity->index_buffer.Bind();
+    render_entity->index_buffer.BufferData(mesh.GetIndices());
 
     VertexBufferLayout layout;
     layout.Push(ShaderDatatype::FLOAT, 3); // position
     layout.Push(ShaderDatatype::FLOAT, 3); // normal
-    render_entity->vertex_array->AddVertexBuffer(*render_entity->vertex_buffer, layout);
+    render_entity->vertex_array.AddVertexBuffer(render_entity->vertex_buffer, layout);
 
 
-    render_entity->vertex_array->SetIndexBuffer(*render_entity->index_buffer);
-    render_entity->vertex_buffer->Unbind();
-    render_entity->vertex_array->Unbind();
+    render_entity->vertex_array.SetIndexBuffer(render_entity->index_buffer);
+    render_entity->vertex_buffer.Unbind();
+    render_entity->vertex_array.Unbind();
 
     /**/
 
-    auto const entity_index = static_cast<uint32_t>(entity);
-    if (entity_index >= _render_entities.size())
+    if (auto const entity_index = static_cast<uint32_t>(entity); entity_index >= _render_entities.size())
         _render_entities.resize(entity_index + 1);
 
     _render_entities[static_cast<uint32_t>(entity)] = std::move(render_entity);
@@ -111,25 +89,50 @@ void Renderer::SetClearColor(float r, float g, float b, float a)
 
 void Renderer::Clear()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::LogInfo()
+void Renderer::SetDeviceSpecs()
 {
+    _device_specs.vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    _device_specs.renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    _device_specs.version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    _device_specs.shading_language_version = reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    spdlog::info("GPU vendor: {}", reinterpret_cast<char const*>(glGetString(GL_VENDOR)));
-    spdlog::info("GPU Renderer: {}", reinterpret_cast<char const*>(glGetString(GL_RENDERER)));
-    spdlog::info("GPU version: {}", reinterpret_cast<char const*>(glGetString(GL_VERSION)));
-    spdlog::info("Shading language: {}", reinterpret_cast<char const*>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+    int max_vertex_attributes;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_vertex_attributes);
+    _device_specs.nr_attributes = max_vertex_attributes;
 
-    int nrAttributes;
-    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-    spdlog::info("Maximum number of vertex attributes supported: {}", nrAttributes);
+    spdlog::info("Device Specifications: \n vendor: {}, \n renderer: {}, \n version: {}, \n shading language version: {}",
+        _device_specs.vendor, _device_specs.renderer, _device_specs.version, _device_specs.shading_language_version);
+}
+
+void Renderer::SetupOpenGLDebug()
+{
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback([] (
+        [[maybe_unused]] GLenum source,
+        [[maybe_unused]] GLenum type,
+        [[maybe_unused]] GLuint id,
+                         GLenum const severity,
+        [[maybe_unused]] GLsizei length,
+                         const GLchar* message,
+        [[maybe_unused]] const void* userParam) -> void
+        {
+            if (severity == GL_DEBUG_SEVERITY_MEDIUM)
+                spdlog::warn("OpenGL warning({}): {}", id, message);
+            else if (severity == GL_DEBUG_SEVERITY_HIGH)
+                spdlog::error("OpenGL error({}): {}", id, message);
+        },
+        nullptr
+    );
 }
 
 void Renderer::OnEvent(EventSystem::Event& event)
 {
-    if (auto type = dynamic_cast<EventSystem::KeyEvent*>(&event))
+    if (auto const type = dynamic_cast<EventSystem::KeyEvent*>(&event))
     {
         if(type->GetKey() == InputSystem::Key::F1 && type->GetType() == EventSystem::KeyEventType::KeyPressedEvent)
         {
