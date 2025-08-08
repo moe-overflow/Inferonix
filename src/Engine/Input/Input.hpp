@@ -11,7 +11,6 @@ namespace Inferonix::InputSystem
     {
     public:
         Input() = delete;
-
         Input(Input const&) = delete;
 
         Input& operator=(Input const&) = delete;
@@ -26,4 +25,4 @@ namespace Inferonix::InputSystem
     private:
         static std::unordered_map<Key, bool> _keys;
     };
-} // namespace Inferonix::InputSystem
+}

@@ -43,7 +43,7 @@ namespace Inferonix::Renderer
                 return false;
             }
 
-            aiMesh* mesh = scene->mMeshes[0];
+            auto const mesh = scene->mMeshes[0];
 
             for (uint64_t i{ 0 }; i < mesh->mNumVertices; i++)
             {
@@ -63,7 +63,6 @@ namespace Inferonix::Renderer
                     _indices.push_back(face.mIndices[j]);
             }
             spdlog::info(fmt::format("Number of indices: {}", mesh->mNumFaces));
-
             return true;
         }
 
@@ -84,4 +83,4 @@ namespace Inferonix::Renderer
         std::vector<uint32_t> _indices;
     };
 
-} // namespace Inferonix::Renderer
+}

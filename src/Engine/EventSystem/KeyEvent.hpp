@@ -16,7 +16,7 @@ namespace Inferonix::EventSystem
     };
 
 
-    class KeyEvent : public Event
+    class KeyEvent final : public Event
     {
     public:
         KeyEvent(InputSystem::Key const& key, KeyEventType const type) : _key(key), _type(type) {}

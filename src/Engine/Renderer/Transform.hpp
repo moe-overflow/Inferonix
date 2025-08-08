@@ -46,4 +46,4 @@ namespace Inferonix::Renderer
         }
     };
 
-} // namespace Inferonix::Renderer
+}

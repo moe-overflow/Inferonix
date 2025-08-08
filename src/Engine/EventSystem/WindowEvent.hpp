@@ -40,4 +40,4 @@ namespace Inferonix::EventSystem
         int _x, _y; // todo: use vec2
     };
 
-} // namespace Inferonix::EventSystem
+}

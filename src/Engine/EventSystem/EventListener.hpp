@@ -14,4 +14,4 @@ namespace Inferonix::EventSystem
         virtual void OnEvent(Event& event) = 0;
     };
 
-} // namespace Inferonix::EventSystem
+}

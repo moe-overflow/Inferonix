@@ -35,7 +35,7 @@ namespace Inferonix::Scene
             UpdateView();
         }
 
-        virtual void Update(float delta_time){};
+        virtual void Update(float delta_time) {}
 
         void SetPosition(glm::vec3 const& position)
         {
@@ -94,4 +94,4 @@ namespace Inferonix::Scene
         glm::mat4 _view_matrix{};
     };
 
-} // namespace Inferonix::Scene
+}

@@ -12,9 +12,8 @@ namespace Inferonix::EventSystem
     public:
         EventHandler() = default;
 
-        EventHandler& operator=(EventHandler const&) = delete;
-
         EventHandler(EventHandler const&) = delete;
+        EventHandler& operator=(EventHandler const&) = delete;
 
         static std::shared_ptr<EventHandler> Get()
         {
@@ -41,4 +40,4 @@ namespace Inferonix::EventSystem
     private:
         std::vector<std::shared_ptr<EventListener>> _event_listeners;
     };
-} // namespace Inferonix::EventSystem
+}

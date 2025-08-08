@@ -3,7 +3,6 @@
 #include "glad/glad.h"
 #include <memory>
 #include <string>
-#include <string_view>
 
 namespace Inferonix::Renderer
 {
@@ -21,17 +20,14 @@ namespace Inferonix::Renderer
 
     public:
         Shader() = delete;
-
         explicit Shader(ShaderType type, char const* src);
 
         ~Shader();
 
         Shader(Shader const&) = delete;
-
         Shader(Shader&& other) noexcept;
 
         Shader& operator=(Shader const&) = delete;
-
         Shader& operator=(Shader&& other) noexcept;
 
         static std::string ReadFromFile(std::string const& path);
@@ -46,6 +42,5 @@ namespace Inferonix::Renderer
         ShaderType _type;
         std::unique_ptr<uint32_t> _id;
         std::unique_ptr<std::string> _src_stream;
-        //        std::unique_ptr<std::string> _src;
     };
-} // namespace Inferonix::Renderer
+}

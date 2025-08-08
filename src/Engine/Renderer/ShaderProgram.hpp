@@ -14,27 +14,18 @@ namespace Inferonix::Renderer
 
     public:
         ShaderProgram();
-
         ~ShaderProgram();
 
-        /**/
-
         ShaderProgram(ShaderProgram const&) = delete;
-
-        ShaderProgram(ShaderProgram&& other) noexcept;
-
-        /**/
-
         ShaderProgram& operator=(ShaderProgram const&) = delete;
 
+        ShaderProgram(ShaderProgram&& other) noexcept;
         ShaderProgram& operator=(ShaderProgram&& other) noexcept;
 
         void Use() const;
-
         void Unuse() const;
 
         void AttachShaders() const;
-
         void Link() const;
 
         void CheckErrors() const;
@@ -56,4 +47,4 @@ namespace Inferonix::Renderer
         std::unique_ptr<uint32_t> _id;
     };
 
-} // namespace Inferonix::Renderer
+}

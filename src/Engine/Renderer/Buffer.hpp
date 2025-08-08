@@ -149,4 +149,4 @@ namespace Inferonix::Renderer
         uint32_t _stride{ 0 };
     };
 
-} // namespace Inferonix::Renderer
+}

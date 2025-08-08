@@ -21,9 +21,9 @@ Shader::~Shader()
 }
 
 Shader::Shader(Shader&& other) noexcept
-    : _id(std::move(other._id)),
-      _src_stream(std::move(other._src_stream)),
-      _type(other._type)
+    : _type(other._type),
+      _id(std::move(other._id)),
+      _src_stream(std::move(other._src_stream))
 {
 }
 
@@ -88,6 +88,6 @@ std::string Shader::ReadFromFile(std::string const& path)
     catch (std::ifstream::failure const& e)
     {
         spdlog::error("Error occurred while reading shaders from disk: {}", e.what());
+        return "";
     }
-    return "";
 }

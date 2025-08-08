@@ -29,17 +29,17 @@ void VertexArray::AddVertexBuffer(VertexBuffer const& vertex_buffer, VertexBuffe
 
     for (uint32_t i = 0; i < elements.size(); i++)
     {
-        auto const& element = elements[i];
+        auto const& [type, size, normalized] = elements[i];
         glEnableVertexAttribArray(i);
         glVertexAttribPointer(
                 i,
-                static_cast<GLint>(element.size),
-                VertexBufferElement::ToGlType(element.type),
-                element.normalized ? GL_TRUE : GL_FALSE,
+                static_cast<GLint>(size),
+                VertexBufferElement::ToGlType(type),
+                normalized ? GL_TRUE : GL_FALSE,
                 static_cast<GLsizei>(layout.GetStride()),
                 reinterpret_cast<void const*>(offset)
         );
-        offset += element.size * VertexBufferElement::GetTypeSize(element.type);
+        offset += size * VertexBufferElement::GetTypeSize(type);
     }
 }
 

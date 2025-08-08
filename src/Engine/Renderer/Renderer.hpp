@@ -26,11 +26,9 @@ namespace Inferonix::Renderer
         explicit Renderer(std::shared_ptr<Window::Window> window);
 
         Renderer(Renderer const&) = delete;
-
         Renderer(Renderer&&) = delete;
 
         Renderer& operator=(Renderer const&) = delete;
-
         Renderer& operator=(Renderer&&) = delete;
 
         ~Renderer() override = default;
@@ -71,4 +69,4 @@ namespace Inferonix::Renderer
 
 
     };
-} // namespace Inferonix::Renderer
+}

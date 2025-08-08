@@ -1,9 +1,8 @@
 #include "Buffer.hpp"
 
+#include <spdlog/spdlog.h>
+
 using namespace Inferonix::Renderer;
-
-
-IndexBuffer::IndexBuffer(int64_t const count, void const* indices) : Buffer(), _count(count) { }
 
 void IndexBuffer::Bind() const
 {

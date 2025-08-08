@@ -11,12 +11,9 @@ ShaderProgram::ShaderProgram()
       _fragment_shader(std::make_unique<Shader>(ShaderType::FRAGMENT, SHADERS_PATH "/FragmentShader.glsl")),
       _id(std::make_unique<uint32_t>(glCreateProgram()))
 {
-
     AttachShaders();
     Link();
     CheckErrors();
-
-    /* todo: move to separate function or two */
 
     glDetachShader(*_id, _vertex_shader->Get());
     glDeleteShader(_vertex_shader->Get());

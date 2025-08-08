@@ -68,4 +68,4 @@ namespace Inferonix::EventSystem
     };
 
 
-} // namespace Inferonix::EventSystem
+}
