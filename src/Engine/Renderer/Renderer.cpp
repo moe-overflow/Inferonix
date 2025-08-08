@@ -28,23 +28,7 @@ void Renderer::Render(Scene::Scene& scene)
     //auto const delta_time = _window_instance->GetDeltaTime();
     //_main_camera->Update(delta_time);
 
-    auto view_matrix = glm::mat4(1.0f);
-    auto projection_matrix = glm::mat4(1.0f);
-
-    auto camera_view = scene.GetRegistry().view<Scene::TransformComponent, Scene::CameraComponent>();
-    for (auto const& entity : camera_view)
-    {
-        auto& camera_component = camera_view.get<Scene::CameraComponent>(entity);
-        if (camera_component.IsPrimary())
-        {
-            view_matrix = camera_component.GetView();
-            projection_matrix = camera_component.GetProjection();
-            break;
-        }
-    }
-
-    auto view = scene.GetRegistry().view<Scene::MeshComponent, Scene::TransformComponent>();
-    for (auto entity : view)
+    for (auto const view = scene.GetRegistry().view<Scene::MeshComponent, Scene::TransformComponent>(); auto entity : view)
     {
         auto const entity_index = static_cast<uint32_t>(entity);
         if (entity_index >= _render_entities.size() || !_render_entities[entity_index])
@@ -61,8 +45,8 @@ void Renderer::Render(Scene::Scene& scene)
             "model",
             view.get<Scene::TransformComponent>(entity).GetMatrix()
         );
-        render_entity->shader_program->SetUniform("view", view_matrix);
-        render_entity->shader_program->SetUniform("projection", projection_matrix);
+        render_entity->shader_program.SetUniform("view", scene.GetMainCamera()->GetView());
+        render_entity->shader_program.SetUniform("projection", scene.GetMainCamera()->GetProjection());
 
         glDrawElements(GL_TRIANGLES, static_cast<int>(render_entity->index_buffer->Count()), GL_UNSIGNED_INT, nullptr);
 

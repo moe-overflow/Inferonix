@@ -31,23 +31,12 @@ InferonixEngine::InferonixEngine()
 
 
     auto& registry = _scene->GetRegistry();
-    auto entity = registry.create();
+    auto const entity = registry.create();
     registry.emplace<MeshComponent>(entity, *mesh.value());
 
     Transform transform{};
     transform.position = {0.0f, 0.0f, 0.0f};
     registry.emplace<TransformComponent>(entity, transform);
-
-    /**/
-
-    Entity camera_entity = registry.create();
-
-    Transform camera_transform;
-    camera_transform.position = {0.0f, 0.0f, 500.0f};
-
-    registry.emplace<TransformComponent>(camera_entity, camera_transform);
-    registry.emplace<CameraComponent>(camera_entity, Camera{});
-
 
 }
 
