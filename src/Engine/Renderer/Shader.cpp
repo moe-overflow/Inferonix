@@ -7,10 +7,10 @@
 
 using namespace Inferonix::Renderer;
 
-Shader::Shader(ShaderType const type, char const* path)
+Shader::Shader(ShaderType const type, char const* src)
     : _type{ type },
       _id{ std::make_unique<uint32_t>(glCreateShader(type)) },
-      _src_stream{ std::make_unique<std::string>(ReadFromFile(path)) }
+      _src_stream{ std::make_unique<std::string>(ReadFromFile(src)) }
 {
     Create();
 }

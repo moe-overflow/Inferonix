@@ -1,8 +1,9 @@
 #pragma once
 
 #include "glad/glad.h"
-#include <memory>
 #include <vector>
+
+#include "Mesh.hpp"
 
 namespace Inferonix::Renderer
 {
@@ -36,7 +37,7 @@ namespace Inferonix::Renderer
     class VertexBuffer final : public Buffer
     {
     public:
-        VertexBuffer() = delete;
+        VertexBuffer() = default;
         explicit VertexBuffer(size_t size);
 
         ~VertexBuffer() override = default;
@@ -44,7 +45,7 @@ namespace Inferonix::Renderer
         void Bind() const override;
         void Unbind() const override;
 
-        void BufferData(size_t size, void const* positions);
+        void BufferData(std::vector<Vertex> const& vertices);
 
         [[nodiscard]] size_t Size() const
         {
@@ -52,28 +53,27 @@ namespace Inferonix::Renderer
         }
 
     private:
-        uint32_t _size;
+        uint32_t _size{0};
     };
 
-    class IndexBuffer : public Buffer
+    class IndexBuffer final : public Buffer
     {
     public:
-        IndexBuffer() = delete;
-        IndexBuffer(int64_t count, void const* indices);
+        IndexBuffer() = default;
         ~IndexBuffer() override = default;
 
         void Bind() const override;
         void Unbind() const override;
 
-        void BufferData(int64_t count, void const* indices);
+        void BufferData(std::vector<uint32_t>& indices);
 
-        [[nodiscard]] int64_t Count() const
+        [[nodiscard]] int32_t Count() const
         {
             return _count;
         }
 
     private:
-        int64_t _count{};
+        uint32_t _count{};
     };
 
     enum ShaderDatatype
@@ -127,7 +127,7 @@ namespace Inferonix::Renderer
     class VertexBufferLayout
     {
     public:
-        VertexBufferLayout() : _stride(0) { }
+        VertexBufferLayout() = default;
 
         [[nodiscard]] std::vector<VertexBufferElement> GetElements() const
         {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Buffer.hpp"
-#include <memory>
 
 namespace Inferonix::Renderer
 {
@@ -23,4 +22,4 @@ namespace Inferonix::Renderer
         uint32_t _id;
     };
 
-} // namespace Inferonix::Renderer
+}

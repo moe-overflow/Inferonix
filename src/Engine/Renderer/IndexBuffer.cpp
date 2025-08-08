@@ -15,12 +15,14 @@ void IndexBuffer::Unbind() const
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void IndexBuffer::BufferData(int64_t const count, void const* indices)
+void IndexBuffer::BufferData(std::vector<uint32_t>& indices)
 {
+    _count = indices.size();
+    spdlog::info("Buffering data (count = {}) for index buffer {}", _id, _count);
     glBufferData(
             GL_ELEMENT_ARRAY_BUFFER,
-            static_cast<GLsizeiptr>(count * sizeof(unsigned int)),
-            indices,
+            static_cast<GLsizeiptr>(_count * sizeof(unsigned int)),
+            reinterpret_cast<GLvoid*>(indices.data()),
             GL_STATIC_DRAW
     );
 }

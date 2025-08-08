@@ -4,9 +4,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-
-#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
+#include <glm/glm.hpp>
 
 namespace Inferonix::Renderer
 {
@@ -59,7 +58,7 @@ namespace Inferonix::Renderer
 
             for (uint64_t i{ 0 }; i < mesh->mNumFaces; i++)
             {
-                aiFace const face = mesh->mFaces[i];
+                auto const face = mesh->mFaces[i];
                 for (uint64_t j{ 0 }; j < face.mNumIndices; j++)
                     _indices.push_back(face.mIndices[j]);
             }
@@ -73,7 +72,7 @@ namespace Inferonix::Renderer
             return _vertices;
         }
 
-        [[nodiscard]] std::vector<unsigned int> const& GetIndices()
+        [[nodiscard]] std::vector<uint32_t>& GetIndices()
         {
             return _indices;
         }
@@ -82,7 +81,7 @@ namespace Inferonix::Renderer
     private:
         std::string _id;
         std::vector<Vertex> _vertices;
-        std::vector<unsigned int> _indices;
+        std::vector<uint32_t> _indices;
     };
 
 } // namespace Inferonix::Renderer
