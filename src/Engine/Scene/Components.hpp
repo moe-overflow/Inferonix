@@ -3,6 +3,7 @@
 #include "../Renderer/Mesh.hpp"
 #include "../Renderer/Transform.hpp"
 #include "Camera.hpp"
+#include "../Script/ScriptObject.hpp"
 
 namespace Inferonix::Scene
 {
@@ -16,6 +17,13 @@ namespace Inferonix::Scene
     };
 
     using CameraComponent = Camera;
+
+    struct ScriptComponent
+    {
+        std::string script_path;
+        Script::ScriptObject script_object;
+        bool initialized {false};
+    };
 
 }
 

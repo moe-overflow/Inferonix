@@ -7,6 +7,7 @@ function(find_packages)
     find_package(spdlog CONFIG REQUIRED)
     find_package(imgui CONFIG REQUIRED)
     find_package(assimp CONFIG REQUIRED)
+    find_package(Angelscript CONFIG REQUIRED)
 endfunction()
 
 function(link_libs target)
@@ -18,5 +19,6 @@ function(link_libs target)
             PRIVATE imgui::imgui
             PRIVATE spdlog::spdlog_header_only
             PRIVATE assimp::assimp
+            PRIVATE Angelscript::angelscript
     )
 endfunction()

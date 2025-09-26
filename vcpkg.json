@@ -37,6 +37,13 @@
     {
       "name": "entt",
       "version>=": "3.15.0"
+    },
+    {
+      "name": "angelscript",
+      "version>=": "2.37.0",
+      "features": [
+        "addons"
+      ]
     }
   ]
 
