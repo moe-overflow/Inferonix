@@ -6,6 +6,8 @@ function(find_packages)
     find_package(spdlog CONFIG REQUIRED)
     find_package(imgui CONFIG REQUIRED)
     find_package(assimp CONFIG REQUIRED)
+    find_package(EnTT CONFIG REQUIRED)
+    find_package(glm CONFIG REQUIRED)
     find_package(Angelscript CONFIG REQUIRED)
 endfunction()
 
