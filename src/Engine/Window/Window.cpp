@@ -189,11 +189,11 @@ namespace
 
             case GLFW_REPEAT:
                 type = KeyEventType::KeyRepeatEvent;
-                Input::SetKeyUp(*key);
                 break;
 
             case GLFW_RELEASE:
                 type = KeyEventType::KeyReleasedEvent;
+                Input::SetKeyUp(*key);
                 break;
 
             default:

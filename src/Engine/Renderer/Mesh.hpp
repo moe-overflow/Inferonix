@@ -47,10 +47,18 @@ namespace Inferonix::Renderer
 
             for (uint64_t i{ 0 }; i < mesh->mNumVertices; i++)
             {
-                Vertex vertex{
-                    .Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z },
-                    .Normal = { mesh->mNormals[i].x,  mesh->mNormals[i].y,  mesh->mNormals[i].z }
-                };
+                Vertex vertex{};
+                vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+
+                if (mesh->mNormals)
+                {
+                    vertex.Normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+                }
+                else
+                {
+                    vertex.Normal = { 0.0f, 1.0f, 0.0f };
+                }
+                
                 _vertices.push_back(vertex);
             }
             spdlog::info(fmt::format("Number of vertices: {}", mesh->mNumVertices));

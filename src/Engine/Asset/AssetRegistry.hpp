@@ -59,10 +59,10 @@ namespace Inferonix::Asset
             return std::any_cast<std::shared_ptr<AssetType>>(it->second);
         }
 
+        Registry& GetAssetRegistry() const { return _registry; }
+
     private:
         Registry& _registry;
         std::unordered_map<std::string, std::any> _assets;
-
-
     };
 }

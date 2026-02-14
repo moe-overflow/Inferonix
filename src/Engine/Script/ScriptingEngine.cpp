@@ -33,57 +33,89 @@ void ScriptingEngineDestructor::operator()(asIScriptEngine* engine) const noexce
 
 ScriptingEngine::ScriptingEngine() : _engine(asCreateScriptEngine())
 {
-    if (!_engine || _engine->SetMessageCallback(asFunctionPtr(AngelscriptCallback), nullptr, asCALL_CDECL) < 0)
-        throw std::runtime_error("Failed to construct scripting engine!");
+    if (!_engine)
+    {
+        throw std::runtime_error("Failed to create scripting engine!");
+    }
+    
+    if (_engine->SetMessageCallback(asFunctionPtr(AngelscriptCallback), nullptr, asCALL_CDECL) < 0)
+    {
+        spdlog::warn("Failed to set AngelScript message callback");
+    }
 
     this->Initialize();
+}
 
+ScriptingEngine::ScriptingEngine(ScriptingEngine&& other) noexcept : _engine(std::move(other._engine))
+{
+}
+
+ScriptingEngine& ScriptingEngine::operator=(ScriptingEngine&& other) noexcept
+{
+    if (this != &other)
+    {
+        _engine = std::move(other._engine);
+    }
+    return *this;
 }
 
 void ScriptingEngine::Initialize() const
 {
+    spdlog::info("Initializing scripting engine with std::string, math and array...");
     RegisterStdString(_engine.get());
     RegisterScriptMath(_engine.get());
+    RegisterScriptArray(_engine.get(), true);
 }
 
 void ScriptingEngine::Terminate() const
 {
-    _engine->ShutDownAndRelease();
+    if (_engine)
+    {
+        _engine->ShutDownAndRelease();
+    }
 }
 
 ScriptModule ScriptingEngine::CompileScript(std::string const& name, std::string const& path) const
 {
-    auto builder = CScriptBuilder{};
-    auto result = builder.StartNewModule(_engine.get(), std::string(name).c_str());
-
-    if (result < 0)
+    if (!_engine)
     {
-        spdlog::error("Failed to start module");
+        spdlog::error("Cannot compile script: engine is null");
         return {};
     }
 
-    result = builder.AddSectionFromFile(path.data());
+    auto builder = CScriptBuilder{};
+    auto result = builder.StartNewModule(_engine.get(), name.c_str());
+
     if (result < 0)
     {
-        spdlog::error("Failed to add script file");
+        spdlog::error("Failed to start module '{}'", name);
+        return {};
+    }
+
+    result = builder.AddSectionFromFile(path.c_str());
+    if (result < 0)
+    {
+        spdlog::error("Failed to add script file '{}'", path);
         return {};
     }
 
     result = builder.BuildModule();
     if (result < 0)
     {
-        spdlog::error("Failed to build module");
+        spdlog::error("Failed to build module '{}'", name);
         return {};
     }
 
+    spdlog::info("Successfully compiled script '{}' from '{}'", name, path);
+
     auto module_deleter = [](asIScriptModule* module) {
-        if (module) {
+        if (module)
+        {
             module->Discard();
         }
     };
 
     auto const module = std::shared_ptr<asIScriptModule>(builder.GetModule(), module_deleter);
     return ScriptModule{ module };
-
 }
 

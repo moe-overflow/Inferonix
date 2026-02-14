@@ -4,6 +4,12 @@
 
 #include <memory>
 #include <angelscript.h>
+#include <unordered_map>
+
+namespace Inferonix::Renderer
+{
+    struct Transform;
+}
 
 namespace Inferonix::Script
 {
@@ -21,15 +27,21 @@ namespace Inferonix::Script
         ScriptModule(ScriptModule&&) noexcept;
         ScriptModule& operator=(ScriptModule&&) noexcept;
 
-        ScriptObject CreateObject(std::string_view name);
-
-        bool IsValid();
+        [[nodiscard]] ScriptObject CreateObject(std::string_view name) const;
+        [[nodiscard]] bool IsValid() const;
+        [[nodiscard]] asIScriptModule* GetModule() const { return _instance.get(); }
 
     private:
-
-        friend class ScriptObject;
-
         std::shared_ptr<asIScriptModule> _instance;
     };
+
+    namespace detail
+    {
+        void RegisterGlobals(asIScriptEngine* engine);
+
+        // Storage for entity to transform mapping
+        extern std::unordered_map<uint32_t, Renderer::Transform*> g_entity_transforms;
+    }
+
 }
 

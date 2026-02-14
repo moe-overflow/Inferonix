@@ -9,7 +9,14 @@ namespace Inferonix::Scene
 {
 
     using MeshComponent = Renderer::Mesh;
-    using TransformComponent = Renderer::Transform;
+    
+    struct TransformComponent : public Renderer::Transform
+    {
+        TransformComponent() : Renderer::Transform() {}
+        
+        Transform& GetTransform() { return *this; }
+        [[nodiscard]] const Transform& GetTransform() const { return *this; }
+    };
 
     struct ShaderComponent
     {

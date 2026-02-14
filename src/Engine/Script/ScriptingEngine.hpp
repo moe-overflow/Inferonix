@@ -4,7 +4,7 @@
 #include <angelscript.h>
 
 #include <memory>
-
+#include <string>
 
 namespace Inferonix::Script
 {
@@ -35,6 +35,8 @@ namespace Inferonix::Script
 
         [[nodiscard]] ScriptModule CompileScript(std::string const& name, std::string const& path) const;
 
+        asIScriptEngine* GetEngine() { return _engine.get(); }
+        [[nodiscard]] asIScriptEngine* GetEngine() const { return _engine.get(); }
 
     private:
         std::unique_ptr<asIScriptEngine, ScriptingEngineDestructor> _engine;
