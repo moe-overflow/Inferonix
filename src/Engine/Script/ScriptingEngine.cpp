@@ -1,28 +1,35 @@
 #include "ScriptingEngine.hpp"
+#include "ScriptModule.hpp"
 
+#include <spdlog/spdlog.h>
 #include <angelscript.h>
 #include <functional>
-#include <spdlog/spdlog.h>
+#include <angelscript/scriptstdstring/scriptstdstring.h>
 #include <angelscript/scriptmath/scriptmath.h>
-#include <angelscript/scriptstdstring/scriptstdstring.h>
-
 #include <angelscript/scriptbuilder/scriptbuilder.h>
-#include <angelscript/scriptstdstring/scriptstdstring.h>
 #include <angelscript/scriptarray/scriptarray.h>
 
 using namespace Inferonix::Script;
 
 namespace
 {
-    void AngelscriptCallback(asSMessageInfo const* message, void* arguments)
+    void AngelscriptCallback(asSMessageInfo const* message, void* /*arguments*/)
     {
         auto severity = std::string{};
         switch (message->type)
         {
-            // todo: log message with severity
+            case asMSGTYPE_ERROR:
+                severity = "ERROR";
+                break;
+            case asMSGTYPE_WARNING:
+                severity = "WARNING";
+                break;
+            case asMSGTYPE_INFORMATION:
+                severity = "INFO";
+                break;
         }
+        spdlog::error("[AngelScript] {} ({}): {}", severity, message->section, message->message);
     }
-
 }
 
 void ScriptingEngineDestructor::operator()(asIScriptEngine* engine) const noexcept

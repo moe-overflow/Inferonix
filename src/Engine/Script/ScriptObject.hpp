@@ -34,6 +34,9 @@ namespace Inferonix::Script
 
         [[nodiscard]] asIScriptObject* GetInstance() const { return _instance.get(); }
 
+        void CallStart(uint32_t entity) const;
+        void CallUpdate(float delta_time) const;
+
     private:
         std::unique_ptr<asIScriptObject, detail::ScriptObjectDeleter> _instance;
     };

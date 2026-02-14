@@ -87,3 +87,42 @@ void ScriptObject::CallMethod(std::string_view method_name, std::vector<void*> c
     ctx->Release();
 }
 
+void ScriptObject::CallStart(uint32_t entity) const
+{
+    if (!_instance) return;
+
+    auto const* type = _instance->GetObjectType();
+    static auto decl = "void Start(uint)";
+    auto* method = type->GetMethodByDecl(decl);
+
+    if (method)
+    {
+        auto* ctx = _instance->GetEngine()->CreateContext();
+        ctx->Prepare(method);
+        ctx->SetObject(_instance.get());
+        ctx->SetArgDWord(0, entity);
+        ctx->Execute();
+        ctx->Release();
+    }
+}
+
+void ScriptObject::CallUpdate(float delta_time) const
+{
+    if (!_instance) return;
+
+    auto* type = _instance->GetObjectType();
+    static const char* decl = "void Update(float)";
+    auto* method = type->GetMethodByDecl(decl);
+
+    if (method)
+    {
+        auto* ctx = _instance->GetEngine()->CreateContext();
+        ctx->Prepare(method);
+        ctx->SetObject(_instance.get());
+        ctx->SetArgFloat(0, delta_time);
+        ctx->Execute();
+        ctx->Release();
+    }
+}
+
+

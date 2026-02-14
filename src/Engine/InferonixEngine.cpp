@@ -28,7 +28,7 @@ InferonixEngine::InferonixEngine()
 
     auto mesh = asset_registry.Load<Mesh>(
         UUID::Generate(),
-        RESOURCES_PATH "models/Pyramid.obj"
+        RESOURCES_PATH "models/Monkey.obj"
     );
 
     if (mesh.has_value())

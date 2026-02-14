@@ -83,11 +83,13 @@ void ScriptingEngineLauncher::Start(Scene::Registry& scene_registry)
             detail::g_entity_transforms[static_cast<uint32_t>(entity)] = &transform_component->GetTransform();
         }
 
+        component.script_object.CallStart(static_cast<uint32_t>(entity));
+
         spdlog::info("Script '{}' initialized for entity {}", class_name, static_cast<uint32_t>(entity));
     }
 }
 
-void ScriptingEngineLauncher::Update(Scene::Registry& scene_registry, float delta_time)
+void ScriptingEngineLauncher::Update(Scene::Registry& scene_registry, float const delta_time)
 {
     auto view = scene_registry.view<Scene::ScriptComponent>();
     
@@ -97,8 +99,7 @@ void ScriptingEngineLauncher::Update(Scene::Registry& scene_registry, float delt
         if (!component.initialized || !component.script_object.IsValid())
             continue;
 
-        // Call the Update method
-        component.script_object.CallMethod("Update");
+        component.script_object.CallUpdate(delta_time);
     }
 }
 
