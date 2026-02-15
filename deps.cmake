@@ -9,6 +9,7 @@ function(find_packages)
     find_package(EnTT CONFIG REQUIRED)
     find_package(glm CONFIG REQUIRED)
     find_package(Angelscript CONFIG REQUIRED)
+    find_package(Boost REQUIRED)
 endfunction()
 
 function(link_libs target)
@@ -21,6 +22,7 @@ function(link_libs target)
             PRIVATE assimp::assimp
             PRIVATE EnTT::EnTT
             PRIVATE Angelscript::angelscript
+            PRIVATE Boost::headers
     )
 endfunction()
 
