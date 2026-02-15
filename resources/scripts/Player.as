@@ -2,38 +2,25 @@
 class Player
 {
     uint entity;
-    float speed = 2.5f;
+    float speed = 5.0f;
 
-    void Start(uint handle)
+    void Start(uint entityHandle)
     {
-        entity = handle;
+        entity = entityHandle;
     }
 
     void Update(float dt)
     {
         Transform@ tf = GetTransform(entity);
+        if (tf is null) return;
 
-        if (tf is null)
-        {
-            return;
-        }
+        vec3 velocity(0.0f);
 
-        if (IsKeyDown(Key::W))
-        {
-            tf.Translate(vec3(0.0f, 0.0f, -speed * dt));
-        }
-        if (IsKeyDown(Key::S))
-        {
-            tf.Translate(vec3(0.0f, 0.0f, speed * dt));
-        }
-        if (IsKeyDown(Key::A))
-        {
-            tf.Translate(vec3(-speed * dt, 0.0f, 0.0f));
-        }
-        if (IsKeyDown(Key::D))
-        {
-            tf.Translate(vec3(speed * dt, 0.0f, 0.0f));
-        }
+        if (IsKeyDown(Key::W)) velocity.z -= 1.0f;
+        if (IsKeyDown(Key::S)) velocity.z += 1.0f;
+        if (IsKeyDown(Key::A)) velocity.x -= 1.0f;
+        if (IsKeyDown(Key::D)) velocity.x += 1.0f;
+
+        tf.Translate(velocity * speed * dt);
     }
 }
-
