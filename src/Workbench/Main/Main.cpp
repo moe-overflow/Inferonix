@@ -2,6 +2,6 @@
 
 int main(int argc, char** argv)
 {
-    Inferonix::InferonixEngine const engine;
+    Inferonix::InferonixEngine engine;
     engine.run();
 }

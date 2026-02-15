@@ -4,6 +4,7 @@
 
 #include "Renderer/Renderer.hpp"
 #include "Window/Window.hpp"
+#include "Script/ScriptingEngineLauncher.hpp"
 
 namespace Inferonix
 {
@@ -19,14 +20,18 @@ namespace Inferonix
         InferonixEngine& operator=(InferonixEngine const&) = delete;
         InferonixEngine& operator=(InferonixEngine&&) = delete;
 
-        ~InferonixEngine() = default;
+        ~InferonixEngine();
 
-        void run() const;
+        void run();
 
     private:
         std::shared_ptr<Window::Window> _window;
         std::shared_ptr<Renderer::Renderer> _renderer;
         std::unique_ptr<Scene::Scene> _scene;
+        
+        Script::ScriptingEngineLauncher _script_launcher;
+        bool _initialized{ false };
     };
 
 }
+
