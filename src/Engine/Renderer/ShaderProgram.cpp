@@ -6,9 +6,12 @@
 
 using namespace Inferonix::Renderer;
 
-ShaderProgram::ShaderProgram()
-    : _vertex_shader(std::make_unique<Shader>(ShaderType::VERTEX, SHADERS_PATH "/VertexShader.glsl")),
-      _fragment_shader(std::make_unique<Shader>(ShaderType::FRAGMENT, SHADERS_PATH "/FragmentShader.glsl")),
+ShaderProgram::ShaderProgram(
+            std::string const& VertexShaderPath,
+            std::string const& FragmentShaderPath
+)
+    : _vertex_shader(std::make_unique<Shader>(VERTEX, VertexShaderPath.c_str())),
+      _fragment_shader(std::make_unique<Shader>(FRAGMENT, FragmentShaderPath.c_str())),
       _id(std::make_unique<uint32_t>(glCreateProgram()))
 {
     AttachShaders();

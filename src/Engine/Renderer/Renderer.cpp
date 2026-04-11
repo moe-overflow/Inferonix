@@ -16,10 +16,40 @@ Renderer::Renderer(std::shared_ptr<Window::Window> window) : _window_instance(st
 
     SetDeviceSpecs();
     SetClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    SetupGrid();
 }
 
 void Renderer::Render(Scene::Scene& scene)
 {
+
+    if (_grid)
+    {
+
+        // Alpha Blending (for handling transparency)
+        {
+            // calculate a color by mixing the new pixel with pixel already in buffer
+            glEnable(GL_BLEND);
+
+            // use the alpha value of new color to determine opacity
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        }
+
+        _grid->shader_program.Use();
+        _grid->vertex_array.Bind();
+
+        _grid->shader_program.SetUniform("view", scene.GetMainCamera()->GetView());
+        _grid->shader_program.SetUniform("projection", scene.GetMainCamera()->GetProjection());
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+        _grid->vertex_array.Unbind();
+        _grid->shader_program.Unuse();
+
+        glDisable(GL_BLEND);
+
+    }
+
     //auto const delta_time = _window_instance->GetDeltaTime();
     //_main_camera->Update(delta_time);
 
@@ -141,3 +171,40 @@ void Renderer::OnEvent(EventSystem::Event& event)
         }
     }
 }
+
+void Renderer::SetupGrid()
+{
+    _grid = std::make_unique<RenderEntity>();
+    _grid->shader_program = ShaderProgram{
+        SHADERS_PATH "/GridVertex.glsl",
+        SHADERS_PATH "/GridFragment.glsl"
+    };
+
+    auto const vertices = std::vector<Vertex>{
+        {{-50.0f, 0.0f, -50.0f}, {0.0f, 1.0f, 0.0f}},
+        {{ 50.0f, 0.0f, -50.0f}, {0.0f, 1.0f, 0.0f}},
+        {{ 50.0f, 0.0f,  50.0f}, {0.0f, 1.0f, 0.0f}},
+        {{-50.0f, 0.0f,  50.0f}, {0.0f, 1.0f, 0.0f}}
+    };
+    auto indices = std::vector<uint32_t> { 0, 1, 2, 2, 3, 0 };
+
+
+    _grid->vertex_buffer.Bind();
+    _grid->vertex_buffer.BufferData(vertices);
+
+    _grid->index_buffer.Bind();
+    _grid->index_buffer.BufferData(indices);
+
+    VertexBufferLayout layout;
+    layout.Push(FLOAT, 3); // position
+    layout.Push(FLOAT, 3); // normal
+
+    _grid->vertex_array.Bind();
+    _grid->vertex_array.AddVertexBuffer(_grid->vertex_buffer, layout);
+    _grid->vertex_array.SetIndexBuffer(_grid->index_buffer);
+
+    _grid->vertex_array.Unbind();
+}
+
+
+

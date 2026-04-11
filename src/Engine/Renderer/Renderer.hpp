@@ -83,5 +83,9 @@ namespace Inferonix::Renderer
         GraphicsProfile _device_specs;
 
 
+        std::unique_ptr<RenderEntity> _grid;
+        void SetupGrid();
+
+
     };
 }
