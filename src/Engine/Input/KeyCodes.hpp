@@ -27,7 +27,9 @@ namespace Inferonix::InputSystem
         I,
         J,
         L,
-        K
+        K,
+        E,
+
     };
 
 

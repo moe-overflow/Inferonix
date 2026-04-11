@@ -2,7 +2,7 @@
 
 namespace Inferonix::InputSystem
 {
-    enum class Key
+    enum class MouseKey
     {
         LEFT_BUTTON,
         RIGHT_BUTTON,

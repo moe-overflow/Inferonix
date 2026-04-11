@@ -87,6 +87,8 @@ void InferonixEngine::run()
             _script_launcher.Update(_scene->GetRegistry(), delta_time);
         }
 
+        _scene->GetEditorCamera()->Update(delta_time);
+
         _renderer->Clear();
         _renderer->Render(*_scene);
 

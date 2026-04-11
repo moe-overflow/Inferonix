@@ -141,6 +141,8 @@ namespace
                 return Key::L;
             case GLFW_KEY_I:
                 return Key::I;
+            case GLFW_KEY_E:
+                return Key::E;
             case GLFW_KEY_F1:
                 return Key::F1;
             default:
@@ -205,12 +207,28 @@ namespace
         Window::HandleEvent(e);
     }
 
+    std::optional<MouseKey> GlfwToMouseKey(int glfw_button)
+    {
+        switch (glfw_button)
+        {
+            case GLFW_MOUSE_BUTTON_LEFT:   return MouseKey::LEFT_BUTTON;
+            case GLFW_MOUSE_BUTTON_RIGHT:  return MouseKey::RIGHT_BUTTON;
+            case GLFW_MOUSE_BUTTON_MIDDLE: return MouseKey::WHEEL_BUTTON;
+            default: return std::nullopt;
+        }
+    }
+
     void MouseButtonCallback(
         [[maybe_unused]] GLFWwindow* window,
         int const button,
         int const action,
         [[maybe_unused]]int mods)
     {
+        if (auto key = GlfwToMouseKey(button)) {
+            if (action == GLFW_PRESS) Input::SetMouseKeyDown(*key);
+            else if (action == GLFW_RELEASE) Input::SetMouseKeyUp(*key);
+        }
+
         MouseButton e;
 
         if (action == GLFW_PRESS)
@@ -228,6 +246,7 @@ namespace
         double const x,
         double const y)
     {
+        Input::SetMousePosition(static_cast<float>(x), static_cast<float>(y));
         MouseCursorMoved e(MouseEventType::MousePointerMoved, static_cast<int>(x), static_cast<int>(y));
         Window::HandleEvent(e);
     }

@@ -7,6 +7,7 @@
 #include <utility>
 
 using namespace Inferonix::Renderer;
+using namespace Inferonix::Scene;
 
 Renderer::Renderer(std::shared_ptr<Window::Window> window) : _window_instance(std::move(window))
 {
@@ -15,49 +16,50 @@ Renderer::Renderer(std::shared_ptr<Window::Window> window) : _window_instance(st
 #endif
 
     SetDeviceSpecs();
-    SetClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     SetupGrid();
+}
+
+static void RenderGrid(Scene const& scene, RenderEntity const& grid)
+{
+    // Alpha Blending (for handling transparency)
+    {
+        // calculate a color by mixing the new pixel with pixel already in buffer
+        glEnable(GL_BLEND);
+
+        // use the alpha value of new color to determine opacity
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    grid.shader_program.Use();
+    grid.vertex_array.Bind();
+
+    grid.shader_program.SetUniform("view", scene.GetEditorCamera()->GetView());
+    grid.shader_program.SetUniform("projection", scene.GetEditorCamera()->GetProjection());
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+    grid.vertex_array.Unbind();
+    grid.shader_program.Unuse();
+
+    glDisable(GL_BLEND);
+
 }
 
 void Renderer::Render(Scene::Scene& scene)
 {
-
     if (_grid)
-    {
+        RenderGrid(scene, *_grid);
 
-        // Alpha Blending (for handling transparency)
-        {
-            // calculate a color by mixing the new pixel with pixel already in buffer
-            glEnable(GL_BLEND);
-
-            // use the alpha value of new color to determine opacity
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        }
-
-        _grid->shader_program.Use();
-        _grid->vertex_array.Bind();
-
-        _grid->shader_program.SetUniform("view", scene.GetMainCamera()->GetView());
-        _grid->shader_program.SetUniform("projection", scene.GetMainCamera()->GetProjection());
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-        _grid->vertex_array.Unbind();
-        _grid->shader_program.Unuse();
-
-        glDisable(GL_BLEND);
-
-    }
 
     //auto const delta_time = _window_instance->GetDeltaTime();
     //_main_camera->Update(delta_time);
 
-    for (auto const view = scene.GetRegistry().view<Scene::MeshComponent, Scene::TransformComponent>(); auto entity : view)
+    for (auto const view = scene.GetRegistry().view<MeshComponent, TransformComponent>(); auto entity : view)
     {
         auto const entity_index = static_cast<uint32_t>(entity);
         if (entity_index >= _render_entities.size() || !_render_entities[entity_index])
-            CreateRenderEntity(entity, view.get<Scene::MeshComponent>(entity));
+            CreateRenderEntity(entity, view.get<MeshComponent>(entity));
 
         auto const& render_entity = _render_entities[entity_index];
         render_entity->shader_program.Use();
@@ -68,10 +70,11 @@ void Renderer::Render(Scene::Scene& scene)
         // uniforms
         render_entity->shader_program.SetUniform(
             "model",
-            view.get<Scene::TransformComponent>(entity).GetMatrix()
+            view.get<TransformComponent>(entity).GetMatrix()
         );
-        render_entity->shader_program.SetUniform("view", scene.GetMainCamera()->GetView());
-        render_entity->shader_program.SetUniform("projection", scene.GetMainCamera()->GetProjection());
+        render_entity->shader_program.SetUniform("view", scene.GetEditorCamera()->GetView());
+        render_entity->shader_program.SetUniform("projection", scene.GetEditorCamera()->GetProjection());
+
 
         glDrawElements(GL_TRIANGLES, static_cast<int>(render_entity->index_buffer.Count()), GL_UNSIGNED_INT, nullptr);
 
@@ -81,7 +84,7 @@ void Renderer::Render(Scene::Scene& scene)
     }
 }
 
-void Renderer::CreateRenderEntity(Scene::Entity const& entity, Scene::MeshComponent& mesh)
+void Renderer::CreateRenderEntity(Entity const& entity, MeshComponent& mesh)
 {
     auto render_entity = std::make_unique<RenderEntity>();
 
@@ -94,8 +97,8 @@ void Renderer::CreateRenderEntity(Scene::Entity const& entity, Scene::MeshCompon
     render_entity->index_buffer.BufferData(mesh.GetIndices());
 
     VertexBufferLayout layout;
-    layout.Push(ShaderDatatype::FLOAT, 3); // position
-    layout.Push(ShaderDatatype::FLOAT, 3); // normal
+    layout.Push(FLOAT, 3); // position
+    layout.Push(FLOAT, 3); // normal
     render_entity->vertex_array.AddVertexBuffer(render_entity->vertex_buffer, layout);
 
 

@@ -11,7 +11,7 @@ Scene::Scene() :
     CameraSettings camera_settings;
     camera_settings.is_primary = true;
     camera_settings.position = glm::vec3(1.0f, 1.0f, 1.0f);
-    _main_camera = std::make_shared<Camera>(camera_settings);
+    _editor_camera = std::make_shared<EditorCamera>(camera_settings);
 }
 
 
