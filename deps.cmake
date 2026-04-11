@@ -10,6 +10,7 @@ function(find_packages)
     find_package(glm CONFIG REQUIRED)
     find_package(Angelscript CONFIG REQUIRED)
     find_package(Boost REQUIRED)
+    find_package(nlohmann_json CONFIG REQUIRED)
 endfunction()
 
 function(link_libs target)
@@ -23,6 +24,7 @@ function(link_libs target)
             PRIVATE EnTT::EnTT
             PRIVATE Angelscript::angelscript
             PRIVATE Boost::headers
+            PRIVATE nlohmann_json::nlohmann_json
     )
 endfunction()
 

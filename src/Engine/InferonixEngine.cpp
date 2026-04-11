@@ -19,6 +19,9 @@ InferonixEngine::InferonixEngine()
       _renderer(std::make_shared<Renderer::Renderer>(_window)),
       _scene(std::make_unique<Scene::Scene>())
 {
+
+/*
+
     // _renderer->SetCamera(_scene->GetMainCamera());
     EventSystem::EventHandler::Get()->Subscribe(_renderer);
 
@@ -57,7 +60,7 @@ InferonixEngine::InferonixEngine()
         transform.position = {0.0f, 0.0f, -5.0f};
         registry.emplace<TransformComponent>(entity, transform);
     }
-
+*/
     _script_launcher.Launch();
     _initialized = true;
 }

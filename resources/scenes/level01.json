@@ -1,0 +1,23 @@
+{
+  "SceneName": "Test",
+  "Entities": [
+    {
+      "Name": "MonkeyPlayer",
+      "Components": {
+        "TransformComponent": {
+          "Position": [0.0, 0.0, -5.0],
+          "Rotation": [0.0, 0.0, 0.0],
+          "Scale": [0.5, 0.5, 0.5]
+        },
+        "MeshComponent": {
+          "AssetID": "004c2f80-92d0-4d05-a1ca-45974ee779b9",
+          "AssetPath": "resources/models/Monkey.obj"
+        },
+        "ScriptComponent": {
+          "ScriptPath": "resources/scripts/Player.as"
+        }
+      }
+    }
+  ]
+
+}

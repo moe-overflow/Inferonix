@@ -48,6 +48,10 @@
     {
       "name": "boost-uuid",
       "version>=": "1.89.0"
+    },
+    {
+      "name": "nlohmann-json",
+      "version>=": "3.12.0"
     }
   ]
 
