@@ -5,6 +5,7 @@
 #include "Renderer/Renderer.hpp"
 #include "Window/Window.hpp"
 #include "Script/ScriptingEngineLauncher.hpp"
+#include "Physics/Physics.hpp"
 
 namespace Inferonix
 {
@@ -31,6 +32,8 @@ namespace Inferonix
         
         Script::ScriptingEngineLauncher _script_launcher;
         bool _initialized{ false };
+
+        Physics::PhysicsEngine _physics_engine;
     };
 
 }

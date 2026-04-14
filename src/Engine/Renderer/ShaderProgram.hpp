@@ -13,7 +13,7 @@ namespace Inferonix::Renderer
     {
 
     public:
-        ShaderProgram(
+        explicit ShaderProgram(
             std::string const& VertexShaderPath = SHADERS_PATH "/VertexShader.glsl",
             std::string const& FragmentShaderPath = SHADERS_PATH "/FragmentShader.glsl"
         );

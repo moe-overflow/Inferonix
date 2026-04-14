@@ -75,21 +75,26 @@ InferonixEngine::~InferonixEngine()
 
 void InferonixEngine::run()
 {
+    _physics_engine.Init();
+    _physics_engine.StartSimulation(_scene->GetRegistry());
+
+
     while (!_window->ShouldClose())
     {
         float const delta_time = _window->GetDeltaTime();
-        _window->PollEvents();
 
+        Window::Window::PollEvents();
 
         if (_initialized)
         {
             _script_launcher.Start(_scene->GetRegistry());
             _script_launcher.Update(_scene->GetRegistry(), delta_time);
+            _physics_engine.Update(_scene->GetRegistry(), delta_time);
         }
 
         _scene->GetEditorCamera()->Update(delta_time);
 
-        _renderer->Clear();
+        Renderer::Renderer::Clear();
         _renderer->Render(*_scene);
 
         _window->SwapBuffers();

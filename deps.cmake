@@ -11,6 +11,7 @@ function(find_packages)
     find_package(Angelscript CONFIG REQUIRED)
     find_package(Boost REQUIRED)
     find_package(nlohmann_json CONFIG REQUIRED)
+    find_package(Jolt CONFIG REQUIRED)
 endfunction()
 
 function(link_libs target)
@@ -25,6 +26,7 @@ function(link_libs target)
             PRIVATE Angelscript::angelscript
             PRIVATE Boost::headers
             PRIVATE nlohmann_json::nlohmann_json
+            PRIVATE Jolt::Jolt
     )
 endfunction()
 
