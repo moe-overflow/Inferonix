@@ -23,13 +23,13 @@ namespace Inferonix
 
         ~InferonixEngine();
 
-        void run();
+        void Run();
 
     private:
         std::shared_ptr<Window::Window> _window;
         std::shared_ptr<Renderer::Renderer> _renderer;
         std::unique_ptr<Scene::Scene> _scene;
-        
+
         Script::ScriptingEngineLauncher _script_launcher;
         bool _initialized{ false };
 

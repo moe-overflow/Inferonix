@@ -1,7 +1,10 @@
-#include "../../Engine/InferonixEngine.hpp"
+#include "InferonixEngine.hpp"
 
 int main(int argc, char** argv)
 {
     auto engine = Inferonix::InferonixEngine{};
-    engine.run();
+    engine.Run();
 }
+
+
+

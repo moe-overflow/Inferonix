@@ -18,6 +18,5 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 include(cmake/PathDefinitions.cmake)
 
-add_subdirectory(src/Engine)
-add_subdirectory(src/Workbench)
+add_subdirectory(src)
 

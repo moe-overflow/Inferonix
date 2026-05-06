@@ -2,13 +2,14 @@
 
 #include "Utility/UUID.hpp"
 #include "Scene/Components.hpp"
+#include "Renderer/Renderer.hpp"
 
 using namespace Inferonix;
 using namespace Inferonix::Window;
 using namespace Inferonix::Renderer;
 using namespace Inferonix::Scene;
 
-WindowSettings workbench_window_settings{ .width = 1920,
+auto workbench_window_settings =  WindowSettings { .width = 1920,
                                           .height = 1080,
                                           .title = "Inferonix Engine",
                                           .full_screen = false,
@@ -61,7 +62,32 @@ InferonixEngine::InferonixEngine()
         registry.emplace<TransformComponent>(entity, transform);
     }
 */
+
     _script_launcher.Launch();
+
+    {
+
+        auto mesh = _scene->GetAssetRegistry().Load<Mesh>(
+            UUID::Generate(),
+            RESOURCES_PATH "models/Monkey.obj"
+        );
+
+        // 1. Create a Static Floor (Invisible, just catches the monkey)
+        auto floor = _scene->GetRegistry().create();
+        _scene->GetRegistry().emplace<TransformComponent>(floor).position = {0, -5.0f, 0};
+        _scene->GetRegistry().emplace<BoxColliderComponent>(floor).HalfExtents = {50.0f, 1.0f, 50.0f};
+        _scene->GetRegistry().emplace<RigidBodyComponent>(floor, 0.0f, JPH::BodyID(), RigidBodyType::Static);
+
+        // 2. Create the Falling Monkey!
+        auto box = _scene->GetRegistry().create();
+        _scene->GetRegistry().emplace<TransformComponent>(box).position = {0, 10.0f, 0}; // Drop from high up!
+        _scene->GetRegistry().emplace<BoxColliderComponent>(box).HalfExtents = {0.5f, 0.5f, 0.5f};
+        _scene->GetRegistry().emplace<RigidBodyComponent>(box, 1.0f, JPH::BodyID(), RigidBodyType::Dynamic);
+
+        if (mesh.has_value())
+            _scene->GetRegistry().emplace<MeshComponent>(box, *mesh.value());
+
+    }
     _initialized = true;
 }
 
@@ -73,7 +99,27 @@ InferonixEngine::~InferonixEngine()
     }
 }
 
-void InferonixEngine::run()
+/*
+const float FIXED_DT = 1.0f / 60.0f; // Exactly 60Hz
+float accumulator = 0.0f;
+
+while (!_window->ShouldClose()) {
+    float frame_time = _window->GetDeltaTime();
+    accumulator += frame_time;
+
+    // Run physics/logic in exact chunks
+    while (accumulator >= FIXED_DT) {
+        _physics_engine.StepSimulation(FIXED_DT);
+        _script_launcher.FixedUpdate(_scene->GetRegistry(), FIXED_DT);
+        accumulator -= FIXED_DT;
+    }
+
+    // Render as fast as possible
+    _renderer->Render(*_scene);
+}
+ */
+
+void InferonixEngine::Run()
 {
     _physics_engine.Init();
     _physics_engine.StartSimulation(_scene->GetRegistry());
