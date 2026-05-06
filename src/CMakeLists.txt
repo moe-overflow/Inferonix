@@ -1,8 +1,8 @@
 file(GLOB_RECURSE SOURCE_FILES "*.cpp" "*.hpp")
 
-add_executable(InferonixEngine ${SOURCE_FILES} EntryPoint.cpp)
+add_executable(InferonixEngine ${SOURCE_FILES} entry_point.cpp)
 
-include(${CMAKE_SOURCE_DIR}/cmake/deps.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 find_packages()
 link_libs(InferonixEngine)
 add_angelscript_addons(InferonixEngine)
