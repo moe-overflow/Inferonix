@@ -6,18 +6,18 @@
 
 #include <utility>
 
-using namespace Inferonix::Renderer;
-using namespace Inferonix::Scene;
+using namespace inferonix::renderer;
+using namespace inferonix::scene;
 
-renderer::renderer(std::shared_ptr<Window::window> window) : _window_instance(std::move(window))
+renderer::renderer(std::shared_ptr<window::window> window) : _window_instance(std::move(window))
 {
 #ifndef NDEBUG
-    SetupOpenGLDebug();
+    setup_opengl_debug();
 #endif
 
-    SetDeviceSpecs();
-    SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    SetupGrid();
+    set_device_specs();
+    set_clear_color(0.0f, 0.0f, 0.0f, 1.0f);
+    setup_grid();
 }
 
 static void RenderGrid(scene const& scene, RenderEntity const& grid)
@@ -31,22 +31,22 @@ static void RenderGrid(scene const& scene, RenderEntity const& grid)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    grid.shader_program_.Use();
-    grid.vertex_array_.Bind();
+    grid.shader_program_.use();
+    grid.vertex_array_.bind();
 
-    grid.shader_program_.SetUniform("view", scene.GetEditorCamera()->GetView());
-    grid.shader_program_.SetUniform("projection", scene.GetEditorCamera()->GetProjection());
+    grid.shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
+    grid.shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-    grid.vertex_array_.Unbind();
-    grid.shader_program_.Unuse();
+    grid.vertex_array_.unbind();
+    grid.shader_program_.unuse();
 
     glDisable(GL_BLEND);
 
 }
 
-void renderer::Render(Scene::scene& scene)
+void renderer::render(scene::scene& scene)
 {
     if (_grid)
         RenderGrid(scene, *_grid);
@@ -55,56 +55,61 @@ void renderer::Render(Scene::scene& scene)
     //auto const delta_time = _window_instance->GetDeltaTime();
     //_main_camera->Update(delta_time);
 
-    for (auto const view = scene.GetRegistry().view<MeshComponent, TransformComponent>(); auto entity : view)
+    for (auto const view = scene.get_registry().view<mesh_component, transform_component>(); auto entity : view)
     {
         auto const entity_index = static_cast<uint32_t>(entity);
         if (entity_index >= _render_entities.size() || !_render_entities[entity_index])
-            CreateRenderEntity(entity, view.get<MeshComponent>(entity));
+            create_render_entity(entity, view.get<mesh_component>(entity));
 
         auto const& render_entity = _render_entities[entity_index];
-        render_entity->shader_program_.Use();
-        render_entity->vertex_array_.Bind();
+        render_entity->shader_program_.use();
+        render_entity->vertex_array_.bind();
 
-        render_entity->shader_program_.SetUniform("myColor", 0.541f, 0.124f, 0.784f);
+        render_entity->shader_program_.set_uniform("myColor", 0.541f, 0.124f, 0.784f);
 
         // uniforms
-        render_entity->shader_program_.SetUniform(
+        render_entity->shader_program_.set_uniform(
             "model",
-            view.get<TransformComponent>(entity).GetMatrix()
+            view.get<transform_component>(entity).get_matrix()
         );
-        render_entity->shader_program_.SetUniform("view", scene.GetEditorCamera()->GetView());
-        render_entity->shader_program_.SetUniform("projection", scene.GetEditorCamera()->GetProjection());
+        render_entity->shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
+        render_entity->shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
 
 
-        glDrawElements(GL_TRIANGLES, static_cast<int>(render_entity->index_buffer_.Count()), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(
+            GL_TRIANGLES,
+            render_entity->index_buffer_.count(),
+            GL_UNSIGNED_INT,
+            nullptr
+        );
 
-        render_entity->vertex_array_.Unbind();
-        render_entity->shader_program_.Unuse();
+        render_entity->vertex_array_.unbind();
+        render_entity->shader_program_.unuse();
 
     }
 }
 
-void renderer::CreateRenderEntity(Entity const& entity, MeshComponent& mesh)
+void renderer::create_render_entity(entity const& entity, mesh_component& mesh)
 {
     auto render_entity = std::make_unique<RenderEntity>();
 
-    render_entity->vertex_array_.Bind();
-    render_entity->vertex_buffer_.Bind();
+    render_entity->vertex_array_.bind();
+    render_entity->vertex_buffer_.bind();
 
-    render_entity->vertex_buffer_.BufferData(mesh.GetVertices());
+    render_entity->vertex_buffer_.buffer_data(mesh.GetVertices());
 
-    render_entity->index_buffer_.Bind();
-    render_entity->index_buffer_.BufferData(mesh.GetIndices());
+    render_entity->index_buffer_.bind();
+    render_entity->index_buffer_.buffer_data(mesh.GetIndices());
 
-    VertexBufferLayout layout;
-    layout.Push(FLOAT, 3); // position
-    layout.Push(FLOAT, 3); // normal
-    render_entity->vertex_array_.AddVertexBuffer(render_entity->vertex_buffer_, layout);
+    vertex_buffer_layout layout;
+    layout.push(FLOAT, 3); // position
+    layout.push(FLOAT, 3); // normal
+    render_entity->vertex_array_.add_vertex_buffer(render_entity->vertex_buffer_, layout);
 
 
-    render_entity->vertex_array_.SetIndexBuffer(render_entity->index_buffer_);
-    render_entity->vertex_buffer_.Unbind();
-    render_entity->vertex_array_.Unbind();
+    render_entity->vertex_array_.set_index_buffer(render_entity->index_buffer_);
+    render_entity->vertex_buffer_.unbind();
+    render_entity->vertex_array_.unbind();
 
     /**/
 
@@ -115,17 +120,17 @@ void renderer::CreateRenderEntity(Entity const& entity, MeshComponent& mesh)
 
 }
 
-void renderer::SetClearColor(float r, float g, float b, float a)
+void renderer::set_clear_color(float r, float g, float b, float a)
 {
     glClearColor(r, g, b, a);
 }
 
-void renderer::Clear()
+void renderer::clear()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void renderer::SetDeviceSpecs()
+void renderer::set_device_specs()
 {
     _device_specs.vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
     _device_specs.renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
@@ -140,7 +145,7 @@ void renderer::SetDeviceSpecs()
         _device_specs.vendor, _device_specs.renderer, _device_specs.version, _device_specs.shading_language_version);
 }
 
-void renderer::SetupOpenGLDebug()
+void renderer::setup_opengl_debug()
 {
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT);
@@ -163,11 +168,11 @@ void renderer::SetupOpenGLDebug()
     );
 }
 
-void renderer::OnEvent(EventSystem::event& event)
+void renderer::on_event(events::event& event)
 {
-    if (auto const type = dynamic_cast<EventSystem::key_event*>(&event))
+    if (auto const type = dynamic_cast<events::key_event*>(&event))
     {
-        if(type->GetKey() == InputSystem::Key::F1 && type->GetType() == EventSystem::KeyEventType::KeyPressedEvent)
+        if(type->GetKey() == input::Key::F1 && type->GetType() == events::KeyEventType::KeyPressedEvent)
         {
             _wireframe_mode = !_wireframe_mode;
             glPolygonMode(GL_FRONT_AND_BACK, _wireframe_mode ? GL_LINE : GL_FILL);
@@ -175,7 +180,7 @@ void renderer::OnEvent(EventSystem::event& event)
     }
 }
 
-void renderer::SetupGrid()
+void renderer::setup_grid()
 {
     _grid = std::make_unique<RenderEntity>();
     _grid->shader_program_ = shader_program{
@@ -183,7 +188,7 @@ void renderer::SetupGrid()
         SHADERS_PATH "/grid_fragment.glsl"
     };
 
-    auto const vertices = std::vector<Vertex>{
+    auto const vertices = std::vector<vertex>{
         {{-50.0f, 0.0f, -50.0f}, {0.0f, 1.0f, 0.0f}},
         {{ 50.0f, 0.0f, -50.0f}, {0.0f, 1.0f, 0.0f}},
         {{ 50.0f, 0.0f,  50.0f}, {0.0f, 1.0f, 0.0f}},
@@ -192,21 +197,21 @@ void renderer::SetupGrid()
     auto indices = std::vector<uint32_t> { 0, 1, 2, 2, 3, 0 };
 
 
-    _grid->vertex_buffer_.Bind();
-    _grid->vertex_buffer_.BufferData(vertices);
+    _grid->vertex_buffer_.bind();
+    _grid->vertex_buffer_.buffer_data(vertices);
 
-    _grid->index_buffer_.Bind();
-    _grid->index_buffer_.BufferData(indices);
+    _grid->index_buffer_.bind();
+    _grid->index_buffer_.buffer_data(indices);
 
-    VertexBufferLayout layout;
-    layout.Push(FLOAT, 3); // position
-    layout.Push(FLOAT, 3); // normal
+    auto layout = vertex_buffer_layout{};
+    layout.push(FLOAT, 3); // position
+    layout.push(FLOAT, 3); // normal
 
-    _grid->vertex_array_.Bind();
-    _grid->vertex_array_.AddVertexBuffer(_grid->vertex_buffer_, layout);
-    _grid->vertex_array_.SetIndexBuffer(_grid->index_buffer_);
+    _grid->vertex_array_.bind();
+    _grid->vertex_array_.add_vertex_buffer(_grid->vertex_buffer_, layout);
+    _grid->vertex_array_.set_index_buffer(_grid->index_buffer_);
 
-    _grid->vertex_array_.Unbind();
+    _grid->vertex_array_.unbind();
 }
 
 

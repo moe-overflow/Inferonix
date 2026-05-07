@@ -2,7 +2,7 @@
 
 #include "scene.hpp"
 
-namespace Inferonix::Scene
+namespace inferonix::scene
 {
 
     class scene_serializer final

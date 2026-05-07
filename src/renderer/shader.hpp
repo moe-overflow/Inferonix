@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-namespace Inferonix::Renderer
+namespace inferonix::renderer
 {
 
     enum ShaderType : GLenum
@@ -30,13 +30,13 @@ namespace Inferonix::Renderer
         shader& operator=(shader const&) = delete;
         shader& operator=(shader&& other) noexcept;
 
-        static std::string ReadFromFile(std::string const& path);
+        static std::string read_from_file(std::string const& path);
 
-        void Create() const;
+        void create() const;
 
-        [[nodiscard]] GLuint Get() const;
+        [[nodiscard]] GLuint get() const;
 
-        void CheckErrors() const;
+        void check_errors() const;
 
     private:
         ShaderType _type;

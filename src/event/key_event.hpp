@@ -4,7 +4,7 @@
 #include "../input/key_codes.hpp"
 
 
-namespace Inferonix::EventSystem
+namespace inferonix::events
 {
     enum class KeyEventType
     {
@@ -19,9 +19,9 @@ namespace Inferonix::EventSystem
     class key_event final : public event
     {
     public:
-        key_event(InputSystem::Key const& key, KeyEventType const type) : _key(key), _type(type) {}
+        key_event(input::Key const& key, KeyEventType const type) : _key(key), _type(type) {}
 
-        [[nodiscard]] InputSystem::Key GetKey() const
+        [[nodiscard]] input::Key GetKey() const
         {
             return _key;
         }
@@ -32,7 +32,7 @@ namespace Inferonix::EventSystem
         }
 
     private:
-        InputSystem::Key _key;
+        input::Key _key;
         KeyEventType _type;
     };
 

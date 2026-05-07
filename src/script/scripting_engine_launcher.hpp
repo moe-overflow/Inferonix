@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <filesystem>
 
-namespace Inferonix::Script
+namespace inferonix::script
 {
     class scripting_engine_launcher final
     {
@@ -15,11 +15,11 @@ namespace Inferonix::Script
         scripting_engine_launcher();
         ~scripting_engine_launcher();
 
-        void Launch();
-        void Terminate();
+        void launch();
+        void terminate();
 
-        void Start(Scene::Registry& scene_registry);
-        void Update(Scene::Registry& scene_registry, float delta_time);
+        void start(scene::registry& scene_registry);
+        void update(scene::registry& scene_registry, float delta_time);
 
     private:
         scripting_engine _engine;

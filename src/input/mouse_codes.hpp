@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Inferonix::InputSystem
+namespace inferonix::input
 {
     enum class MouseKey
     {

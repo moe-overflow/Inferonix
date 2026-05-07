@@ -6,10 +6,10 @@
 #include "entt/entt.hpp"
 #include <memory>
 
-namespace Inferonix::Scene
+namespace inferonix::scene
 {
-    using Registry = entt::registry;
-    using Entity = entt::entity;
+    using registry = entt::registry;
+    using entity = entt::entity;
 
     class scene
     {
@@ -17,16 +17,16 @@ namespace Inferonix::Scene
         scene();
         ~scene() = default;
 
-        [[nodiscard]] Registry& GetRegistry() { return *_registry; }
-        [[nodiscard]] const Registry& GetRegistry() const { return *_registry; }
+        [[nodiscard]] registry& get_registry() { return *_registry; }
+        [[nodiscard]] const registry& get_registry() const { return *_registry; }
 
-        [[nodiscard]] Asset::asset_registry& GetAssetRegistry() { return *_asset_registry; }
+        [[nodiscard]] asset::asset_registry& get_asset_registry() const { return *_asset_registry; }
 
-        [[nodiscard]] std::shared_ptr<camera> GetEditorCamera() const { return _editor_camera; }
+        [[nodiscard]] std::shared_ptr<camera> get_editor_camera() const { return _editor_camera; }
 
     private:
-        std::unique_ptr<Registry> _registry;
-        std::unique_ptr<Asset::asset_registry> _asset_registry;
+        std::unique_ptr<registry> _registry;
+        std::unique_ptr<asset::asset_registry> _asset_registry;
 
         std::shared_ptr<editor_camera> _editor_camera;
 

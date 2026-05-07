@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
-using namespace Inferonix::Scene;
+using namespace inferonix::scene;
 
 scene_serializer::scene_serializer(scene& scene) : _scene(scene) {}
 
@@ -20,8 +20,8 @@ bool scene_serializer::Deserialize(const std::string& filepath) const
     std::ifstream file(filepath);
     auto data = nlohmann::json::parse(file);
 
-    auto& registry = _scene.GetRegistry();
-    auto& assets = _scene.GetAssetRegistry();
+    auto& registry = _scene.get_registry();
+    auto& assets = _scene.get_asset_registry();
 
     for (auto& entity_data : data["entities"])
     {
@@ -29,10 +29,10 @@ bool scene_serializer::Deserialize(const std::string& filepath) const
         if (entity_data["Components"].contains("TransformComponent"))
         {
             auto& transform = entity_data["Components"]["TransformComponent"];
-            auto tc = TransformComponent{};
+            auto tc = transform_component{};
             tc.position = {transform["Position"][0], transform["Position"][1], transform["Position"][2]};
             tc.scale = {transform["Scale"][0], transform["Scale"][1], transform["Scale"][2]};
-            registry.emplace<TransformComponent>(entity, tc);
+            registry.emplace<transform_component>(entity, tc);
         }
 
         if (entity_data["Components"].contains("MeshComponent"))
@@ -41,18 +41,18 @@ bool scene_serializer::Deserialize(const std::string& filepath) const
             auto path = mesh_data["AssetPath"];
             auto id = mesh_data["AssetID"];
 
-            auto mesh = assets.Load<Renderer::mesh>(id, path);
+            auto mesh = assets.load<renderer::mesh>(id, path);
             if (mesh)
-                registry.emplace<MeshComponent>(entity, *mesh.value());
+                registry.emplace<mesh_component>(entity, *mesh.value());
         }
 
         if (entity_data["Components"].contains("ScriptComponent"))
         {
             auto& script_data = entity_data["Components"]["ScriptComponent"];
-            auto script = ScriptComponent{};
+            auto script = script_component{};
             script.script_path = script_data["ScriptPath"];
             script.initialized = false;
-            registry.emplace<ScriptComponent>(entity, std::move(script));
+            registry.emplace<script_component>(entity, std::move(script));
         }
 
     }

@@ -3,7 +3,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace Inferonix::Renderer
+namespace inferonix::renderer
 {
     struct transform
     {
@@ -14,7 +14,7 @@ namespace Inferonix::Renderer
         transform() : position(0.0f), rotation(0.0f), scale(1.0f) { }
 
 
-        [[nodiscard]] glm::mat4 GetMatrix() const
+        [[nodiscard]] glm::mat4 get_matrix() const
         {
             auto mat = glm::mat4(1.0f);
             mat = glm::translate(mat, position);
@@ -25,22 +25,22 @@ namespace Inferonix::Renderer
             return mat;
         }
 
-        void Translate(glm::vec3 const& delta)
+        void translate(glm::vec3 const& delta)
         {
             position += delta;
         }
 
-        void Rotate(glm::vec3 const& delta)
+        void rotate(glm::vec3 const& delta)
         {
             rotation += delta;
         }
 
-        void ScaleBy(glm::vec3 const& factor)
+        void scale_by(glm::vec3 const& factor)
         {
             scale *= factor;
         }
 
-        void NormalizeRotation()
+        void normalize_rotation()
         {
             rotation = glm::mod(rotation, 360.0f);
         }

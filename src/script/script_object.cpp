@@ -1,11 +1,11 @@
 #include "script_object.hpp"
 #include <spdlog/spdlog.h>
 
-using namespace Inferonix::Script;
+using namespace inferonix::script;
 
-namespace Inferonix::Script::detail
+namespace inferonix::script::detail
 {
-    void ScriptObjectDeleter::operator()(asIScriptObject const* obj) const noexcept
+    void script_object_deleter::operator()(asIScriptObject const* obj) const noexcept
     {
         if (obj)
         {
@@ -14,7 +14,7 @@ namespace Inferonix::Script::detail
     }
 }
 
-script_object::script_object(std::unique_ptr<asIScriptObject, detail::ScriptObjectDeleter> instance) 
+script_object::script_object(std::unique_ptr<asIScriptObject, detail::script_object_deleter> instance)
     : _instance(std::move(instance))
 {}
 
@@ -33,7 +33,7 @@ script_object& script_object::operator=(script_object&& other) noexcept
     return *this;
 }
 
-void script_object::CallMethod(std::string_view method_name, std::vector<void*> const& /*arguments*/) const
+void script_object::call_method(std::string_view method_name, std::vector<void*> const& /*arguments*/) const
 {
     if (!_instance)
     {
@@ -87,7 +87,7 @@ void script_object::CallMethod(std::string_view method_name, std::vector<void*> 
     ctx->Release();
 }
 
-void script_object::CallStart(uint32_t entity) const
+void script_object::call_start(uint32_t entity) const
 {
     if (!_instance) return;
 
@@ -106,7 +106,7 @@ void script_object::CallStart(uint32_t entity) const
     }
 }
 
-void script_object::CallUpdate(float delta_time) const
+void script_object::call_update(float delta_time) const
 {
     if (!_instance) return;
 

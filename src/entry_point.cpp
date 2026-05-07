@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv)
 {
-    auto engine = Inferonix::inferonix_engine{};
+    auto engine = inferonix::inferonix_engine{};
     engine.Run();
 }
 

@@ -12,21 +12,22 @@
 #include "../input/key_codes.hpp"
 #include "../input/input.hpp"
 
-using namespace Inferonix::Window;
-using namespace Inferonix::EventSystem;
-using namespace std::chrono;
-using namespace Inferonix::InputSystem;
+using namespace inferonix::window;
+using namespace inferonix::events;
+using namespace inferonix::input;
 
-window::window(WindowSettings& window_settings)
+using namespace std::chrono;
+
+window::window(window_settings& window_settings)
     : _settings(std::move(window_settings)),
       _instance(nullptr),
       _last_frame_time(steady_clock::now())
 {
-    Create();
+    create();
     _initialized = true;
 }
 
-void window::Init()
+void window::init()
 {
     _initialized = glfwInit();
     if (!_initialized)
@@ -41,16 +42,16 @@ void window::Init()
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 }
 
-void window::Create()
+void window::create()
 {
-    Init();
+    init();
     _instance = glfwCreateWindow(_settings.width, _settings.height, _settings.title.c_str(), nullptr, nullptr);
-    SetInputPointerFunctions(_instance);
+    set_input_pointer_functions(_instance);
 
     if (_instance == nullptr)
     {
         spdlog::error("Error while creating Window");
-        this->Destroy();
+        this->destroy();
         return;
     }
 
@@ -66,38 +67,38 @@ void window::Create()
     }
 }
 
-bool window::ShouldClose() const
+bool window::should_close() const
 {
     return glfwWindowShouldClose(_instance);
 }
 
-void window::PollEvents()
+void window::poll_events()
 {
     glfwPollEvents();
 }
 
-void window::SwapBuffers() const
+void window::swap_buffers() const
 {
     glfwSwapBuffers(_instance);
 }
 
-void window::Destroy()
+void window::destroy()
 {
     glfwTerminate();
     _instance = nullptr;
 }
 
-void window::Close() const
+void window::close() const
 {
     glfwSetWindowShouldClose(_instance, GLFW_TRUE);
 }
 
-void window::HandleEvent(event& event)
+void window::handle_event(event& event)
 {
-    event_handler::Get()->Dispatch(event);
+    event_handler::get()->dispatch(event);
 }
 
-float window::GetDeltaTime()
+float window::get_delta_time()
 {
     delta_time_point const current_frame_time = steady_clock::now();
     duration<float> const duration = current_frame_time - _last_frame_time;
@@ -159,13 +160,13 @@ namespace
     void WindowCloseCallback([[maybe_unused]] GLFWwindow* window)
     {
         window_event e(WindowEventType::WindowClose);
-        window::HandleEvent(e);
+        window::handle_event(e);
     }
 
     void WindowResizeCallback([[maybe_unused]]GLFWwindow* window, int width, int height)
     {
         window_event e(WindowEventType::WindowResize, width, height);
-        window::HandleEvent(e);
+        window::handle_event(e);
     }
 
     void KeyCallback(
@@ -185,7 +186,7 @@ namespace
         {
             case GLFW_PRESS:
                 type = KeyEventType::KeyPressedEvent;
-                input::SetKeyDown(*key);
+                input::set_key_down(*key);
 
                 break;
 
@@ -195,7 +196,7 @@ namespace
 
             case GLFW_RELEASE:
                 type = KeyEventType::KeyReleasedEvent;
-                input::SetKeyUp(*key);
+                input::set_key_up(*key);
                 break;
 
             default:
@@ -204,7 +205,7 @@ namespace
         }
 
         key_event e(*key, type);
-        window::HandleEvent(e);
+        window::handle_event(e);
     }
 
     std::optional<MouseKey> GlfwToMouseKey(int glfw_button)
@@ -225,11 +226,11 @@ namespace
         [[maybe_unused]]int mods)
     {
         if (auto key = GlfwToMouseKey(button)) {
-            if (action == GLFW_PRESS) input::SetMouseKeyDown(*key);
-            else if (action == GLFW_RELEASE) input::SetMouseKeyUp(*key);
+            if (action == GLFW_PRESS) input::set_mouse_key_down(*key);
+            else if (action == GLFW_RELEASE) input::set_mouse_key_up(*key);
         }
 
-        MouseButton e;
+        auto e = MouseButton{};
 
         if (action == GLFW_PRESS)
             e = MouseButton(MouseEventType::MouseButtonClicked, button);
@@ -238,7 +239,7 @@ namespace
             e = MouseButton(MouseEventType::MouseButtonReleased, button);
 
 
-        window::HandleEvent(e);
+        window::handle_event(e);
     }
 
     void CursorCallback(
@@ -246,9 +247,9 @@ namespace
         double const x,
         double const y)
     {
-        input::SetMousePosition(static_cast<float>(x), static_cast<float>(y));
+        input::set_mouse_position(static_cast<float>(x), static_cast<float>(y));
         MouseCursorMoved e(MouseEventType::MousePointerMoved, static_cast<int>(x), static_cast<int>(y));
-        window::HandleEvent(e);
+        window::handle_event(e);
     }
 
     void PointerEnterCallback([[maybe_unused]] GLFWwindow* window, int const entered)
@@ -275,12 +276,12 @@ namespace
         }
 
         MouseCursorEntered e(type, in_window);
-        window::HandleEvent(e);
+        window::handle_event(e);
     }
 } // namespace
 
 
-void window::SetInputPointerFunctions(GLFWwindow* glfw_window)
+void window::set_input_pointer_functions(GLFWwindow* glfw_window)
 {
     glfwSetFramebufferSizeCallback(glfw_window, FramebufferSizeCallback);
 

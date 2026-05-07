@@ -6,12 +6,12 @@
 #include <angelscript.h>
 #include <unordered_map>
 
-namespace Inferonix::Renderer
+namespace inferonix::renderer
 {
     struct transform;
 }
 
-namespace Inferonix::Script
+namespace inferonix::script
 {
 
     class script_module final
@@ -37,10 +37,10 @@ namespace Inferonix::Script
 
     namespace detail
     {
-        void RegisterGlobals(asIScriptEngine* engine);
+        void register_globals(asIScriptEngine* engine);
 
         // Storage for entity to transform mapping
-        extern std::unordered_map<uint32_t, Renderer::transform*> g_entity_transforms;
+        extern std::unordered_map<uint32_t, renderer::transform*> g_entity_transforms;
     }
 
 }

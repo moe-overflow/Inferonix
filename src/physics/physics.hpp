@@ -9,18 +9,18 @@
 #include <Jolt/Physics/PhysicsSystem.h>
 
 namespace JPH { class PhysicsSystem; class JobSystem; class TempAllocator; }
-namespace Inferonix::Physics
+namespace inferonix::physics
 {
-    class PhysicsEngine final
+    class physics_engine final
     {
     public:
-        PhysicsEngine() = default;
-        ~PhysicsEngine();
+        physics_engine() = default;
+        ~physics_engine();
 
-        void Init();
-        void StartSimulation(Scene::Registry& registry) const;
+        void init();
+        void start_simulation(scene::registry& registry) const;
 
-        void Update(Scene::Registry& registry, float delta_time) const;
+        void update(scene::registry& registry, float delta_time) const;
 
     private:
         std::unique_ptr<JPH::PhysicsSystem> _physics_system;

@@ -8,38 +8,38 @@
 #include <filesystem>
 #include <spdlog/spdlog.h>
 
-namespace Inferonix::Asset
+namespace inferonix::asset
 {
-    using Registry = entt::registry;
+    using registry = entt::registry;
 
     template<typename T>
-    concept LoadableAsset = requires(T t, const std::filesystem::path& path)
+    concept loadable_asset = requires(T t, const std::filesystem::path& path)
     {
-        { t.LoadFromFile(path) } -> std::same_as<bool>;
+        { t.load_from_file(path) } -> std::same_as<bool>;
     };
 
     class asset_registry
     {
     public:
-        explicit asset_registry(Registry& registry);
+        explicit asset_registry(registry& registry);
         ~asset_registry() = default;
 
         asset_registry(const asset_registry&) = delete;
         asset_registry& operator=(const asset_registry&) = delete;
 
-        template<typename AssetType>
-        std::expected<std::shared_ptr<AssetType>, std::string>
-        Load(std::string const& id, std::filesystem::path const& path)
+        template<typename asset_type>
+        std::expected<std::shared_ptr<asset_type>, std::string>
+        load(std::string const& id, std::filesystem::path const& path)
         {
             spdlog::info("Attempting to load asset: {}", id);
 
             if (auto const it = _assets.find(id); it != _assets.end())
             {
-                return std::any_cast<std::shared_ptr<AssetType>>(it->second);
+                return std::any_cast<std::shared_ptr<asset_type>>(it->second);
             }
 
-            auto asset = std::make_shared<AssetType>();
-            if (!asset->LoadFromFile(path))
+            auto asset = std::make_shared<asset_type>();
+            if (!asset->load_from_file(path))
             {
                 spdlog::error("Failed to load asset: {}", id);
                 return std::unexpected(std::format("Failed to load asset {}", path.string()));
@@ -51,18 +51,19 @@ namespace Inferonix::Asset
 
         }
 
-        template<LoadableAsset AssetType>
-        std::shared_ptr<AssetType> Get(const std::string& id)
+        template<loadable_asset asset_type>
+        std::shared_ptr<asset_type> get(const std::string& id)
         {
             auto const it = _assets.find(id);
             if (it == _assets.end()) return nullptr;
-            return std::any_cast<std::shared_ptr<AssetType>>(it->second);
+            return std::any_cast<std::shared_ptr<asset_type>>(it->second);
         }
 
-        Registry& GetAssetRegistry() const { return _registry; }
+        registry& get_asset_registry() const { return _registry; }
 
     private:
-        Registry& _registry;
+        registry& _registry;
         std::unordered_map<std::string, std::any> _assets;
     };
 }
+

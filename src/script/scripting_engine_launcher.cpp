@@ -5,37 +5,37 @@
 
 #include <spdlog/spdlog.h>
 
-using namespace Inferonix::Script;
+using namespace inferonix::script;
 
 scripting_engine_launcher::scripting_engine_launcher() = default;
 
 scripting_engine_launcher::~scripting_engine_launcher()
 {
-    Terminate();
+    terminate();
 }
 
-void scripting_engine_launcher::Launch()
+void scripting_engine_launcher::launch()
 {
     // _engine.Initialize();
     spdlog::info("Launching Scripting Engine and registering globals...");
-    detail::RegisterGlobals(_engine.GetEngine());
+    detail::register_globals(_engine.GetEngine());
 }
 
-void scripting_engine_launcher::Terminate()
+void scripting_engine_launcher::terminate()
 {
     _engine.Terminate();
     _module_storage.clear();
 }
 
-void scripting_engine_launcher::Start(Scene::Registry& scene_registry)
+void scripting_engine_launcher::start(scene::registry& scene_registry)
 {
     // spdlog::info("Starting script system...");
     // detail::RegisterGlobals(_engine.GetEngine());
 
-    auto view = scene_registry.view<Scene::ScriptComponent>();
+    auto view = scene_registry.view<scene::script_component>();
     for (auto entity : view)
     {
-        auto& component = view.get<Scene::ScriptComponent>(entity);
+        auto& component = view.get<scene::script_component>(entity);
         
         if (component.initialized)
             continue;
@@ -67,7 +67,7 @@ void scripting_engine_launcher::Start(Scene::Registry& scene_registry)
 
         // Create the script object
         auto script_object = p_module->CreateObject(class_name);
-        if (!script_object.IsValid())
+        if (!script_object.is_valid())
         {
             spdlog::error("Failed to create script object for class: {}", class_name);
             continue;
@@ -77,29 +77,29 @@ void scripting_engine_launcher::Start(Scene::Registry& scene_registry)
         component.initialized = true;
 
         // Register entity's transform with scripting system
-        auto* transform_component = scene_registry.try_get<Scene::TransformComponent>(entity);
+        auto* transform_component = scene_registry.try_get<scene::transform_component>(entity);
         if (transform_component)
         {
-            detail::g_entity_transforms[static_cast<uint32_t>(entity)] = &transform_component->GetTransform();
+            detail::g_entity_transforms[static_cast<uint32_t>(entity)] = &transform_component->get_transform();
         }
 
-        component.script_object.CallStart(static_cast<uint32_t>(entity));
+        component.script_object.call_start(static_cast<uint32_t>(entity));
 
         spdlog::info("Script '{}' initialized for entity {}", class_name, static_cast<uint32_t>(entity));
     }
 }
 
-void scripting_engine_launcher::Update(Scene::Registry& scene_registry, float const delta_time)
+void scripting_engine_launcher::update(scene::registry& scene_registry, float const delta_time)
 {
-    auto view = scene_registry.view<Scene::ScriptComponent>();
+    auto view = scene_registry.view<scene::script_component>();
     
     for (auto const entity : view)
     {
-        auto& component = view.get<Scene::ScriptComponent>(entity);
-        if (!component.initialized || !component.script_object.IsValid())
+        auto& component = view.get<scene::script_component>(entity);
+        if (!component.initialized || !component.script_object.is_valid())
             continue;
 
-        component.script_object.CallUpdate(delta_time);
+        component.script_object.call_update(delta_time);
     }
 }
 

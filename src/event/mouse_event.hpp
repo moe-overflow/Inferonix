@@ -2,7 +2,7 @@
 
 #include "event.hpp"
 
-namespace Inferonix::EventSystem
+namespace inferonix::events
 {
     enum class MouseEventType
     {
@@ -20,7 +20,7 @@ namespace Inferonix::EventSystem
     public:
         mouse_event() : _type(MouseEventType::None) { }
 
-        explicit mouse_event(MouseEventType type) : _type(type) { }
+        explicit mouse_event(const MouseEventType type) : _type(type) { }
 
         [[nodiscard]] MouseEventType GetType() const
         {

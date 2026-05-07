@@ -2,7 +2,7 @@
 
 #include "event.hpp"
 
-namespace Inferonix::EventSystem
+namespace inferonix::events
 {
     enum class WindowEventType
     {

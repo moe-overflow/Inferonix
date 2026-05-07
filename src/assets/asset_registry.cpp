@@ -2,10 +2,10 @@
 
 #include <entt/entt.hpp>
 
-using namespace Inferonix::Asset;
+using namespace inferonix::asset;
 
 
-asset_registry::asset_registry(Registry& registry) : _registry(registry)
+asset_registry::asset_registry(registry& registry) : _registry(registry)
 {
     _registry.ctx().emplace<asset_registry*>(this);
 }

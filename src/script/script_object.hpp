@@ -5,11 +5,11 @@
 #include <vector>
 #include <angelscript.h>
 
-namespace Inferonix::Script
+namespace inferonix::script
 {
     namespace detail
     {
-        struct ScriptObjectDeleter
+        struct script_object_deleter
         {
             void operator()(asIScriptObject const* obj) const noexcept;
         };
@@ -19,7 +19,7 @@ namespace Inferonix::Script
     {
     public:
         script_object() = default;
-        explicit script_object(std::unique_ptr<asIScriptObject, detail::ScriptObjectDeleter> instance);
+        explicit script_object(std::unique_ptr<asIScriptObject, detail::script_object_deleter> instance);
         ~script_object();
 
         script_object(const script_object&) = delete;
@@ -28,17 +28,17 @@ namespace Inferonix::Script
         script_object(script_object&&) noexcept;
         script_object& operator=(script_object&&) noexcept;
 
-        void CallMethod(std::string_view method_name, std::vector<void*> const& arguments = {}) const;
+        void call_method(std::string_view method_name, std::vector<void*> const& arguments = {}) const;
 
-        [[nodiscard]] bool IsValid() const { return _instance != nullptr; }
+        [[nodiscard]] bool is_valid() const { return _instance != nullptr; }
 
-        [[nodiscard]] asIScriptObject* GetInstance() const { return _instance.get(); }
+        [[nodiscard]] asIScriptObject* get_instance() const { return _instance.get(); }
 
-        void CallStart(uint32_t entity) const;
-        void CallUpdate(float delta_time) const;
+        void call_start(uint32_t entity) const;
+        void call_update(float delta_time) const;
 
     private:
-        std::unique_ptr<asIScriptObject, detail::ScriptObjectDeleter> _instance;
+        std::unique_ptr<asIScriptObject, detail::script_object_deleter> _instance;
     };
 }
 

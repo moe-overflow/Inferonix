@@ -5,7 +5,7 @@
 
 #include "mesh.hpp"
 
-namespace Inferonix::Renderer
+namespace inferonix::renderer
 {
 
     class buffer
@@ -17,11 +17,11 @@ namespace Inferonix::Renderer
                 glDeleteBuffers(1, &_id);
         }
 
-        virtual void Bind() const = 0;
-        virtual void Unbind() const = 0;
+        virtual void bind() const = 0;
+        virtual void unbind() const = 0;
 
 
-        [[nodiscard]] uint32_t& Get()
+        [[nodiscard]] uint32_t& get()
         {
             return _id;
         }
@@ -42,10 +42,10 @@ namespace Inferonix::Renderer
 
         ~vertex_buffer() override = default;
 
-        void Bind() const override;
-        void Unbind() const override;
+        void bind() const override;
+        void unbind() const override;
 
-        void BufferData(std::vector<Vertex> const& vertices);
+        void buffer_data(std::vector<vertex> const& vertices);
 
         [[nodiscard]] size_t Size() const
         {
@@ -62,12 +62,12 @@ namespace Inferonix::Renderer
         index_buffer() = default;
         ~index_buffer() override = default;
 
-        void Bind() const override;
-        void Unbind() const override;
+        void bind() const override;
+        void unbind() const override;
 
-        void BufferData(std::vector<uint32_t>& indices);
+        void buffer_data(std::vector<uint32_t>& indices);
 
-        [[nodiscard]] int32_t Count() const
+        [[nodiscard]] int32_t count() const
         {
             return _count;
         }
@@ -84,13 +84,13 @@ namespace Inferonix::Renderer
         UBYTE
     };
 
-    struct VertexBufferElement
+    struct vertex_buffer_element
     {
         ShaderDatatype type;
         uint32_t size;
         bool normalized;
 
-        static uint32_t GetTypeSize(ShaderDatatype type)
+        static uint32_t get_type_size(const ShaderDatatype type)
         {
             switch (type)
             {
@@ -106,7 +106,7 @@ namespace Inferonix::Renderer
             }
         }
 
-        static GLenum ToGlType(ShaderDatatype type)
+        static GLenum to_gl_type(ShaderDatatype type)
         {
             switch (type)
             {
@@ -124,28 +124,28 @@ namespace Inferonix::Renderer
         }
     };
 
-    class VertexBufferLayout
+    class vertex_buffer_layout
     {
     public:
-        VertexBufferLayout() = default;
+        vertex_buffer_layout() = default;
 
-        [[nodiscard]] std::vector<VertexBufferElement> GetElements() const
+        [[nodiscard]] std::vector<vertex_buffer_element> get_elements() const
         {
             return _elements;
         }
-        [[nodiscard]] unsigned int GetStride() const
+        [[nodiscard]] unsigned int get_stride() const
         {
             return _stride;
         }
 
-        void Push(ShaderDatatype const type, uint32_t const count)
+        void push(ShaderDatatype const type, uint32_t const count)
         {
             _elements.push_back({ type, count, false });
-            _stride += count * VertexBufferElement::GetTypeSize(type);
+            _stride += count * vertex_buffer_element::get_type_size(type);
         }
 
     private:
-        std::vector<VertexBufferElement> _elements;
+        std::vector<vertex_buffer_element> _elements;
         uint32_t _stride{ 0 };
     };
 

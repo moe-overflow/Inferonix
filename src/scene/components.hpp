@@ -8,43 +8,43 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/BodyID.h>
 
-namespace Inferonix::Scene
+namespace inferonix::scene
 {
 
-    using MeshComponent = Renderer::mesh;
+    using mesh_component = renderer::mesh;
     
-    struct TransformComponent : public Renderer::transform
+    struct transform_component : public renderer::transform
     {
-        TransformComponent() : Renderer::transform() {}
+        transform_component() : renderer::transform() {}
         
-        transform& GetTransform() { return *this; }
-        [[nodiscard]] const transform& GetTransform() const { return *this; }
+        transform& get_transform() { return *this; }
+        [[nodiscard]] const transform& get_transform() const { return *this; }
     };
 
-    struct ShaderComponent
+    struct shader_component
     {
         std::string vertex_shader_path, fragment_shader_path;
     };
 
-    using CameraComponent = camera;
+    using camera_component = camera;
 
-    struct ScriptComponent
+    struct script_component
     {
         std::string script_path;
-        Script::script_object script_object;
+        script::script_object script_object;
         bool initialized {false};
     };
 
     enum class RigidBodyType { Static, Dynamic, Kinematic };
 
-    struct RigidBodyComponent
+    struct rigid_body_component
     {
         float mass = 1.0f;
         JPH::BodyID body_id {};
         RigidBodyType type;
     };
 
-    struct BoxColliderComponent
+    struct box_collider_component
     {
         glm::vec3 HalfExtents = {0.5f, 0.5f, 0.5f};
     };

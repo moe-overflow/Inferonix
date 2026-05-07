@@ -6,7 +6,7 @@
 #include <optional>
 #include <unordered_map>
 
-namespace Inferonix::InputSystem
+namespace inferonix::input
 {
     class input
     {
@@ -16,17 +16,17 @@ namespace Inferonix::InputSystem
 
         input& operator=(input const&) = delete;
 
-        static bool IsKeyDown(Key const& key);
-        static void SetKeyDown(Key const& key);
-        static void SetKeyUp(Key const& key);
+        static bool is_key_down(Key const& key);
+        static void set_key_down(Key const& key);
+        static void set_key_up(Key const& key);
 
-        static bool IsMouseKeyDown(MouseKey const& key);
-        static void SetMouseKeyDown(MouseKey const& key);
-        static void SetMouseKeyUp(MouseKey const& key);
+        static bool is_mouse_key_down(MouseKey const& key);
+        static void set_mouse_key_down(MouseKey const& key);
+        static void set_mouse_key_up(MouseKey const& key);
 
 
-        static std::pair<float, float> GetMousePosition();
-        static void SetMousePosition(float x, float y);
+        static std::pair<float, float> get_mouse_position();
+        static void set_mouse_position(float x, float y);
 
 
     private:

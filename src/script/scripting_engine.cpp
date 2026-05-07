@@ -9,7 +9,7 @@
 #include <angelscript/scriptbuilder/scriptbuilder.h>
 #include <angelscript/scriptarray/scriptarray.h>
 
-using namespace Inferonix::Script;
+using namespace inferonix::script;
 
 namespace
 {

@@ -7,11 +7,11 @@
 
 class GLFWwindow;
 
-namespace Inferonix::Window
+namespace inferonix::window
 {
     using delta_time_point = std::chrono::time_point<std::chrono::steady_clock>;
 
-    struct WindowSettings
+    struct window_settings
     {
         int width, height;
         std::string title;
@@ -23,7 +23,7 @@ namespace Inferonix::Window
     {
 
     public:
-        explicit window(WindowSettings& window_settings);
+        explicit window(window_settings& window_settings);
 
         window(window const&) = delete;
         window(window&&) = delete;
@@ -34,19 +34,19 @@ namespace Inferonix::Window
         ~window() = default;
 
 
-        void Init();
-        void Create();
-        void Destroy();
+        void init();
+        void create();
+        void destroy();
 
-        [[nodiscard]] bool ShouldClose() const;
-        void SwapBuffers() const;
-        static void PollEvents();
+        [[nodiscard]] bool should_close() const;
+        void swap_buffers() const;
+        static void poll_events();
         //[[nodiscard]] bool key_pressed(int key);
-        void Close() const;
+        void close() const;
 
-        static void HandleEvent(EventSystem::event& event);
+        static void handle_event(events::event& event);
 
-        [[nodiscard]] float GetDeltaTime();
+        [[nodiscard]] float get_delta_time();
 
         // void process_input();
 
@@ -54,13 +54,13 @@ namespace Inferonix::Window
     private:
         bool _initialized = false;
         GLFWwindow* _instance;
-        WindowSettings _settings;
+        window_settings _settings;
 
         delta_time_point _last_frame_time{};
 
 
     private:
-        static void SetInputPointerFunctions(GLFWwindow* glfw_window);
+        static void set_input_pointer_functions(GLFWwindow* glfw_window);
     };
 
 } // namespace Inferonix::Window

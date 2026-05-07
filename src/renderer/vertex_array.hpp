@@ -2,7 +2,7 @@
 
 #include "buffer.hpp"
 
-namespace Inferonix::Renderer
+namespace inferonix::renderer
 {
 
     class vertex_array
@@ -12,11 +12,11 @@ namespace Inferonix::Renderer
         vertex_array();
         ~vertex_array() = default;
 
-        void Bind() const;
-        void Unbind() const;
+        void bind() const;
+        void unbind() const;
 
-        void AddVertexBuffer(vertex_buffer const& vertex_buffer, VertexBufferLayout const& layout) const;
-        void SetIndexBuffer(index_buffer const& index_buffer) const;
+        void add_vertex_buffer(vertex_buffer const& vertex_buffer, vertex_buffer_layout const& layout) const;
+        void set_index_buffer(index_buffer const& index_buffer) const;
 
     private:
         uint32_t _id;

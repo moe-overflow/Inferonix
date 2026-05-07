@@ -2,7 +2,7 @@
 
 #include "event.hpp"
 
-namespace Inferonix::EventSystem
+namespace inferonix::events
 {
 
     // This class acts as an interface that each class subscribing an event should implement
@@ -11,7 +11,7 @@ namespace Inferonix::EventSystem
     public:
         virtual ~event_listener() = default;
 
-        virtual void OnEvent(event& event) = 0;
+        virtual void on_event(event& event) = 0;
     };
 
 }

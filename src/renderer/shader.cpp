@@ -5,14 +5,14 @@
 #include <filesystem>
 #include <fstream>
 
-using namespace Inferonix::Renderer;
+using namespace inferonix::renderer;
 
 shader::shader(ShaderType const type, char const* src)
     : _type{ type },
       _id{ std::make_unique<uint32_t>(glCreateShader(type)) },
-      _src_stream{ std::make_unique<std::string>(ReadFromFile(src)) }
+      _src_stream{ std::make_unique<std::string>(read_from_file(src)) }
 {
-    Create();
+    create();
 }
 
 shader::~shader()
@@ -40,21 +40,21 @@ shader& shader::operator=(shader&& other) noexcept
 }
 
 
-void shader::Create() const
+void shader::create() const
 {
     auto const src = _src_stream->c_str();
     glShaderSource(*_id, 1, &src, nullptr);
     glCompileShader(*_id);
 
-    CheckErrors();
+    check_errors();
 }
 
-GLuint shader::Get() const
+GLuint shader::get() const
 {
     return *_id;
 }
 
-void shader::CheckErrors() const
+void shader::check_errors() const
 {
     // Checking run time errors after calling 'glCompileShader()'
     int result;
@@ -67,7 +67,7 @@ void shader::CheckErrors() const
     }
 }
 
-std::string shader::ReadFromFile(std::string const& path)
+std::string shader::read_from_file(std::string const& path)
 {
     try
     {

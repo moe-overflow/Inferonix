@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-namespace Inferonix::Script
+namespace inferonix::script
 {
 
     struct ScriptingEngineDestructor

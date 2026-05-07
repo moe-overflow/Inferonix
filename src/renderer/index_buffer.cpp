@@ -2,19 +2,19 @@
 
 #include <spdlog/spdlog.h>
 
-using namespace Inferonix::Renderer;
+using namespace inferonix::renderer;
 
-void index_buffer::Bind() const
+void index_buffer::bind() const
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _id);
 }
 
-void index_buffer::Unbind() const
+void index_buffer::unbind() const
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void index_buffer::BufferData(std::vector<uint32_t>& indices)
+void index_buffer::buffer_data(std::vector<uint32_t>& indices)
 {
     _count = indices.size();
     spdlog::info("Buffering data (count = {}) for index buffer {}", _id, _count);

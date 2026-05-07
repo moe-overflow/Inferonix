@@ -7,9 +7,8 @@
 
 #include "../scene/components.hpp"
 #include "../input/input.hpp"
-#include "../input/key_codes.hpp"
 
-using namespace Inferonix::Script;
+using namespace inferonix::script;
 
 script_module::script_module(std::shared_ptr<asIScriptModule> module) : _instance(std::move(module))
 {}
@@ -104,7 +103,7 @@ script_object script_module::CreateObject(std::string_view name) const
         return script_object{};
     }
 
-    return script_object{std::unique_ptr<asIScriptObject, detail::ScriptObjectDeleter>(obj)};
+    return script_object{std::unique_ptr<asIScriptObject, detail::script_object_deleter>(obj)};
 }
 
 bool script_module::IsValid() const
@@ -112,70 +111,70 @@ bool script_module::IsValid() const
     return _instance != nullptr;
 }
 
-namespace Inferonix::Script::detail
+namespace inferonix::script::detail
 {
     // storage for entity to transform mapping
-    std::unordered_map<uint32_t, Renderer::transform*> g_entity_transforms;
+    std::unordered_map<uint32_t, renderer::transform*> g_entity_transforms;
 
 
-    void ConstructVec3Default(void* memory)
+    void construct_vec_3default(void* memory)
     {
         new(memory) glm::vec3(0.0f);
     }
 
-    void ConstructVec3Copy(void* memory, const glm::vec3& other)
+    void construct_vec3_copy(void* memory, const glm::vec3& other)
     {
         new(memory) glm::vec3(other);
     }
 
-    void ConstructVec3Splat(void* memory, float v)
+    void construct_vec3_splat(void* memory, float v)
     {
         new(memory) glm::vec3(v);
     }
 
-    void ConstructVec3(void* memory, float x, float y, float z)
+    void construct_vec3(void* memory, float x, float y, float z)
     {
         new(memory) glm::vec3(x, y, z);
     }
 
-    void DestructVec3(void* memory)
+    void destruct_vec3(void* memory)
     {}
 
-    glm::vec3& Vec3Assign(glm::vec3& a, const glm::vec3& b)
+    glm::vec3& vec3_assign(glm::vec3& a, const glm::vec3& b)
     {
         a = b;
         return a;
     }
 
-    void Vec3AddGeneric(asIScriptGeneric* gen)
+    void vec3_add_generic(asIScriptGeneric* gen)
     {
         auto const* a = static_cast<glm::vec3*>(gen->GetObject());
         auto const* b = static_cast<glm::vec3*>(gen->GetArgObject(0));
         new(gen->GetAddressOfReturnLocation()) glm::vec3(*a + *b);
     }
 
-    void Vec3SubGeneric(asIScriptGeneric* gen)
+    void vec3_sub_generic(asIScriptGeneric* gen)
     {
         auto const* a = static_cast<glm::vec3*>(gen->GetObject());
         auto const* b = static_cast<glm::vec3*>(gen->GetArgObject(0));
         new(gen->GetAddressOfReturnLocation()) glm::vec3(*a - *b);
     }
 
-    void Vec3MulScalarGeneric(asIScriptGeneric* gen)
+    void vec3_mul_scalar_generic(asIScriptGeneric* gen)
     {
         auto const* a = static_cast<glm::vec3*>(gen->GetObject());
         float const f = gen->GetArgFloat(0);
         new(gen->GetAddressOfReturnLocation()) glm::vec3(*a * f);
     }
 
-    void Vec3MulScalarGeneric_r(asIScriptGeneric* gen)
+    void vec3_mul_scalar_generic_r(asIScriptGeneric* gen)
     {
         auto const* a = static_cast<glm::vec3*>(gen->GetObject());
         const float f = gen->GetArgFloat(0);
         new(gen->GetAddressOfReturnLocation()) glm::vec3(f * *a);
     }
 
-    void Vec3AddAssignGeneric(asIScriptGeneric* gen)
+    void vec3_add_assign_generic(asIScriptGeneric* gen)
     {
         auto* a = static_cast<glm::vec3*>(gen->GetObject());
         auto* b = static_cast<glm::vec3*>(gen->GetArgObject(0));
@@ -184,7 +183,7 @@ namespace Inferonix::Script::detail
     }
 
 
-    void RegisterGlobals(asIScriptEngine* engine)
+    void register_globals(asIScriptEngine* engine)
     {
         int r;
 
@@ -200,58 +199,58 @@ namespace Inferonix::Script::detail
 
         // Behaviors
         r = engine->RegisterObjectBehaviour("vec3", asBEHAVE_CONSTRUCT, "void f()",
-            asFUNCTION(ConstructVec3Default), asCALL_CDECL_OBJFIRST); assert(r >= 0);
+            asFUNCTION(construct_vec_3default), asCALL_CDECL_OBJFIRST); assert(r >= 0);
 
         r = engine->RegisterObjectBehaviour("vec3", asBEHAVE_CONSTRUCT, "void f(float)",
-            asFUNCTION(ConstructVec3Splat), asCALL_CDECL_OBJFIRST); assert(r >= 0);
+            asFUNCTION(construct_vec3_splat), asCALL_CDECL_OBJFIRST); assert(r >= 0);
 
         r = engine->RegisterObjectBehaviour("vec3", asBEHAVE_CONSTRUCT, "void f(float, float, float)",
-            asFUNCTION(ConstructVec3), asCALL_CDECL_OBJFIRST); assert(r >= 0);
+            asFUNCTION(construct_vec3), asCALL_CDECL_OBJFIRST); assert(r >= 0);
 
         r = engine->RegisterObjectBehaviour("vec3", asBEHAVE_CONSTRUCT, "void f(const vec3 &in)",
-            asFUNCTION(ConstructVec3Copy), asCALL_CDECL_OBJFIRST); assert(r >= 0);
+            asFUNCTION(construct_vec3_copy), asCALL_CDECL_OBJFIRST); assert(r >= 0);
 
         r = engine->RegisterObjectBehaviour("vec3", asBEHAVE_DESTRUCT, "void f()",
-            asFUNCTION(DestructVec3), asCALL_CDECL_OBJFIRST); assert(r >= 0);
+            asFUNCTION(destruct_vec3), asCALL_CDECL_OBJFIRST); assert(r >= 0);
 
         r = engine->RegisterObjectMethod("vec3", "vec3 &opAssign(const vec3 &in)",
-            asFUNCTION(Vec3Assign), asCALL_CDECL_OBJFIRST); assert(r >= 0);
+            asFUNCTION(vec3_assign), asCALL_CDECL_OBJFIRST); assert(r >= 0);
 
 
-        // --- math operators
+        // math operators
         r = engine->RegisterObjectMethod("vec3", "vec3 opAdd(const vec3 &in) const",
-            asFUNCTION(Vec3AddGeneric), asCALL_GENERIC); assert(r >= 0);
+            asFUNCTION(vec3_add_generic), asCALL_GENERIC); assert(r >= 0);
 
         r = engine->RegisterObjectMethod("vec3", "vec3 opSub(const vec3 &in) const",
-            asFUNCTION(Vec3SubGeneric), asCALL_GENERIC); assert(r >= 0);
+            asFUNCTION(vec3_sub_generic), asCALL_GENERIC); assert(r >= 0);
 
         r = engine->RegisterObjectMethod("vec3", "vec3 opMul(float) const",
-            asFUNCTION(Vec3MulScalarGeneric), asCALL_GENERIC); assert(r >= 0);
+            asFUNCTION(vec3_mul_scalar_generic), asCALL_GENERIC); assert(r >= 0);
 
         r = engine->RegisterObjectMethod("vec3", "vec3 opMul_r(float) const",
-            asFUNCTION(Vec3MulScalarGeneric_r), asCALL_GENERIC); assert(r >= 0);
+            asFUNCTION(vec3_mul_scalar_generic_r), asCALL_GENERIC); assert(r >= 0);
 
         r = engine->RegisterObjectMethod("vec3", "vec3 &opAddAssign(const vec3 &in)",
-            asFUNCTION(Vec3AddAssignGeneric), asCALL_GENERIC); assert(r >= 0);
+            asFUNCTION(vec3_add_assign_generic), asCALL_GENERIC); assert(r >= 0);
 
-        // 2. Register Camera
+        // register camera
         r = engine->RegisterObjectType("Camera", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
 
         r = engine->RegisterObjectMethod(
             "Camera", "void SetPosition(const vec3 &in)",
-            asFUNCTION(+[](Inferonix::Scene::camera* c, const glm::vec3& pos) { c->SetPosition(pos); }),
+            asFUNCTION(+[](scene::camera* c, const glm::vec3& pos) { c->set_position(pos); }),
             asCALL_CDECL_OBJFIRST
         ); assert(r >= 0);
 
         r = engine->RegisterObjectMethod(
             "Camera", "void SetOrientation(const vec3 &in)",
-            asFUNCTION(+[](Inferonix::Scene::camera* c, const glm::vec3& ori) { c->SetOrientation(ori); }),
+            asFUNCTION(+[](scene::camera* c, const glm::vec3& ori) { c->set_orientation(ori); }),
             asCALL_CDECL_OBJFIRST
         ); assert(r >= 0);
 
         engine->RegisterGlobalFunction(
             "Camera@ GetMainCamera()",
-            asFUNCTION(+[]() -> Inferonix::Scene::camera* { return nullptr; }), asCALL_CDECL
+            asFUNCTION(+[]() -> scene::camera* { return nullptr; }), asCALL_CDECL
         );
 
         /**/
@@ -260,7 +259,7 @@ namespace Inferonix::Script::detail
 
         /**/
 
-# define REG_KEY(Name) engine->RegisterEnumValue("Key", #Name, (int)Inferonix::InputSystem::Key::Name)
+# define REG_KEY(Name) engine->RegisterEnumValue("Key", #Name, (int)inferonix::input::Key::Name)
         REG_KEY(W); REG_KEY(A); REG_KEY(S); REG_KEY(D);
         REG_KEY(UP); REG_KEY(DOWN); REG_KEY(LEFT); REG_KEY(RIGHT);
         REG_KEY(SPACE); REG_KEY(ESC);
@@ -271,8 +270,8 @@ namespace Inferonix::Script::detail
 
         r = engine->RegisterObjectType("Transform", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
         r = engine->RegisterObjectMethod("Transform", "void Translate(const vec3 &in)",
-            asFUNCTION(+[](Inferonix::Renderer::transform* t, const glm::vec3& v) {
-                if (t) t->Translate(v);
+            asFUNCTION(+[](inferonix::renderer::transform* t, const glm::vec3& v) {
+                if (t) t->translate(v);
             }), asCALL_CDECL_OBJFIRST
         ); assert(r >= 0);
 
@@ -280,11 +279,11 @@ namespace Inferonix::Script::detail
 
         engine->RegisterGlobalFunction("bool IsKeyDown(Key key)",
             asFUNCTION(+[](int key) -> bool {
-                return Inferonix::InputSystem::input::IsKeyDown(static_cast<Inferonix::InputSystem::Key>(key));
+                return inferonix::input::input::is_key_down(static_cast<input::Key>(key));
             }), asCALL_CDECL);
 
         engine->RegisterGlobalFunction("Transform@ GetTransform(uint entity)",
-            asFUNCTION(+[](uint32_t entity) -> Inferonix::Renderer::transform* {
+            asFUNCTION(+[](uint32_t entity) -> inferonix::renderer::transform* {
                 auto it = g_entity_transforms.find(entity);
                 return (it != g_entity_transforms.end()) ? it->second : nullptr;
             }), asCALL_CDECL);

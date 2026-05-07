@@ -8,10 +8,10 @@
 #include <memory>
 #include "../scene/components.hpp"
 
-using namespace Inferonix::Physics;
-using namespace Inferonix::Scene;
+using namespace inferonix::physics;
+using namespace inferonix::scene;
 
-PhysicsEngine::~PhysicsEngine()
+physics_engine::~physics_engine()
 {
     delete JPH::Factory::sInstance;
     JPH::UnregisterTypes();
@@ -19,69 +19,69 @@ PhysicsEngine::~PhysicsEngine()
 
 namespace
 {
-    namespace Layers
+    namespace layers
     {
         constexpr JPH::ObjectLayer NON_MOVING = 0;
         constexpr JPH::ObjectLayer MOVING = 1;
         constexpr JPH::ObjectLayer NUM_LAYERS = 2;
     };
 
-    namespace BroadPhaseLayers
+    namespace broad_phase_layers
     {
         constexpr JPH::BroadPhaseLayer NON_MOVING(0);
         constexpr JPH::BroadPhaseLayer MOVING(1);
         constexpr uint32_t NUM_LAYERS(2);
     };
 
-    class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
+    class bp_layer_interface_impl final : public JPH::BroadPhaseLayerInterface
     {
     public:
-        BPLayerInterfaceImpl()
+        bp_layer_interface_impl()
         {
-            mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
-            mObjectToBroadPhase[Layers::MOVING]     = BroadPhaseLayers::MOVING;
+            mObjectToBroadPhase[layers::NON_MOVING] = broad_phase_layers::NON_MOVING;
+            mObjectToBroadPhase[layers::MOVING]     = broad_phase_layers::MOVING;
         }
 
-        [[nodiscard]] uint32_t GetNumBroadPhaseLayers() const override { return BroadPhaseLayers::NUM_LAYERS; }
+        [[nodiscard]] uint32_t GetNumBroadPhaseLayers() const override { return broad_phase_layers::NUM_LAYERS; }
 
         [[nodiscard]] JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer in_layer) const override
         {
             return mObjectToBroadPhase[in_layer];
         }
     private:
-        JPH::BroadPhaseLayer mObjectToBroadPhase[Layers::NUM_LAYERS];
+        JPH::BroadPhaseLayer mObjectToBroadPhase[layers::NUM_LAYERS];
     };
 
-    class ObjectVsBroadPhaseLayerFilterImpl final : public JPH::ObjectVsBroadPhaseLayerFilter
+    class object_vs_broad_phase_layer_filter_impl final : public JPH::ObjectVsBroadPhaseLayerFilter
     {
     public:
         [[nodiscard]] bool ShouldCollide(const JPH::ObjectLayer in_layer1, const JPH::BroadPhaseLayer in_layer2) const override {
             switch (in_layer1) {
-                case Layers::NON_MOVING: return in_layer2 == BroadPhaseLayers::MOVING;
-                case Layers::MOVING:     return true;
+                case layers::NON_MOVING: return in_layer2 == broad_phase_layers::MOVING;
+                case layers::MOVING:     return true;
                 default: return false;
             }
         }
     };
 
-    class ObjectLayerPairFilterImpl final : public JPH::ObjectLayerPairFilter
+    class object_layer_pair_filter_impl final : public JPH::ObjectLayerPairFilter
     {
     public:
         [[nodiscard]] bool ShouldCollide(JPH::ObjectLayer in_object1, JPH::ObjectLayer in_object2) const override {
             switch (in_object1) {
-                case Layers::NON_MOVING: return in_object2 == Layers::MOVING;
-                case Layers::MOVING:     return true;
+                case layers::NON_MOVING: return in_object2 == layers::MOVING;
+                case layers::MOVING:     return true;
                 default: return false;
             }
         }
     };
 
-    BPLayerInterfaceImpl               g_bp_layer_interface;
-    ObjectVsBroadPhaseLayerFilterImpl  g_obj_vs_bp_filter;
-    ObjectLayerPairFilterImpl          g_obj_pair_filter;
+    bp_layer_interface_impl               g_bp_layer_interface;
+    object_vs_broad_phase_layer_filter_impl  g_obj_vs_bp_filter;
+    object_layer_pair_filter_impl          g_obj_pair_filter;
 }
 
-void PhysicsEngine::Init()
+void physics_engine::init()
 {
 
     spdlog::info("Initializing Physics Engine");
@@ -90,18 +90,18 @@ void PhysicsEngine::Init()
     JPH::Factory::sInstance = new JPH::Factory();
     JPH::RegisterTypes();
 
-    _temp_allocator.reset(new JPH::TempAllocatorImpl(10 * 1024 * 1024));
-    _job_system.reset(new JPH::JobSystemThreadPool(
+    _temp_allocator = std::make_unique<JPH::TempAllocatorImpl>(10 * 1024 * 1024);
+    _job_system = std::make_unique<JPH::JobSystemThreadPool>(
             JPH::cMaxPhysicsJobs,
             JPH::cMaxPhysicsBarriers,
             std::thread::hardware_concurrency() - 1
-    ));
+    );
 
-    _bp_layer_interface.reset(new BPLayerInterfaceImpl());
-    _obj_vs_bp_filter.reset(new ObjectVsBroadPhaseLayerFilterImpl());
-    _obj_pair_filter.reset(new ObjectLayerPairFilterImpl());
+    _bp_layer_interface = std::make_unique<bp_layer_interface_impl>();
+    _obj_vs_bp_filter = std::make_unique<object_vs_broad_phase_layer_filter_impl>();
+    _obj_pair_filter = std::make_unique<object_layer_pair_filter_impl>();
 
-    _physics_system.reset(new JPH::PhysicsSystem());
+    _physics_system = std::make_unique<JPH::PhysicsSystem>();
 
     _physics_system->Init(
         1024, 0, 1024, 1024,
@@ -115,21 +115,21 @@ void PhysicsEngine::Init()
     spdlog::info("Initializing Physics Engine - done");
 }
 
-void PhysicsEngine::StartSimulation(Registry& registry) const
+void physics_engine::start_simulation(registry& registry) const
 {
     auto& body_interface = _physics_system->GetBodyInterface();
 
     // Iterate through all entities that have physics components
-    for (auto const view = registry.view<RigidBodyComponent, TransformComponent, BoxColliderComponent>();
-         auto const entity : view)
+    auto const view = registry.view<rigid_body_component, transform_component, box_collider_component>();
+    for (auto const entity_ : view)
     {
-        auto& rigid_body_component = view.get<RigidBodyComponent>(entity);
-        auto const& transform_component = view.get<TransformComponent>(entity);
-        auto& [HalfExtents]  = view.get<BoxColliderComponent>(entity);
+        auto& rigid_body_component_ = view.get<rigid_body_component>(entity_);
+        auto const& transform_component_ = view.get<transform_component>(entity_);
+        auto& [HalfExtents]  = view.get<box_collider_component>(entity_);
 
         // create a Jolt Box Shape using the Half Extents from our Collider component
-        JPH::ObjectLayer const layer = (rigid_body_component.type == RigidBodyType::Static) ? Layers::NON_MOVING : Layers::MOVING;
-        auto const motion_type = rigid_body_component.type == RigidBodyType::Static ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
+        JPH::ObjectLayer const layer = (rigid_body_component_.type == RigidBodyType::Static) ? layers::NON_MOVING : layers::MOVING;
+        auto const motion_type = rigid_body_component_.type == RigidBodyType::Static ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
 
         JPH::Ref<JPH::Shape> shape = JPH::BoxShapeSettings{
             JPH::Vec3(HalfExtents.x, HalfExtents.y, HalfExtents.z)
@@ -138,30 +138,30 @@ void PhysicsEngine::StartSimulation(Registry& registry) const
         auto body_settings = JPH::BodyCreationSettings
         {
             shape,
-            JPH::RVec3(transform_component.position.x, transform_component.position.y, transform_component.position.z),
+            JPH::RVec3(transform_component_.position.x, transform_component_.position.y, transform_component_.position.z),
             JPH::Quat::sIdentity(),
             motion_type,
             layer
         };
 
-        JPH::Body* const body = body_interface.CreateBody(body_settings);
-        rigid_body_component.body_id = body->GetID();
+        const JPH::Body* const body = body_interface.CreateBody(body_settings);
+        rigid_body_component_.body_id = body->GetID();
         body_interface.AddBody(body->GetID(), JPH::EActivation::Activate);
     }
 }
 
-void PhysicsEngine::Update(Registry& registry, float const delta_time) const
+void physics_engine::update(registry& registry, float const delta_time) const
 {
     constexpr int collision_steps = 1;
     _physics_system->Update(delta_time, collision_steps, _temp_allocator.get(), _job_system.get());
 
     // yield results to ECS
     auto const& body_interface = _physics_system->GetBodyInterface();
-    for (auto const view = registry.view<RigidBodyComponent, TransformComponent>();
+    for (auto const view = registry.view<rigid_body_component, transform_component>();
          auto const entity : view )
     {
-        auto& rigid_body = view.get<RigidBodyComponent>(entity);
-        auto& transform = view.get<TransformComponent>(entity);
+        auto& rigid_body = view.get<rigid_body_component>(entity);
+        auto& transform = view.get<transform_component>(entity);
         if (rigid_body.type == RigidBodyType::Dynamic)
         {
             JPH::Vec3 jolt_pos = body_interface.GetPosition(rigid_body.body_id);

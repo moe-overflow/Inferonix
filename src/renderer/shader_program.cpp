@@ -4,7 +4,7 @@
 #include "spdlog/spdlog.h"
 #include <cmath>
 
-using namespace Inferonix::Renderer;
+using namespace inferonix::renderer;
 
 shader_program::shader_program(
             std::string const& VertexShaderPath,
@@ -14,15 +14,15 @@ shader_program::shader_program(
       _fragment_shader(std::make_unique<shader>(FRAGMENT, FragmentShaderPath.c_str())),
       _id(std::make_unique<uint32_t>(glCreateProgram()))
 {
-    AttachShaders();
-    Link();
-    CheckErrors();
+    attach_shaders();
+    link();
+    check_errors();
 
-    glDetachShader(*_id, _vertex_shader->Get());
-    glDeleteShader(_vertex_shader->Get());
+    glDetachShader(*_id, _vertex_shader->get());
+    glDeleteShader(_vertex_shader->get());
 
-    glDetachShader(*_id, _fragment_shader->Get());
-    glDeleteShader(_fragment_shader->Get());
+    glDetachShader(*_id, _fragment_shader->get());
+    glDeleteShader(_fragment_shader->get());
 }
 
 shader_program::~shader_program()
@@ -50,28 +50,28 @@ shader_program& shader_program::operator=(shader_program&& other) noexcept
     return *this;
 }
 
-void shader_program::Use() const
+void shader_program::use() const
 {
     glUseProgram(*_id);
 }
 
-void shader_program::Unuse() const
+void shader_program::unuse() const
 {
     glUseProgram(0);
 }
 
-void shader_program::AttachShaders() const
+void shader_program::attach_shaders() const
 {
-    glAttachShader(*_id, _vertex_shader->Get());
-    glAttachShader(*_id, _fragment_shader->Get());
+    glAttachShader(*_id, _vertex_shader->get());
+    glAttachShader(*_id, _fragment_shader->get());
 }
 
-void shader_program::Link() const
+void shader_program::link() const
 {
     glLinkProgram(*_id);
 }
 
-void shader_program::CheckErrors() const
+void shader_program::check_errors() const
 {
     // Checking compile time errors after calling 'glCompileShader()'
     int result;
@@ -91,21 +91,21 @@ void shader_program::CheckErrors() const
 }
 
 //todo: use vector instead of three rgb values
-void shader_program::SetUniform(std::string const& name, float r, float g, float b) const
+void shader_program::set_uniform(std::string const& name, float r, float g, float b) const
 {
-    int location = glGetUniformLocation(this->Get(), name.c_str());
+    int location = glGetUniformLocation(this->get(), name.c_str());
     assert(location != -1);
     glUniform4f(location, r, g, b, 1.0f);
 }
 
-void shader_program::SetUniform(std::string const& name, glm::mat4 mat) const
+void shader_program::set_uniform(std::string const& name, glm::mat4 mat) const
 {
-    int location = glGetUniformLocation(this->Get(), name.c_str());
+    int location = glGetUniformLocation(this->get(), name.c_str());
     assert(location != -1);
     glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
 }
 
-void shader_program::SetDynamicColor(std::string const& uniform_name) const
+void shader_program::set_dynamic_color(std::string const& uniform_name) const
 {
     auto time_value = static_cast<float>(glfwGetTime());
 
@@ -113,5 +113,5 @@ void shader_program::SetDynamicColor(std::string const& uniform_name) const
     auto blue = static_cast<float>(sin(static_cast<double>(time_value)) * 0.5 + 0.5);
     auto red = 1.0f;
 
-    SetUniform(uniform_name, red, green, blue);
+    set_uniform(uniform_name, red, green, blue);
 }

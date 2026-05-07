@@ -4,21 +4,21 @@
 #include "../input/input.hpp"
 #include "../input/mouse_codes.hpp"
 
-namespace Inferonix::Scene
+namespace inferonix::scene
 {
     class editor_camera final : public camera
     {
     public:
-        explicit editor_camera(CameraSettings const& settings) : camera(settings)
+        explicit editor_camera(camera_settings const& settings) : camera(settings)
         {
             UpdateCameraVectors();
         }
 
-        void Update(float delta_time) override
+        void update(float delta_time) override
         {
-            if (InputSystem::input::IsMouseKeyDown(InputSystem::MouseKey::RIGHT_BUTTON))
+            if (input::input::is_mouse_key_down(input::MouseKey::RIGHT_BUTTON))
             {
-                auto [mouse_x, mouse_y] = InputSystem::input::GetMousePosition();
+                auto [mouse_x, mouse_y] = input::input::get_mouse_position();
                 if (_first_mouse) {
                     _last_x = mouse_x;
                     _last_y = mouse_y;
@@ -44,18 +44,18 @@ namespace Inferonix::Scene
             }
 
             float velocity = _movement_speed * delta_time;
-            glm::vec3 pos = GetSettings().position;
+            glm::vec3 pos = get_settings().position;
 
-            if (InputSystem::input::IsKeyDown(InputSystem::Key::W)) pos += _front * velocity;
-            if (InputSystem::input::IsKeyDown(InputSystem::Key::S)) pos -= _front * velocity;
-            if (InputSystem::input::IsKeyDown(InputSystem::Key::A)) pos -= _right * velocity;
-            if (InputSystem::input::IsKeyDown(InputSystem::Key::D)) pos += _right * velocity;
+            if (input::input::is_key_down(input::Key::W)) pos += _front * velocity;
+            if (input::input::is_key_down(input::Key::S)) pos -= _front * velocity;
+            if (input::input::is_key_down(input::Key::A)) pos -= _right * velocity;
+            if (input::input::is_key_down(input::Key::D)) pos += _right * velocity;
 
             // Up/Down (E and Q)
-            if (InputSystem::input::IsKeyDown(InputSystem::Key::E)) pos += _up * velocity;
-            if (InputSystem::input::IsKeyDown(InputSystem::Key::Q)) pos -= _up * velocity;
+            if (input::input::is_key_down(input::Key::E)) pos += _up * velocity;
+            if (input::input::is_key_down(input::Key::Q)) pos -= _up * velocity;
 
-            SetPosition(pos);
+            set_position(pos);
 
 
         }
@@ -74,7 +74,7 @@ namespace Inferonix::Scene
             _up    = glm::normalize(glm::cross(_right, _front));
 
             // Tell the base Camera class to look along the new front vector
-            SetOrientation(_front);
+            set_orientation(_front);
         }
 
         float _yaw = -90.0f; // initially, look down the -Z axis

@@ -4,21 +4,21 @@
 #include "scene/components.hpp"
 #include "renderer/renderer.hpp"
 
-using namespace Inferonix;
-using namespace Inferonix::Window;
-using namespace Inferonix::Renderer;
-using namespace Inferonix::Scene;
+using namespace inferonix;
+using namespace inferonix::window;
+using namespace inferonix::renderer;
+using namespace inferonix::scene;
 
-auto workbench_window_settings =  WindowSettings { .width = 1920,
+auto window_settings_ =  window_settings { .width = 1920,
                                           .height = 1080,
                                           .title = "Inferonix Engine",
                                           .full_screen = false,
                                           .v_sync = true };
 
 inferonix_engine::inferonix_engine()
-    : _window(std::make_shared<window>(workbench_window_settings)),
-      _renderer(std::make_shared<renderer>(_window)),
-      _scene(std::make_unique<scene>())
+    : _window(std::make_shared<window::window>(window_settings_)),
+      _renderer(std::make_shared<renderer::renderer>(_window)),
+      _scene(std::make_unique<scene::scene>())
 {
 
 /*
@@ -62,32 +62,32 @@ inferonix_engine::inferonix_engine()
         registry.emplace<TransformComponent>(entity, transform);
     }
 */
-
-    _script_launcher.Launch();
-
+    _script_launcher.launch();
+/*
     {
 
-        auto mesh_ = _scene->GetAssetRegistry().Load<mesh>(
-            UUID::Generate(),
+        auto mesh_ = _scene->get_asset_registry().load<mesh>(
+            utils::generate_uuid(),
             RESOURCES_PATH "models/Monkey.obj"
         );
 
         // 1. Create a Static Floor (Invisible, just catches the monkey)
-        auto floor = _scene->GetRegistry().create();
-        _scene->GetRegistry().emplace<TransformComponent>(floor).position = {0, -5.0f, 0};
-        _scene->GetRegistry().emplace<BoxColliderComponent>(floor).HalfExtents = {50.0f, 1.0f, 50.0f};
-        _scene->GetRegistry().emplace<RigidBodyComponent>(floor, 0.0f, JPH::BodyID(), RigidBodyType::Static);
+        auto floor = _scene->get_registry().create();
+        _scene->get_registry().emplace<transform_component>(floor).position = {0, -5.0f, 0};
+        _scene->get_registry().emplace<box_collider_component>(floor).HalfExtents = {50.0f, 1.0f, 50.0f};
+        _scene->get_registry().emplace<rigid_body_component>(floor, 0.0f, JPH::BodyID(), RigidBodyType::Static);
 
         // 2. Create the Falling Monkey!
-        auto box = _scene->GetRegistry().create();
-        _scene->GetRegistry().emplace<TransformComponent>(box).position = {0, 10.0f, 0}; // Drop from high up!
-        _scene->GetRegistry().emplace<BoxColliderComponent>(box).HalfExtents = {0.5f, 0.5f, 0.5f};
-        _scene->GetRegistry().emplace<RigidBodyComponent>(box, 1.0f, JPH::BodyID(), RigidBodyType::Dynamic);
+        auto box = _scene->get_registry().create();
+        _scene->get_registry().emplace<transform_component>(box).position = {0, 10.0f, 0}; // Drop from high up!
+        _scene->get_registry().emplace<box_collider_component>(box).HalfExtents = {0.5f, 0.5f, 0.5f};
+        _scene->get_registry().emplace<box_collider_component>(box, 1.0f, JPH::BodyID(), RigidBodyType::Dynamic);
 
         if (mesh_.has_value())
-            _scene->GetRegistry().emplace<MeshComponent>(box, *mesh_.value());
+            _scene->get_registry().emplace<mesh_component>(box, *mesh_.value());
 
     }
+    */
     _initialized = true;
 }
 
@@ -95,7 +95,7 @@ inferonix_engine::~inferonix_engine()
 {
     if (_initialized)
     {
-        _script_launcher.Terminate();
+        _script_launcher.terminate();
     }
 }
 
@@ -121,29 +121,29 @@ while (!_window->ShouldClose()) {
 
 void inferonix_engine::Run()
 {
-    _physics_engine.Init();
-    _physics_engine.StartSimulation(_scene->GetRegistry());
+    _physics_engine.init();
+    _physics_engine.start_simulation(_scene->get_registry());
 
 
-    while (!_window->ShouldClose())
+    while (!_window->should_close())
     {
-        float const delta_time = _window->GetDeltaTime();
+        float const delta_time = _window->get_delta_time();
 
-        window::PollEvents();
+        window::window::poll_events();
 
         if (_initialized)
         {
-            _script_launcher.Start(_scene->GetRegistry());
-            _script_launcher.Update(_scene->GetRegistry(), delta_time);
-            _physics_engine.Update(_scene->GetRegistry(), delta_time);
+            _script_launcher.start(_scene->get_registry());
+            _script_launcher.update(_scene->get_registry(), delta_time);
+            _physics_engine.update(_scene->get_registry(), delta_time);
         }
 
-        _scene->GetEditorCamera()->Update(delta_time);
+        _scene->get_editor_camera()->update(delta_time);
 
-        renderer::Clear();
-        _renderer->Render(*_scene);
+        renderer::renderer::clear();
+        _renderer->render(*_scene);
 
-        _window->SwapBuffers();
+        _window->swap_buffers();
     }
 }
 

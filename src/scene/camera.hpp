@@ -4,10 +4,10 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/glm.hpp"
 
-namespace Inferonix::Scene
+namespace inferonix::scene
 {
 
-    struct CameraSettings
+    struct camera_settings
     {
 
         float fov = 45.0f;
@@ -25,58 +25,57 @@ namespace Inferonix::Scene
     class camera
     {
     public:
-        camera() : camera(CameraSettings()){};
+        camera() : camera(camera_settings()){};
 
         virtual ~camera() = default;
 
-        explicit camera(CameraSettings const& settings) : _settings(settings)
+        explicit camera(camera_settings const& settings) : _settings(settings)
         {
-            UpdateProjection();
-            UpdateView();
+            update_projection();
+            update_view();
         }
 
-        virtual void Update(float delta_time) {}
+        virtual void update(float delta_time) {}
 
-        void SetPosition(glm::vec3 const& position)
+        void set_position(glm::vec3 const& position)
         {
             _settings.position = position;
-            UpdateView();
+            update_view();
         }
 
-        void SetOrientation(glm::vec3 const& orientation)
+        void set_orientation(glm::vec3 const& orientation)
         {
             _settings.orientation = orientation;
-            UpdateProjection();
+            update_projection();
         }
 
-        [[nodiscard]] auto GetProjection() const
+        [[nodiscard]] auto get_projection() const
         {
             return _projection_matrix;
         }
-        [[nodiscard]] auto GetView() const
+        [[nodiscard]] auto get_view() const
         {
             return _view_matrix;
         }
 
-        [[nodiscard]] auto GetSettings() const
+        [[nodiscard]] auto get_settings() const
         {
             return _settings;
         }
 
-        [[nodiscard]] auto IsPrimary() const{ return _settings.is_primary; }
+        [[nodiscard]] auto is_primary() const{ return _settings.is_primary; }
 
     private:
-        void UpdateView()
+        void update_view()
         {
-            _view_matrix =
-                    glm::lookAt(
-                        _settings.position,
-                        _settings.position + _settings.orientation,
-                        _settings.up_vector
-                    );
+            _view_matrix = glm::lookAt(
+                _settings.position,
+                _settings.position + _settings.orientation,
+                _settings.up_vector
+            );
         }
 
-        void UpdateProjection()
+        void update_projection()
         {
             _projection_matrix = glm::perspective(
                     glm::radians(_settings.fov),
@@ -88,7 +87,7 @@ namespace Inferonix::Scene
 
 
     private:
-        CameraSettings _settings{};
+        camera_settings _settings{};
 
         glm::mat4 _projection_matrix{};
         glm::mat4 _view_matrix{};

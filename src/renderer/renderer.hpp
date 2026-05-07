@@ -10,9 +10,9 @@
 #include "../scene/components.hpp"
 #include "../scene/scene.hpp"
 
-namespace Inferonix::Renderer
+namespace inferonix::renderer
 {
-    struct GraphicsProfile
+    struct graphics_profile
     {
         std::string vendor = reinterpret_cast<char const*>(glGetString(GL_VENDOR));
         std::string renderer;
@@ -29,13 +29,13 @@ namespace Inferonix::Renderer
         index_buffer index_buffer_;
     };
 
-    class renderer final : public EventSystem::event_listener
+    class renderer final : public events::event_listener
     {
     public:
-        explicit renderer(std::shared_ptr<Window::window> window);
+        explicit renderer(std::shared_ptr<window::window> window);
 
     private:
-        static void SetupOpenGLDebug();
+        static void setup_opengl_debug();
 
     public:
 
@@ -47,44 +47,44 @@ namespace Inferonix::Renderer
 
         ~renderer() override = default;
 
-        void Render(Scene::scene& scene);
+        void render(scene::scene& scene);
 
     private:
-        void CreateRenderEntity(Scene::Entity const& entity, Scene::MeshComponent& mesh);
+        void create_render_entity(scene::entity const& entity, scene::mesh_component& mesh);
 
     public:
-        static void SetClearColor(float r, float g, float b, float a);
+        static void set_clear_color(float r, float g, float b, float a);
 
-        static void Clear();
+        static void clear();
 
-        void SetDeviceSpecs();
+        void set_device_specs();
 
-        [[nodiscard]] std::shared_ptr<Scene::camera> GetCamera()
+        [[nodiscard]] std::shared_ptr<scene::camera> get_camera()
         {
             return _main_camera;
         }
 
-        void SetCamera(std::shared_ptr<Scene::camera> const& camera)
+        void set_camera(std::shared_ptr<scene::camera> const& camera)
         {
             _main_camera = camera;
         }
 
-        void OnEvent(EventSystem::event& event) override;
+        void on_event(events::event& event) override;
 
 
     private:
         std::vector<std::unique_ptr<RenderEntity>> _render_entities;
 
-        std::shared_ptr<Scene::camera> _main_camera;
-        std::shared_ptr<Window::window> _window_instance{};
+        std::shared_ptr<scene::camera> _main_camera;
+        std::shared_ptr<window::window> _window_instance{};
 
         bool _wireframe_mode{ false };
 
-        GraphicsProfile _device_specs;
+        graphics_profile _device_specs;
 
 
         std::unique_ptr<RenderEntity> _grid;
-        void SetupGrid();
+        void setup_grid();
 
 
     };

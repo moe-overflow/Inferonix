@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Inferonix::EventSystem
+namespace inferonix::events
 {
 
     class event

@@ -7,7 +7,7 @@
 #include "script/scripting_engine_launcher.hpp"
 #include "physics/physics.hpp"
 
-namespace Inferonix
+namespace inferonix
 {
 
     class inferonix_engine final
@@ -26,14 +26,14 @@ namespace Inferonix
         void Run();
 
     private:
-        std::shared_ptr<Window::window> _window;
-        std::shared_ptr<Renderer::renderer> _renderer;
-        std::unique_ptr<Scene::scene> _scene;
+        std::shared_ptr<window::window> _window;
+        std::shared_ptr<renderer::renderer> _renderer;
+        std::unique_ptr<scene::scene> _scene;
 
-        Script::scripting_engine_launcher _script_launcher;
+        script::scripting_engine_launcher _script_launcher;
         bool _initialized{ false };
 
-        Physics::PhysicsEngine _physics_engine;
+        physics::physics_engine _physics_engine;
     };
 
 }

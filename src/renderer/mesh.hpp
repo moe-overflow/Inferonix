@@ -7,12 +7,12 @@
 #include <spdlog/spdlog.h>
 #include <glm/glm.hpp>
 
-namespace Inferonix::Renderer
+namespace inferonix::renderer
 {
-    struct Vertex
+    struct vertex
     {
-        glm::vec3 Position;
-        glm::vec3 Normal;
+        glm::vec3 position;
+        glm::vec3 normal;
         // TODO: TextureCoordinates here to add
     };
 
@@ -24,14 +24,14 @@ namespace Inferonix::Renderer
 
         explicit mesh(std::string const& id, std::string const& path) : _id(id)
         {
-            LoadFromFile(path);
+            load_from_file(path);
         }
 
-        bool LoadFromFile(std::filesystem::path const& path)
+        bool load_from_file(std::filesystem::path const& path)
         {
             spdlog::info(fmt::format("Loading Mesh {}", path.string()));
 
-            Assimp::Importer importer{};
+            auto importer = Assimp::Importer{};
 
             constexpr uint32_t flags = { aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices };
 
@@ -47,19 +47,15 @@ namespace Inferonix::Renderer
 
             for (uint64_t i{ 0 }; i < mesh->mNumVertices; i++)
             {
-                Vertex vertex{};
-                vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+                auto vertex_ = vertex{};
+                vertex_.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
 
                 if (mesh->mNormals)
-                {
-                    vertex.Normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
-                }
+                    vertex_.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
                 else
-                {
-                    vertex.Normal = { 0.0f, 1.0f, 0.0f };
-                }
-                
-                _vertices.push_back(vertex);
+                    vertex_.normal = { 0.0f, 1.0f, 0.0f };
+
+                _vertices.push_back(vertex_);
             }
             spdlog::info(fmt::format("Number of vertices: {}", mesh->mNumVertices));
 
@@ -74,7 +70,7 @@ namespace Inferonix::Renderer
             return true;
         }
 
-        [[nodiscard]] std::vector<Vertex> const& GetVertices()
+        [[nodiscard]] std::vector<vertex> const& GetVertices()
         {
             return _vertices;
         }
@@ -87,7 +83,7 @@ namespace Inferonix::Renderer
 
     private:
         std::string _id;
-        std::vector<Vertex> _vertices;
+        std::vector<vertex> _vertices;
         std::vector<uint32_t> _indices;
     };
 

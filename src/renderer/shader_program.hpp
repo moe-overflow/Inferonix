@@ -6,7 +6,7 @@
 
 #include "glm/glm.hpp"
 
-namespace Inferonix::Renderer
+namespace inferonix::renderer
 {
 
     class shader_program
@@ -14,8 +14,8 @@ namespace Inferonix::Renderer
 
     public:
         explicit shader_program(
-            std::string const& VertexShaderPath = SHADERS_PATH "/vertex_shader.glsl",
-            std::string const& FragmentShaderPath = SHADERS_PATH "/fragment_shader.glsl"
+            std::string const& vertex_shader_path = SHADERS_PATH "/vertex_shader.glsl",
+            std::string const& fragment_shader_path = SHADERS_PATH "/fragment_shader.glsl"
         );
 
         ~shader_program();
@@ -26,24 +26,24 @@ namespace Inferonix::Renderer
         shader_program(shader_program&& other) noexcept;
         shader_program& operator=(shader_program&& other) noexcept;
 
-        void Use() const;
-        void Unuse() const;
+        void use() const;
+        void unuse() const;
 
-        void AttachShaders() const;
-        void Link() const;
+        void attach_shaders() const;
+        void link() const;
 
-        void CheckErrors() const;
+        void check_errors() const;
 
-        void SetUniform(std::string const& name, float r, float g, float b) const;
+        void set_uniform(std::string const& name, float r, float g, float b) const;
 
-        void SetUniform(std::string const& name, glm::mat4 mat) const;
+        void set_uniform(std::string const& name, glm::mat4 mat) const;
 
-        [[nodiscard]] uint32_t Get() const
+        [[nodiscard]] uint32_t get() const
         {
             return *_id;
         }
 
-        void SetDynamicColor(std::string const& uniform_name) const;
+        void set_dynamic_color(std::string const& uniform_name) const;
 
     private:
         std::unique_ptr<shader> _vertex_shader;
