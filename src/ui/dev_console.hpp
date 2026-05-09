@@ -15,7 +15,13 @@ namespace inferonix::ui
         auto on_render() -> void override
         {
             if (ImGui::IsKeyPressed(ImGuiKey_M, false))
+            {
                 _is_open = !_is_open;
+                if (_is_open)
+                {
+                    _reclaim_focus = true;
+                }
+            }
 
 
             auto const delta_time = ImGui::GetIO().DeltaTime;
@@ -45,12 +51,19 @@ namespace inferonix::ui
                 for (const auto& log : _history) TextUnformatted(log.c_str());
                 EndChild();
 
-                Separator();
 
                 PushItemWidth(-1);
+
+                if (_reclaim_focus)
+                {
+                    SetKeyboardFocusHere();
+                    _reclaim_focus = false;
+                }
+
                 if (InputText("##ConsoleInput", _input_buffer, IM_ARRAYSIZE(_input_buffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
                     // todo: execute command
                     SetKeyboardFocusHere(-1);
+                    _reclaim_focus = true;
                 }
                 PopItemWidth();
             }
@@ -63,6 +76,8 @@ namespace inferonix::ui
 
         char _input_buffer[256] = "";
         std::vector<std::string> _history;
+
+        bool _reclaim_focus { false };
 
     };
 }
