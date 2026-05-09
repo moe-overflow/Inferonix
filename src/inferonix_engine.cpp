@@ -104,13 +104,13 @@ inferonix_engine::inferonix_engine()
         // 1. Create a Static Floor (Invisible, just catches the monkey)
         auto floor = _scene->get_registry().create();
         _scene->get_registry().emplace<transform_component>(floor).position = {0, -5.0f, 0};
-        _scene->get_registry().emplace<box_collider_component>(floor).HalfExtents = {50.0f, 1.0f, 50.0f};
+        _scene->get_registry().emplace<box_collider_component>(floor).half_extents = {50.0f, 1.0f, 50.0f};
         _scene->get_registry().emplace<rigid_body_component>(floor, 0.0f, JPH::BodyID(), RigidBodyType::Static);
 
         // 2. Create the Falling Monkey!
         auto box = _scene->get_registry().create();
         _scene->get_registry().emplace<transform_component>(box).position = {0, 10.0f, 0}; // Drop from high up!
-        _scene->get_registry().emplace<box_collider_component>(box).HalfExtents = {0.5f, 0.5f, 0.5f};
+        _scene->get_registry().emplace<box_collider_component>(box).half_extents = {0.5f, 0.5f, 0.5f};
         _scene->get_registry().emplace<box_collider_component>(box, 1.0f, JPH::BodyID(), RigidBodyType::Dynamic);
 
         if (mesh_.has_value())
@@ -151,6 +151,10 @@ while (!_window->ShouldClose()) {
 
 void inferonix_engine::init(const std::string_view scene_path)
 {
+
+    _window->add_layer<ui::dockspace>();
+    _window->add_layer<ui::scene_layer>(_renderer->get_frame_buffer());
+
     _renderer->setup();
     _physics_engine.init();
     _script_launcher.launch();
@@ -180,7 +184,7 @@ void inferonix_engine::run()
 
         renderer::renderer::clear();
         _renderer->render(*_scene);
-
+        _window->display();
         _window->swap_buffers();
     }
 }

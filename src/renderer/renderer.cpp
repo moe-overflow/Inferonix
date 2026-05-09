@@ -6,12 +6,14 @@
 
 #include <utility>
 
+#include "frame_buffer.hpp"
+
 using namespace inferonix::renderer;
 using namespace inferonix::scene;
 
 namespace
 {
-    void render_grid(scene const& scene, RenderEntity const& grid)
+    void render_grid(scene const& scene, render_entity const& grid)
     {
         // Alpha Blending (for handling transparency)
         {
@@ -38,7 +40,9 @@ namespace
     }
 }
 
-renderer::renderer(std::shared_ptr<window::window> window) : _window_instance(std::move(window))
+renderer::renderer(std::shared_ptr<window::window> window) :
+    _window_instance(std::move(window)),
+    _frame_buffer(std::make_shared<frame_buffer>(frame_buffer::frame_buffer_settings(1920, 1080)))
 {}
 
 void renderer::setup()
@@ -54,6 +58,10 @@ void renderer::setup()
 
 void renderer::render(scene::scene& scene)
 {
+    _frame_buffer->bind();
+
+    clear();
+
     if (_grid)
         render_grid(scene, *_grid);
 
@@ -95,36 +103,38 @@ void renderer::render(scene::scene& scene)
         render_entity->shader_program_.unuse();
 
     }
+
+    _frame_buffer->unbind();
 }
 
 void renderer::create_render_entity(entity const& entity, mesh_component& mesh)
 {
-    auto render_entity = std::make_unique<RenderEntity>();
+    auto render_entity_ = std::make_unique<render_entity>();
 
-    render_entity->vertex_array_.bind();
-    render_entity->vertex_buffer_.bind();
+    render_entity_->vertex_array_.bind();
+    render_entity_->vertex_buffer_.bind();
 
-    render_entity->vertex_buffer_.buffer_data(mesh.GetVertices());
+    render_entity_->vertex_buffer_.buffer_data(mesh.GetVertices());
 
-    render_entity->index_buffer_.bind();
-    render_entity->index_buffer_.buffer_data(mesh.GetIndices());
+    render_entity_->index_buffer_.bind();
+    render_entity_->index_buffer_.buffer_data(mesh.GetIndices());
 
     vertex_buffer_layout layout;
     layout.push(FLOAT, 3); // position
     layout.push(FLOAT, 3); // normal
-    render_entity->vertex_array_.add_vertex_buffer(render_entity->vertex_buffer_, layout);
+    render_entity_->vertex_array_.add_vertex_buffer(render_entity_->vertex_buffer_, layout);
 
 
-    render_entity->vertex_array_.set_index_buffer(render_entity->index_buffer_);
-    render_entity->vertex_buffer_.unbind();
-    render_entity->vertex_array_.unbind();
+    render_entity_->vertex_array_.set_index_buffer(render_entity_->index_buffer_);
+    render_entity_->vertex_buffer_.unbind();
+    render_entity_->vertex_array_.unbind();
 
     /**/
 
     if (auto const entity_index = static_cast<uint32_t>(entity); entity_index >= _render_entities.size())
         _render_entities.resize(entity_index + 1);
 
-    _render_entities[static_cast<uint32_t>(entity)] = std::move(render_entity);
+    _render_entities[static_cast<uint32_t>(entity)] = std::move(render_entity_);
 
 }
 
@@ -190,7 +200,7 @@ void renderer::on_event(events::event& event)
 
 void renderer::setup_grid()
 {
-    _grid = std::make_unique<RenderEntity>();
+    _grid = std::make_unique<render_entity>();
     _grid->shader_program_ = shader_program{
         SHADERS_PATH "/grid_vertex.glsl",
         SHADERS_PATH "/grid_fragment.glsl"

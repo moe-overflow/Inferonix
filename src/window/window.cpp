@@ -12,6 +12,10 @@
 #include "../input/key_codes.hpp"
 #include "../input/input.hpp"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 using namespace inferonix::window;
 using namespace inferonix::events;
 using namespace inferonix::input;
@@ -23,11 +27,28 @@ window::window(window_settings& window_settings)
       _instance(nullptr),
       _last_frame_time(steady_clock::now())
 {
-    create();
+    init();
+}
+
+window::~window()
+{
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    if (_instance)
+        glfwDestroyWindow(_instance);
+}
+
+
+void window::init()
+{
+    init_glfw();
+    init_imgui();
     _initialized = true;
 }
 
-void window::init()
+void window::init_glfw()
 {
     _initialized = glfwInit();
     if (!_initialized)
@@ -38,13 +59,10 @@ void window::init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-}
 
-void window::create()
-{
-    init();
     _instance = glfwCreateWindow(_settings.width, _settings.height, _settings.title.c_str(), nullptr, nullptr);
     set_input_pointer_functions(_instance);
 
@@ -66,6 +84,37 @@ void window::create()
         throw std::runtime_error("Error while initializing GLAD");
     }
 }
+
+void window::init_imgui()
+{
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_ViewportsEnable;
+
+    // font
+    /*
+    {
+        io.Fonts->Clear();
+        auto const font_file = RESOURCES_PATH "/fonts/IosevkaCharonMono-Light.ttf";
+
+        _settings.font = io.Fonts->AddFontFromFileTTF(
+            font_file,
+            _settings.font_size,
+            nullptr,
+            io.Fonts->GetGlyphRangesJapanese()
+        );
+        io.Fonts->Build();
+    }*/
+
+    auto const glsl_version = "#version 330";
+    ImGui_ImplOpenGL3_Init(glsl_version);
+    ImGui_ImplGlfw_InitForOpenGL(_instance, true);
+
+}
+
+
 
 bool window::should_close() const
 {
@@ -104,6 +153,41 @@ float window::get_delta_time()
     duration<float> const duration = current_frame_time - _last_frame_time;
     _last_frame_time = current_frame_time;
     return duration.count();
+}
+
+
+void window::display() const
+{
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    /**/
+
+
+    for (const auto& layer : _layer_stack)
+    {
+        layer->on_render();
+    }
+
+    /**/
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2(static_cast<float>(_settings.width), static_cast<float>(_settings.height));
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
+
+
 }
 
 /**/

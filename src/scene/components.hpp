@@ -73,7 +73,7 @@ namespace inferonix::scene
 
     struct box_collider_component
     {
-        glm::vec3 HalfExtents = {0.5f, 0.5f, 0.5f};
+        glm::vec3 half_extents = {0.5f, 0.5f, 0.5f};
     };
 
 }

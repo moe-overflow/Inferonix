@@ -2,6 +2,7 @@
 
 #include "../event/event.hpp"
 #include "../event/event_handler.hpp"
+#include "../ui/layer.hpp"
 
 #include <chrono>
 
@@ -31,11 +32,9 @@ namespace inferonix::window
         window& operator=(window const&) = delete;
         window& operator=(window&&) = delete;
 
-        ~window() = default;
-
+        ~window();
 
         void init();
-        void create();
         void destroy();
 
         [[nodiscard]] bool should_close() const;
@@ -48,8 +47,19 @@ namespace inferonix::window
 
         [[nodiscard]] float get_delta_time();
 
+        void display() const;
+
         // void process_input();
 
+        template<typename T, typename... Args> T& add_layer(Args&&... args)
+        {
+            static_assert(std::is_base_of_v<ui::layer, T>);
+            auto layer = std::make_shared<T>(std::forward<Args>(args)...);
+            T& ref = *layer;
+            _layer_stack.emplace_back(layer);
+            layer->on_attach();
+            return ref;
+        }
 
     private:
         bool _initialized = false;
@@ -58,9 +68,14 @@ namespace inferonix::window
 
         delta_time_point _last_frame_time{};
 
+        std::vector<std::shared_ptr<ui::layer>> _layer_stack;
 
     private:
+        void init_glfw();
+        void init_imgui();
+
         static void set_input_pointer_functions(GLFWwindow* glfw_window);
+
     };
 
 } // namespace Inferonix::Window

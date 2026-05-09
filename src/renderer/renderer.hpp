@@ -21,7 +21,7 @@ namespace inferonix::renderer
         int nr_attributes;
     };
 
-    struct RenderEntity
+    struct render_entity
     {
         shader_program shader_program_;
         vertex_array vertex_array_;
@@ -73,9 +73,11 @@ namespace inferonix::renderer
 
         void on_event(events::event& event) override;
 
+        [[nodiscard]] auto get_frame_buffer()  { return _frame_buffer; }
+
 
     private:
-        std::vector<std::unique_ptr<RenderEntity>> _render_entities;
+        std::vector<std::unique_ptr<render_entity>> _render_entities;
 
         std::shared_ptr<scene::camera> _main_camera;
         std::shared_ptr<window::window> _window_instance{};
@@ -85,9 +87,10 @@ namespace inferonix::renderer
         graphics_profile _device_specs{};
 
 
-        std::unique_ptr<RenderEntity> _grid;
+        std::unique_ptr<render_entity> _grid;
         void setup_grid();
 
+        std::shared_ptr<frame_buffer> _frame_buffer;
 
     };
 }
