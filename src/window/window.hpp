@@ -72,7 +72,7 @@ namespace inferonix::window
 
     private:
         void init_glfw();
-        void init_imgui();
+        void init_imgui() const;
 
         static void set_input_pointer_functions(GLFWwindow* glfw_window);
 

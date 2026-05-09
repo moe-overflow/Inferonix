@@ -4,6 +4,9 @@
 #include "renderer/renderer.hpp"
 #include "scene/scene_serializer.hpp"
 
+#include "ui/layer.hpp"
+#include "ui/dev_console.hpp"
+
 using namespace inferonix;
 using namespace inferonix::window;
 using namespace inferonix::renderer;
@@ -154,6 +157,7 @@ void inferonix_engine::init(const std::string_view scene_path)
 
     _window->add_layer<ui::dockspace>();
     _window->add_layer<ui::scene_layer>(_renderer->get_frame_buffer());
+    _window->add_layer<ui::dev_console>();
 
     _renderer->setup();
     _physics_engine.init();
