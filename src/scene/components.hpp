@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "../renderer/mesh.hpp"
 #include "../renderer/transform.hpp"
 #include "camera.hpp"
@@ -8,11 +10,36 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/BodyID.h>
 
+#include "util/uuid.hpp"
+
 namespace inferonix::scene
 {
+    // This is needed to each scene object gets an UUID that is fixed rather than using
+    //  an entt::entity handle that is not consistent when reloading the engine/game
+    struct id_component
+    {
+        std::string id;
+        id_component() = default;
+        id_component(const id_component& id) = default;
+        id_component(const std::string& id) : id(id) {}
+    };
+
+    // human readable ID of an object
+    struct tag_component
+    {
+        std::string tag;
+        tag_component() = default;
+        tag_component(const tag_component&) = default;
+        tag_component(const std::string& tag) : tag(tag) {}
+    };
 
     using mesh_component = renderer::mesh;
-    
+
+    struct material_component
+    {
+        glm::vec3 color {.0f, .0f, .0f};
+    };
+
     struct transform_component : public renderer::transform
     {
         transform_component() : renderer::transform() {}

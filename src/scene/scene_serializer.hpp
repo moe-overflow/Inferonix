@@ -13,8 +13,9 @@ namespace inferonix::scene
     public:
         explicit scene_serializer(scene& scene);
 
-        [[nodiscard]] bool Serialize(const std::string& filepath) const;
-        [[nodiscard]] bool Deserialize(const std::string& filepath) const;
+        [[nodiscard]] auto serialize(const std::string& filepath) const -> bool;
+
+        auto deserialize(const std::string& filepath) const -> void;
 
 
     };

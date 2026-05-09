@@ -9,23 +9,28 @@ using namespace inferonix::scene;
 
 scene_serializer::scene_serializer(scene& scene) : _scene(scene) {}
 
-bool scene_serializer::Serialize(const std::string& filepath) const
+bool scene_serializer::serialize(const std::string& filepath) const
 {
     // todo
     return false;
 }
 
-bool scene_serializer::Deserialize(const std::string& filepath) const
+void scene_serializer::deserialize(const std::string& filepath) const
 {
-    std::ifstream file(filepath);
+    assert(std::filesystem::exists(filepath));
+    auto file = std::ifstream{filepath};
     auto data = nlohmann::json::parse(file);
 
     auto& registry = _scene.get_registry();
     auto& assets = _scene.get_asset_registry();
 
-    for (auto& entity_data : data["entities"])
+    for (auto& entity_data : data["Entities"])
     {
         auto entity = registry.create();
+        auto name = entity_data.contains("Name") ? entity_data["Name"] : "Unnamed";
+        registry.emplace<tag_component>(entity, name);
+        registry.emplace<id_component>(entity, utils::generate_uuid());
+
         if (entity_data["Components"].contains("TransformComponent"))
         {
             auto& transform = entity_data["Components"]["TransformComponent"];
@@ -44,6 +49,12 @@ bool scene_serializer::Deserialize(const std::string& filepath) const
             auto mesh = assets.load<renderer::mesh>(id, path);
             if (mesh)
                 registry.emplace<mesh_component>(entity, *mesh.value());
+
+            if (mesh_data.contains("Color"))
+            {
+                auto& c = mesh_data["Color"];
+                registry.emplace<material_component>(entity, glm::vec3{ c[0], c[1], c[2] });
+            }
         }
 
         if (entity_data["Components"].contains("ScriptComponent"))
@@ -56,9 +67,6 @@ bool scene_serializer::Deserialize(const std::string& filepath) const
         }
 
     }
-
-    return true;
-
 }
 
 

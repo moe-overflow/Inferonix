@@ -1,27 +1,57 @@
 #include "inferonix_engine.hpp"
 
-#include "util/uuid.hpp"
 #include "scene/components.hpp"
 #include "renderer/renderer.hpp"
+#include "scene/scene_serializer.hpp"
 
 using namespace inferonix;
 using namespace inferonix::window;
 using namespace inferonix::renderer;
 using namespace inferonix::scene;
 
-auto window_settings_ =  window_settings { .width = 1920,
-                                          .height = 1080,
-                                          .title = "Inferonix Engine",
-                                          .full_screen = false,
-                                          .v_sync = true };
+namespace
+{
+    auto window_settings_ = window_settings
+    {
+        .width = 1920,
+        .height = 1080,
+        .title = "Inferonix Engine",
+        .full_screen = false,
+        .v_sync = true
+    };
+
+    auto log_scene_registry(registry& registry) -> void
+    {
+        const auto view = registry.view<tag_component>();
+        spdlog::info("Scene has following entities: ");
+        for (const auto entity : view)
+        {
+            const auto& tag = view.get<tag_component>(entity).tag;
+            auto id = std::string{"no ID"};
+            if (registry.any_of<id_component>(entity))
+                id = registry.get<id_component>(entity).id;
+            spdlog::info("We have entity: {}, with ID: {}", tag, id);
+
+            if (registry.any_of<transform_component>(entity))
+            {
+                const auto& transform_ = registry.get<transform_component>(entity);
+                spdlog::info("Entity has transform: {}, {}, {}",
+                    transform_.position.x, transform_.position.y, transform_.position.z
+                );
+            }
+        }
+        spdlog::info("");
+    }
+}
 
 inferonix_engine::inferonix_engine()
     : _window(std::make_shared<window::window>(window_settings_)),
       _renderer(std::make_shared<renderer::renderer>(_window)),
-      _scene(std::make_unique<scene::scene>())
+      _scene(std::make_unique<scene::scene>()),
+      _scene_serializer(std::make_unique<scene_serializer>(*_scene))
 {
 
-/*
+#if 0
 
     // _renderer->SetCamera(_scene->GetMainCamera());
     EventSystem::EventHandler::Get()->Subscribe(_renderer);
@@ -61,9 +91,9 @@ inferonix_engine::inferonix_engine()
         transform.position = {0.0f, 0.0f, -5.0f};
         registry.emplace<TransformComponent>(entity, transform);
     }
-*/
-    _script_launcher.launch();
-/*
+#endif
+
+#if 0
     {
 
         auto mesh_ = _scene->get_asset_registry().load<mesh>(
@@ -87,8 +117,7 @@ inferonix_engine::inferonix_engine()
             _scene->get_registry().emplace<mesh_component>(box, *mesh_.value());
 
     }
-    */
-    _initialized = true;
+#endif
 }
 
 inferonix_engine::~inferonix_engine()
@@ -119,12 +148,21 @@ while (!_window->ShouldClose()) {
 }
  */
 
-void inferonix_engine::Run()
+
+void inferonix_engine::init(const std::string_view scene_path)
 {
+    _renderer->setup();
     _physics_engine.init();
-    _physics_engine.start_simulation(_scene->get_registry());
+    _script_launcher.launch();
+    _scene_serializer->deserialize(scene_path.data());
+    auto& registry = _scene->get_registry();
+    log_scene_registry(registry);
+    _physics_engine.start_simulation(registry);
+    _initialized = true;
+}
 
-
+void inferonix_engine::run()
+{
     while (!_window->should_close())
     {
         float const delta_time = _window->get_delta_time();

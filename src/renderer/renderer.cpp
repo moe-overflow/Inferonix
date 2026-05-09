@@ -9,53 +9,59 @@
 using namespace inferonix::renderer;
 using namespace inferonix::scene;
 
+namespace
+{
+    void render_grid(scene const& scene, RenderEntity const& grid)
+    {
+        // Alpha Blending (for handling transparency)
+        {
+            // calculate a color by mixing the new pixel with pixel already in buffer
+            glEnable(GL_BLEND);
+
+            // use the alpha value of new color to determine opacity
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+
+        grid.shader_program_.use();
+        grid.vertex_array_.bind();
+
+        grid.shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
+        grid.shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+        grid.vertex_array_.unbind();
+        grid.shader_program_.unuse();
+
+        glDisable(GL_BLEND);
+
+    }
+}
+
 renderer::renderer(std::shared_ptr<window::window> window) : _window_instance(std::move(window))
+{}
+
+void renderer::setup()
 {
 #ifndef NDEBUG
     setup_opengl_debug();
 #endif
 
     set_device_specs();
-    set_clear_color(0.0f, 0.0f, 0.0f, 1.0f);
+    set_clear_color(1.0f, 1.0f, 1.0f, 1.0f);
     setup_grid();
-}
-
-static void RenderGrid(scene const& scene, RenderEntity const& grid)
-{
-    // Alpha Blending (for handling transparency)
-    {
-        // calculate a color by mixing the new pixel with pixel already in buffer
-        glEnable(GL_BLEND);
-
-        // use the alpha value of new color to determine opacity
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    grid.shader_program_.use();
-    grid.vertex_array_.bind();
-
-    grid.shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
-    grid.shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
-
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-    grid.vertex_array_.unbind();
-    grid.shader_program_.unuse();
-
-    glDisable(GL_BLEND);
-
 }
 
 void renderer::render(scene::scene& scene)
 {
     if (_grid)
-        RenderGrid(scene, *_grid);
-
+        render_grid(scene, *_grid);
 
     //auto const delta_time = _window_instance->GetDeltaTime();
     //_main_camera->Update(delta_time);
 
-    for (auto const view = scene.get_registry().view<mesh_component, transform_component>(); auto entity : view)
+    auto const view = scene.get_registry().view<mesh_component, transform_component, material_component>();
+    for (auto entity : view)
     {
         auto const entity_index = static_cast<uint32_t>(entity);
         if (entity_index >= _render_entities.size() || !_render_entities[entity_index])
@@ -65,7 +71,9 @@ void renderer::render(scene::scene& scene)
         render_entity->shader_program_.use();
         render_entity->vertex_array_.bind();
 
-        render_entity->shader_program_.set_uniform("myColor", 0.541f, 0.124f, 0.784f);
+        const auto& [color] = view.get<material_component>(entity);
+        render_entity->shader_program_.set_uniform("myColor", color.r, color.g, color.b);
+
 
         // uniforms
         render_entity->shader_program_.set_uniform(

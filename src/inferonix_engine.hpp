@@ -9,6 +9,9 @@
 
 namespace inferonix
 {
+    namespace scene {
+        class scene_serializer;
+    }
 
     class inferonix_engine final
     {
@@ -23,7 +26,9 @@ namespace inferonix
 
         ~inferonix_engine();
 
-        void Run();
+        void init(std::string_view scene_path);
+        void run();
+
 
     private:
         std::shared_ptr<window::window> _window;
@@ -34,6 +39,9 @@ namespace inferonix
         bool _initialized{ false };
 
         physics::physics_engine _physics_engine;
+
+        std::unique_ptr<scene::scene_serializer> _scene_serializer;
+
     };
 
 }

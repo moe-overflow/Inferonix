@@ -50,7 +50,7 @@ scripting_engine::scripting_engine() : _engine(asCreateScriptEngine())
         spdlog::warn("Failed to set AngelScript message callback");
     }
 
-    this->Initialize();
+    this->initialize();
 }
 
 scripting_engine::scripting_engine(scripting_engine&& other) noexcept : _engine(std::move(other._engine))
@@ -66,7 +66,7 @@ scripting_engine& scripting_engine::operator=(scripting_engine&& other) noexcept
     return *this;
 }
 
-void scripting_engine::Initialize() const
+void scripting_engine::initialize() const
 {
     spdlog::info("Initializing scripting engine with std::string, math and array...");
     RegisterStdString(_engine.get());
@@ -74,7 +74,7 @@ void scripting_engine::Initialize() const
     RegisterScriptArray(_engine.get(), true);
 }
 
-void scripting_engine::Terminate() const
+void scripting_engine::terminate() const
 {
     if (_engine)
     {
@@ -82,7 +82,7 @@ void scripting_engine::Terminate() const
     }
 }
 
-script_module scripting_engine::CompileScript(std::string const& name, std::string const& path) const
+script_module scripting_engine::compile_script(std::string const& name, std::string const& path) const
 {
     if (!_engine)
     {

@@ -11,7 +11,7 @@ namespace inferonix::scene
     public:
         explicit editor_camera(camera_settings const& settings) : camera(settings)
         {
-            UpdateCameraVectors();
+            update_camera_vectors();
         }
 
         void update(float delta_time) override
@@ -36,7 +36,7 @@ namespace inferonix::scene
                 if (_pitch > 89.0f) _pitch = 89.0f;
                 if (_pitch < -89.0f) _pitch = -89.0f;
 
-                UpdateCameraVectors();
+                update_camera_vectors();
             }
             else
             {
@@ -61,7 +61,7 @@ namespace inferonix::scene
         }
 
     private:
-        void UpdateCameraVectors()
+        void update_camera_vectors()
         {
             glm::vec3 front;
             front.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));

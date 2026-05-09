@@ -30,13 +30,13 @@ namespace inferonix::script
         /**/
 
 
-        void Initialize() const;
-        void Terminate() const;
+        void initialize() const;
+        void terminate() const;
 
-        [[nodiscard]] script_module CompileScript(std::string const& name, std::string const& path) const;
+        [[nodiscard]] script_module compile_script(std::string const& name, std::string const& path) const;
 
-        asIScriptEngine* GetEngine() { return _engine.get(); }
-        [[nodiscard]] asIScriptEngine* GetEngine() const { return _engine.get(); }
+        asIScriptEngine* get_engine() { return _engine.get(); }
+        [[nodiscard]] asIScriptEngine* get_engine() const { return _engine.get(); }
 
     private:
         std::unique_ptr<asIScriptEngine, ScriptingEngineDestructor> _engine;

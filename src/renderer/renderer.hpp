@@ -49,6 +49,8 @@ namespace inferonix::renderer
 
         void render(scene::scene& scene);
 
+        void setup();
+
     private:
         void create_render_entity(scene::entity const& entity, scene::mesh_component& mesh);
 
@@ -80,7 +82,7 @@ namespace inferonix::renderer
 
         bool _wireframe_mode{ false };
 
-        graphics_profile _device_specs;
+        graphics_profile _device_specs{};
 
 
         std::unique_ptr<RenderEntity> _grid;

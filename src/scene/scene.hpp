@@ -21,11 +21,13 @@ namespace inferonix::scene
         [[nodiscard]] const registry& get_registry() const { return *_registry; }
 
         [[nodiscard]] asset::asset_registry& get_asset_registry() const { return *_asset_registry; }
-
         [[nodiscard]] std::shared_ptr<camera> get_editor_camera() const { return _editor_camera; }
 
     private:
+        // responsible for holding scene data (e.g. entities and their components)
         std::unique_ptr<registry> _registry;
+
+        // responsible for loading assets files
         std::unique_ptr<asset::asset_registry> _asset_registry;
 
         std::shared_ptr<editor_camera> _editor_camera;

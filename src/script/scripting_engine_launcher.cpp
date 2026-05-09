@@ -18,12 +18,12 @@ void scripting_engine_launcher::launch()
 {
     // _engine.Initialize();
     spdlog::info("Launching Scripting Engine and registering globals...");
-    detail::register_globals(_engine.GetEngine());
+    detail::register_globals(_engine.get_engine());
 }
 
 void scripting_engine_launcher::terminate()
 {
-    _engine.Terminate();
+    _engine.terminate();
     _module_storage.clear();
 }
 
@@ -55,7 +55,7 @@ void scripting_engine_launcher::start(scene::registry& scene_registry)
         }
         else
         {
-            auto module = _engine.CompileScript(class_name, component.script_path);
+            auto module = _engine.compile_script(class_name, component.script_path);
             if (!module.IsValid())
             {
                 spdlog::error("Failed to compile script: {}", component.script_path);
