@@ -51,6 +51,17 @@ namespace inferonix::renderer
 
         void setup();
 
+        void toggle_wireframe_mode()
+        {
+            set_wireframe_mode(!_wireframe_mode);
+        }
+
+        void set_wireframe_mode(bool enable)
+        {
+            _wireframe_mode = enable;
+            glPolygonMode(GL_FRONT_AND_BACK, _wireframe_mode ? GL_LINE : GL_FILL);
+        }
+
     private:
         void create_render_entity(scene::entity const& entity, scene::mesh_component& mesh);
 

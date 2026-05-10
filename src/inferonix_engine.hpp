@@ -55,6 +55,10 @@ namespace inferonix
 
         EngineState _state{ EngineState::PLAY };
         bool _was_console_open{ false };
+
+        void register_commands();
+        void add_window_layers();
+
     };
 
 }

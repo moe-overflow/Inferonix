@@ -156,21 +156,8 @@ while (!_window->ShouldClose()) {
 
 void inferonix_engine::init(const std::string_view scene_path)
 {
-
-    _window->add_layer<ui::dockspace>();
-    _window->add_layer<ui::scene_layer>(_renderer->get_frame_buffer());
-    _window->add_layer<ui::dev_console>(
-        [this](const std::string_view command) -> void { _command_registry.execute(command); }
-    );
-    _window->add_layer<ui::toolbar>(
-        [this]() -> void { _state = EngineState::PLAY;  },
-        [this]() -> void { _state = EngineState::PAUSE; }
-    );
-
-    _command_registry.register_command(
-        "quit", "Exits the engine", [this](const auto& args)-> void { _window->close(); }
-    );
-
+    add_window_layers();
+    register_commands();
     configure_console_sink();
 
     _renderer->setup();
@@ -225,4 +212,53 @@ void inferonix_engine::configure_console_sink() const
     custom_sink->set_pattern("[%Y-%m-%d %T] [%l] %v");
     spdlog::default_logger()->sinks().push_back(custom_sink);
 }
+
+
+void inferonix_engine::add_window_layers()
+{
+    _window->add_layer<ui::dockspace>();
+    _window->add_layer<ui::scene_layer>(_renderer->get_frame_buffer());
+    _window->add_layer<ui::dev_console>(
+        [this](const std::string_view command) -> void { _command_registry.execute(command); }
+    );
+    _window->add_layer<ui::toolbar>(
+        [this]() -> void { _state = EngineState::PLAY;  },
+        [this]() -> void { _state = EngineState::PAUSE; }
+    );
+
+}
+
+void inferonix_engine::register_commands()
+{
+    _command_registry.register_command(
+            "quit", "Exits the engine", [this](const auto& args)-> void { _window->close(); }
+    );
+
+    _command_registry.register_command(
+        "wireframe", "wireframe_mode", [this](const auto& args)-> void
+        {
+            if (args.empty())
+            {
+                _renderer->toggle_wireframe_mode();
+                spdlog::info("Wireframe toggled");
+                return;
+            }
+            const std::string& arg = args[0];
+            bool enable = false;
+            if (arg == "1" || arg == "true" || arg == "on")
+                enable = true;
+            else if (arg == "0" || arg == "false" || arg == "off")
+                enable = false;
+            else
+            {
+                spdlog::error("Invalid");
+                return;
+            }
+            _renderer->set_wireframe_mode(enable);
+            spdlog::info("Wireframe mode set to {}", enable ? "ON" : "OFF");
+
+        }
+    );
+}
+
 
