@@ -50,11 +50,26 @@ void scene_serializer::deserialize(const std::string& filepath) const
             if (mesh)
                 registry.emplace<mesh_component>(entity, *mesh.value());
 
-            if (mesh_data.contains("Color"))
+            auto material = material_component{};
+            if (mesh_data.contains("TexturePath") && mesh_data.contains("TextureID"))
+            {
+                auto tex_path = mesh_data["TexturePath"];
+                auto tex_id = mesh_data["TextureID"];
+                auto texture = assets.load<renderer::texture>(tex_id, tex_path);
+
+                if (texture)
+                {
+                    material.albedo_map = texture.value();
+                    material.use_texture = true;
+                }
+            }
+            else if (mesh_data.contains("Color"))
             {
                 auto& c = mesh_data["Color"];
-                registry.emplace<material_component>(entity, glm::vec3{ c[0], c[1], c[2] });
+                material.color = glm::vec3{ c[0], c[1], c[2] };
+                material.use_texture = false;
             }
+            registry.emplace<material_component>(entity, material);
         }
 
         if (entity_data["Components"].contains("ScriptComponent"))

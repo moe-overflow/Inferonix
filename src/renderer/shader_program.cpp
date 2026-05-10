@@ -105,6 +105,14 @@ void shader_program::set_uniform(std::string const& name, glm::mat4 mat) const
     glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
 }
 
+
+void shader_program::set_uniform_int(std::string const& name, int val) const
+{
+    int location = glGetUniformLocation(this->get(), name.c_str());
+    assert(location != -1);
+    glUniform1i(location, val);
+}
+
 void shader_program::set_dynamic_color(std::string const& uniform_name) const
 {
     auto time_value = static_cast<float>(glfwGetTime());

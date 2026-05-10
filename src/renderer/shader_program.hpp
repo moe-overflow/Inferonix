@@ -38,6 +38,8 @@ namespace inferonix::renderer
 
         void set_uniform(std::string const& name, glm::mat4 mat) const;
 
+        void set_uniform_int(std::string const& name, int val) const;
+
         [[nodiscard]] uint32_t get() const
         {
             return *_id;

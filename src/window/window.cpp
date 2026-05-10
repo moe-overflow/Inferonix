@@ -232,7 +232,7 @@ namespace
             case GLFW_KEY_F1:
                 return Key::F1;
             default:
-                spdlog::warn("GLFW key code {} not known", glfw_key_code);
+                // spdlog::warn("GLFW key code {} not known", glfw_key_code);
                 return std::nullopt;
         }
     }

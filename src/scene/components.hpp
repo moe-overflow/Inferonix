@@ -1,9 +1,11 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "../renderer/mesh.hpp"
 #include "../renderer/transform.hpp"
+#include "../renderer/texture.hpp"
 #include "camera.hpp"
 #include "../script/script_object.hpp"
 
@@ -38,6 +40,8 @@ namespace inferonix::scene
     struct material_component
     {
         glm::vec3 color {.0f, .0f, .0f};
+        std::shared_ptr<renderer::texture> albedo_map;
+        bool use_texture;
     };
 
     struct transform_component : public renderer::transform

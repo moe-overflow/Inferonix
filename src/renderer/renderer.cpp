@@ -52,7 +52,8 @@ void renderer::setup()
 #endif
 
     set_device_specs();
-    set_clear_color(1.0f, 1.0f, 1.0f, 1.0f);
+    set_clear_color(.1f, .1f, .1f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
     setup_grid();
 }
 
@@ -79,8 +80,8 @@ void renderer::render(scene::scene& scene)
         render_entity->shader_program_.use();
         render_entity->vertex_array_.bind();
 
-        const auto& [color] = view.get<material_component>(entity);
-        render_entity->shader_program_.set_uniform("myColor", color.r, color.g, color.b);
+        const auto& color = view.get<material_component>(entity).color;
+        render_entity->shader_program_.set_uniform("my_color", color.r, color.g, color.b);
 
 
         // uniforms
@@ -91,6 +92,20 @@ void renderer::render(scene::scene& scene)
         render_entity->shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
         render_entity->shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
 
+        const auto& material = view.get<material_component>(entity);
+        render_entity->shader_program_.set_uniform("my_color", material.color.r, material.color.g, material.color.b);
+
+        if (material.albedo_map && material.use_texture)
+        {
+            material.albedo_map->bind(0); // Bind to texture slot 0
+            // Note: You need to add this set_uniform signature to shader_program.hpp!
+            render_entity->shader_program_.set_uniform_int("albedo_map", 0);
+            render_entity->shader_program_.set_uniform_int("use_texture", 1);
+        }
+        else
+        {
+            render_entity->shader_program_.set_uniform_int("use_texture", 0);
+        }
 
         glDrawElements(
             GL_TRIANGLES,
@@ -122,6 +137,7 @@ void renderer::create_render_entity(entity const& entity, mesh_component& mesh)
     vertex_buffer_layout layout;
     layout.push(FLOAT, 3); // position
     layout.push(FLOAT, 3); // normal
+    layout.push(FLOAT, 2); // texture
     render_entity_->vertex_array_.add_vertex_buffer(render_entity_->vertex_buffer_, layout);
 
 
@@ -224,6 +240,7 @@ void renderer::setup_grid()
     auto layout = vertex_buffer_layout{};
     layout.push(FLOAT, 3); // position
     layout.push(FLOAT, 3); // normal
+    layout.push(FLOAT, 2);
 
     _grid->vertex_array_.bind();
     _grid->vertex_array_.add_vertex_buffer(_grid->vertex_buffer_, layout);

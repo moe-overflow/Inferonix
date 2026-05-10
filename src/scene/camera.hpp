@@ -48,7 +48,7 @@ namespace inferonix::scene
         void set_orientation(glm::vec3 const& orientation)
         {
             _settings.orientation = orientation;
-            update_projection();
+            update_view();
         }
 
         [[nodiscard]] auto get_projection() const

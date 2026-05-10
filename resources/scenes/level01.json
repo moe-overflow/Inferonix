@@ -5,17 +5,61 @@
       "Name": "MonkeyPlayer",
       "Components": {
         "TransformComponent": {
-          "Position": [0.0, 0.0, 0.0],
+          "Position": [10.0, 0.0, 0.0],
           "Rotation": [30.0, 20.0, 10.0],
           "Scale": [1, 1, 1]
         },
         "MeshComponent": {
           "AssetID": "004c2f80-92d0-4d05-a1ca-45974ee779b9",
           "AssetPath": "resources/models/Monkey.obj",
-          "Color": [0.33, 0.234, 0.26]
+          "Color": [0.3, 0.934, 0.96]
+        }
+      }
+    },
+    {
+      "Name": "MonkeyPlayer2",
+      "Components": {
+        "TransformComponent": {
+          "Position": [-10.0, 0.0, 0.0],
+          "Rotation": [30.0, 20.0, 10.0],
+          "Scale": [1, 1, 1]
         },
-        "ScriptComponent": {
-          "ScriptPath": "resources/scripts/Player.as"
+        "MeshComponent": {
+          "AssetID": "004c2f80-92d0-4d05-a1ca-45974ee779b9",
+          "AssetPath": "resources/models/Monkey.obj",
+          "Color": [0.8, 0.534, 0.96]
+        }
+      }
+    },
+    {
+      "Name": "Dragon",
+      "Components": {
+        "TransformComponent": {
+          "Position": [2.0, 2.0, 2.0],
+          "Rotation": [1.0, 1.0, 1.0],
+          "Scale": [0.1, 0.1, 0.1]
+        },
+        "MeshComponent": {
+          "AssetID": "ant_mesh",
+          "AssetPath": "resources/models/1/L1.obj",
+          "TextureID": "ant_tex",
+          "TexturePath": "resources/models/1/L2.png"
+        }
+      }
+    },
+    {
+      "Name": "Chair",
+      "Components": {
+        "TransformComponent": {
+          "Position": [0.0, 0.0, 0.0],
+          "Rotation": [1.0, 1.0, 1.0],
+          "Scale": [0.1, 0.1, 0.1]
+        },
+        "MeshComponent": {
+          "AssetID": "chair_mesh",
+          "AssetPath": "resources/models/Chair.obj",
+          "TextureID": "chair_tex",
+          "TexturePath": "resources/models/Chair.jpg"
         }
       }
     }

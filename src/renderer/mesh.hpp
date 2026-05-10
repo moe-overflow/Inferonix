@@ -13,7 +13,7 @@ namespace inferonix::renderer
     {
         glm::vec3 position;
         glm::vec3 normal;
-        // TODO: TextureCoordinates here to add
+        glm::vec2 texture_coordinates;
     };
 
     class mesh
@@ -54,6 +54,11 @@ namespace inferonix::renderer
                     vertex_.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
                 else
                     vertex_.normal = { 0.0f, 1.0f, 0.0f };
+
+                if (mesh->mTextureCoords[0])
+                    vertex_.texture_coordinates = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+                else
+                    vertex_.texture_coordinates = { 0.0f, 0.0f };
 
                 _vertices.push_back(vertex_);
             }
