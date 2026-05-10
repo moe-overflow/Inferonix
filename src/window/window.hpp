@@ -61,6 +61,15 @@ namespace inferonix::window
             return ref;
         }
 
+        template<typename T> auto get_layer() -> T&
+        {
+            static_assert(std::is_base_of_v<ui::layer, T>);
+            for (auto& layer : _layer_stack)
+                if (std::dynamic_pointer_cast<T>(layer))
+                    return *std::dynamic_pointer_cast<T>(layer);
+            throw std::runtime_error("layer not found");
+        }
+
     private:
         bool _initialized = false;
         GLFWwindow* _instance;

@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 #include <vector>
+#include <string_view>
+#include <mutex>
 
 #include "layer.hpp"
 
@@ -34,7 +36,7 @@ namespace inferonix::ui
             constexpr float slide_speed = 15.0f;
             _current_y += (target_y - _current_y) * slide_speed * delta_time;
 
-            // todo: return if it's off screen
+            if (!_is_open && _current_y <= -static_cast<float>(console_height) + 1.0f) return;
 
             using namespace ImGui;
             SetNextWindowPos({ 0, _current_y}, ImGuiCond_Always);
@@ -48,9 +50,14 @@ namespace inferonix::ui
             {
                 float const footer_height = GetStyle().ItemSpacing.y + GetFrameHeightWithSpacing();
                 BeginChild("Logs", {0, -footer_height},false, ImGuiWindowFlags_HorizontalScrollbar);
-                for (const auto& log : _history) TextUnformatted(log.c_str());
-                EndChild();
+                bool const is_at_bottom = GetScrollY() >= GetScrollMaxY() - 5.0f;
+                auto lock = std::lock_guard<std::mutex>{ _history_mutex };
+                for (const auto& log : _history)
+                    TextUnformatted(log.c_str());
+                if (is_at_bottom || _reclaim_focus)
+                    SetScrollHereY(1.0f);
 
+                EndChild();
 
                 PushItemWidth(-1);
 
@@ -70,14 +77,28 @@ namespace inferonix::ui
             End();
         }
 
+        [[nodiscard]] auto is_open() const -> bool { return _is_open; }
+
+        auto insert_log(const std::string_view log_message) -> void
+        {
+            auto lock = std::lock_guard<std::mutex>{ _history_mutex };
+            _history.emplace_back(log_message.data());
+            if (_history.size() > 500)
+                _history.erase(_history.begin());
+        } 
+
+
     private:
         bool _is_open {false};
         float _current_y {.0f};
 
         char _input_buffer[256] = "";
+
+        // log history
         std::vector<std::string> _history;
 
         bool _reclaim_focus { false };
+        std::mutex _history_mutex;
 
     };
 }

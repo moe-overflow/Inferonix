@@ -6,6 +6,7 @@
 
 #include "ui/layer.hpp"
 #include "ui/dev_console.hpp"
+#include "ui/console_sink.hpp"
 
 using namespace inferonix;
 using namespace inferonix::window;
@@ -159,6 +160,8 @@ void inferonix_engine::init(const std::string_view scene_path)
     _window->add_layer<ui::scene_layer>(_renderer->get_frame_buffer());
     _window->add_layer<ui::dev_console>();
 
+    configure_console_sink();
+
     _renderer->setup();
     _physics_engine.init();
     _script_launcher.launch();
@@ -191,5 +194,16 @@ void inferonix_engine::run()
         _window->display();
         _window->swap_buffers();
     }
+}
+
+void inferonix_engine::configure_console_sink() const
+{
+    // create a spdlog sink pointing to the dev console
+    auto log_callback = [this](const std::string& message) {
+        _window->get_layer<ui::dev_console>().insert_log(message);
+    };
+    auto const custom_sink = std::make_shared<ui::console_sink>(log_callback);
+    custom_sink->set_pattern("[%Y-%m-%d %T] [%l] %v");
+    spdlog::default_logger()->sinks().push_back(custom_sink);
 }
 
