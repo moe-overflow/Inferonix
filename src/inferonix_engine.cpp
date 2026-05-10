@@ -7,6 +7,7 @@
 #include "ui/layer.hpp"
 #include "ui/dev_console.hpp"
 #include "ui/console_sink.hpp"
+#include "ui/toolbar.hpp"
 
 using namespace inferonix;
 using namespace inferonix::window;
@@ -161,6 +162,10 @@ void inferonix_engine::init(const std::string_view scene_path)
     _window->add_layer<ui::dev_console>(
         [this](const std::string_view command) -> void { _command_registry.execute(command); }
     );
+    _window->add_layer<ui::toolbar>(
+        [this]() -> void { _state = EngineState::PLAY;  },
+        [this]() -> void { _state = EngineState::PAUSE; }
+    );
 
     _command_registry.register_command(
         "quit", "Exits the engine", [this](const auto& args)-> void { _window->close(); }
@@ -182,13 +187,21 @@ void inferonix_engine::run()
 {
     while (!_window->should_close())
     {
-        float const delta_time = _window->get_delta_time();
+        assert(_initialized);
 
+        float const delta_time = _window->get_delta_time();
         window::window::poll_events();
 
-        if (_initialized)
+        auto& console = _window->get_layer<ui::dev_console>();
+        _scene->get_editor_camera()->set_block_input(console.is_open());
+
+        _script_launcher.start(_scene->get_registry());
+
+        if (console.is_open())
+            _state = EngineState::PAUSE;
+
+        if(_state == EngineState::PLAY)
         {
-            _script_launcher.start(_scene->get_registry());
             _script_launcher.update(_scene->get_registry(), delta_time);
             _physics_engine.update(_scene->get_registry(), delta_time);
         }

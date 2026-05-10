@@ -16,6 +16,12 @@ namespace inferonix::scene
 
         void update(float delta_time) override
         {
+            if (_block_input)
+            {
+                _first_mouse = true;
+                return;
+            }
+
             if (input::input::is_mouse_key_down(input::MouseKey::RIGHT_BUTTON))
             {
                 auto [mouse_x, mouse_y] = input::input::get_mouse_position();
@@ -57,8 +63,9 @@ namespace inferonix::scene
 
             set_position(pos);
 
-
         }
+
+        void set_block_input(bool block) override { _block_input = block; }
 
     private:
         void update_camera_vectors()

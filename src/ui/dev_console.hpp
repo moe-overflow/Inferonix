@@ -28,7 +28,6 @@ namespace inferonix::ui
                 }
             }
 
-
             auto const delta_time = ImGui::GetIO().DeltaTime;
 
             auto const console_height = ImGui::GetIO().DisplaySize.y * 0.5;
@@ -72,22 +71,8 @@ namespace inferonix::ui
                     _reclaim_focus = false;
                 }
 
-                if (InputText("##ConsoleInput", _input_buffer, IM_ARRAYSIZE(_input_buffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
-
-                    /*
-                    auto const raw = std::string { _input_buffer };
-                    insert_log(">>> " + raw);
-
-                    auto stream = std::istringstream{ raw };
-                    std::string command_name;
-                    stream >> command_name;
-
-                    auto args = std::vector<std::string>{};
-                    auto arg = std::string{};
-                    while (stream >> arg)
-                        args.push_back(arg);
-                    */
-
+                if (InputText("##ConsoleInput", _input_buffer, IM_ARRAYSIZE(_input_buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+                {
                     auto const command = std::string{ _input_buffer };
                     if (!command.empty() && _on_execute)
                         _on_execute(command);
@@ -115,8 +100,8 @@ namespace inferonix::ui
     private:
         execute_callback _on_execute;
 
-        bool _is_open {false};
-        float _current_y {.0f};
+        bool _is_open { false };
+        float _current_y { .0f };
 
         char _input_buffer[256] = "";
 

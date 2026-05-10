@@ -37,6 +37,8 @@ namespace inferonix::scene
 
         virtual void update(float delta_time) {}
 
+        virtual void set_block_input(bool block) {}
+
         void set_position(glm::vec3 const& position)
         {
             _settings.position = position;
@@ -91,6 +93,9 @@ namespace inferonix::scene
 
         glm::mat4 _projection_matrix{};
         glm::mat4 _view_matrix{};
+
+    protected:
+        bool _block_input { false };
     };
 
 }

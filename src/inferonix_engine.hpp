@@ -14,6 +14,12 @@ namespace inferonix
         class scene_serializer;
     }
 
+    enum class EngineState
+    {
+        PAUSE,
+        PLAY,
+    };
+
     class inferonix_engine final
     {
     public:
@@ -47,6 +53,8 @@ namespace inferonix
 
         std::unique_ptr<scene::scene_serializer> _scene_serializer;
 
+        EngineState _state{ EngineState::PLAY };
+        bool _was_console_open{ false };
     };
 
 }
