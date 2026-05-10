@@ -6,17 +6,20 @@
 #include <mutex>
 
 #include "layer.hpp"
+#include "util/command_registry.hpp"
 
 namespace inferonix::ui
 {
     class dev_console final : public layer
     {
     public:
-        dev_console() : _current_y(-1000.0f) {}
+        using execute_callback = std::function<void(const std::string&)>;
+        explicit dev_console(execute_callback const& on_execute) : _on_execute(on_execute), _current_y(-1000.0f)
+        {}
 
         auto on_render() -> void override
         {
-            if (ImGui::IsKeyPressed(ImGuiKey_M, false))
+            if (ImGui::IsKeyPressed(ImGuiKey_F1, false))
             {
                 _is_open = !_is_open;
                 if (_is_open)
@@ -51,9 +54,11 @@ namespace inferonix::ui
                 float const footer_height = GetStyle().ItemSpacing.y + GetFrameHeightWithSpacing();
                 BeginChild("Logs", {0, -footer_height},false, ImGuiWindowFlags_HorizontalScrollbar);
                 bool const is_at_bottom = GetScrollY() >= GetScrollMaxY() - 5.0f;
-                auto lock = std::lock_guard<std::mutex>{ _history_mutex };
-                for (const auto& log : _history)
-                    TextUnformatted(log.c_str());
+                {
+                    auto lock = std::lock_guard<std::mutex>{ _history_mutex };
+                    for (const auto& log : _history)
+                        TextUnformatted(log.c_str());
+                }
                 if (is_at_bottom || _reclaim_focus)
                     SetScrollHereY(1.0f);
 
@@ -68,7 +73,26 @@ namespace inferonix::ui
                 }
 
                 if (InputText("##ConsoleInput", _input_buffer, IM_ARRAYSIZE(_input_buffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
-                    // todo: execute command
+
+                    /*
+                    auto const raw = std::string { _input_buffer };
+                    insert_log(">>> " + raw);
+
+                    auto stream = std::istringstream{ raw };
+                    std::string command_name;
+                    stream >> command_name;
+
+                    auto args = std::vector<std::string>{};
+                    auto arg = std::string{};
+                    while (stream >> arg)
+                        args.push_back(arg);
+                    */
+
+                    auto const command = std::string{ _input_buffer };
+                    if (!command.empty() && _on_execute)
+                        _on_execute(command);
+                    _input_buffer[0] = '\0';
+
                     SetKeyboardFocusHere(-1);
                     _reclaim_focus = true;
                 }
@@ -89,6 +113,8 @@ namespace inferonix::ui
 
 
     private:
+        execute_callback _on_execute;
+
         bool _is_open {false};
         float _current_y {.0f};
 

@@ -158,7 +158,13 @@ void inferonix_engine::init(const std::string_view scene_path)
 
     _window->add_layer<ui::dockspace>();
     _window->add_layer<ui::scene_layer>(_renderer->get_frame_buffer());
-    _window->add_layer<ui::dev_console>();
+    _window->add_layer<ui::dev_console>(
+        [this](const std::string_view command) -> void { _command_registry.execute(command); }
+    );
+
+    _command_registry.register_command(
+        "quit", "Exits the engine", [this](const auto& args)-> void { _window->close(); }
+    );
 
     configure_console_sink();
 

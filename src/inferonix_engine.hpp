@@ -6,6 +6,7 @@
 #include "window/window.hpp"
 #include "script/scripting_engine_launcher.hpp"
 #include "physics/physics.hpp"
+#include "util/command_registry.hpp"
 
 namespace inferonix
 {
@@ -36,6 +37,8 @@ namespace inferonix
         std::shared_ptr<window::window> _window;
         std::shared_ptr<renderer::renderer> _renderer;
         std::unique_ptr<scene::scene> _scene;
+
+        utils::command_registry _command_registry;
 
         script::scripting_engine_launcher _script_launcher;
         bool _initialized{ false };
