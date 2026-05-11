@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "frame_buffer.hpp"
+#include "color.hpp"
 
 using namespace inferonix::renderer;
 using namespace inferonix::scene;
@@ -80,8 +81,8 @@ void renderer::render(scene::scene& scene)
         render_entity->shader_program_.use();
         render_entity->vertex_array_.bind();
 
-        const auto& color = view.get<material_component>(entity).color;
-        render_entity->shader_program_.set_uniform("my_color", color.r, color.g, color.b);
+        const auto& color_ = view.get<material_component>(entity).color;
+        render_entity->shader_program_.set_uniform("my_color", color{color_.r, color_.g, color_.b});
 
 
         // uniforms
@@ -93,7 +94,7 @@ void renderer::render(scene::scene& scene)
         render_entity->shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
 
         const auto& material = view.get<material_component>(entity);
-        render_entity->shader_program_.set_uniform("my_color", material.color.r, material.color.g, material.color.b);
+        render_entity->shader_program_.set_uniform("my_color", color {material.color.r, material.color.g, material.color.b});
 
         if (material.albedo_map && material.use_texture)
         {
@@ -147,7 +148,8 @@ void renderer::create_render_entity(entity const& entity, mesh_component& mesh)
 
     /**/
 
-    if (auto const entity_index = static_cast<uint32_t>(entity); entity_index >= _render_entities.size())
+    auto const entity_index = static_cast<uint32_t>(entity);
+    if (entity_index >= _render_entities.size())
         _render_entities.resize(entity_index + 1);
 
     _render_entities[static_cast<uint32_t>(entity)] = std::move(render_entity_);

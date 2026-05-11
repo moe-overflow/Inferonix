@@ -90,12 +90,11 @@ void shader_program::check_errors() const
     }
 }
 
-//todo: use vector instead of three rgb values
-void shader_program::set_uniform(std::string const& name, float r, float g, float b) const
+void shader_program::set_uniform(std::string const& name, color const color) const
 {
     int location = glGetUniformLocation(this->get(), name.c_str());
     assert(location != -1);
-    glUniform4f(location, r, g, b, 1.0f);
+    glUniform4f(location, color.r, color.g, color.b, 1.0f);
 }
 
 void shader_program::set_uniform(std::string const& name, glm::mat4 mat) const
@@ -121,5 +120,5 @@ void shader_program::set_dynamic_color(std::string const& uniform_name) const
     auto blue = static_cast<float>(sin(static_cast<double>(time_value)) * 0.5 + 0.5);
     auto red = 1.0f;
 
-    set_uniform(uniform_name, red, green, blue);
+    set_uniform(uniform_name, color{red, green, blue});
 }

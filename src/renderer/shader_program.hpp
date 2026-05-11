@@ -34,7 +34,7 @@ namespace inferonix::renderer
 
         void check_errors() const;
 
-        void set_uniform(std::string const& name, float r, float g, float b) const;
+        void set_uniform(std::string const& name, color color) const;
 
         void set_uniform(std::string const& name, glm::mat4 mat) const;
 
