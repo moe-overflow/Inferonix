@@ -9,6 +9,8 @@
 #include "ui/console_sink.hpp"
 #include "ui/toolbar.hpp"
 
+#include "util/stop_watch.hpp"
+
 using namespace inferonix;
 using namespace inferonix::window;
 using namespace inferonix::renderer;
@@ -176,7 +178,7 @@ void inferonix_engine::run()
     {
         assert(_initialized);
 
-        float const delta_time = _window->get_delta_time();
+        utils::stop_watch::update();
         window::window::poll_events();
 
         auto& console = _window->get_layer<ui::dev_console>();
@@ -187,13 +189,14 @@ void inferonix_engine::run()
         if (console.is_open())
             _state = EngineState::PAUSE;
 
+        auto const dt = utils::stop_watch::get_delta_time();
         if(_state == EngineState::PLAY)
         {
-            _script_launcher.update(_scene->get_registry(), delta_time);
-            _physics_engine.update(_scene->get_registry(), delta_time);
+            _script_launcher.update(_scene->get_registry(), dt);
+            _physics_engine.update(_scene->get_registry(), dt);
         }
 
-        _scene->get_editor_camera()->update(delta_time);
+        _scene->get_editor_camera()->update(dt);
 
         renderer::renderer::clear();
         _renderer->render(*_scene);
