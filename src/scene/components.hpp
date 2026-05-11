@@ -41,7 +41,8 @@ namespace inferonix::scene
     {
         glm::vec3 color {.0f, .0f, .0f};
         std::shared_ptr<renderer::texture> albedo_map;
-        bool use_texture;
+        bool use_texture { false };
+        bool use_dynamic_color { false };
     };
 
     struct transform_component : public renderer::transform

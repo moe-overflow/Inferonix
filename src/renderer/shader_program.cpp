@@ -7,11 +7,11 @@
 using namespace inferonix::renderer;
 
 shader_program::shader_program(
-            std::string const& VertexShaderPath,
-            std::string const& FragmentShaderPath
+            std::string const& vertex_shader_path,
+            std::string const& fragment_shader_path
 )
-    : _vertex_shader(std::make_unique<shader>(VERTEX, VertexShaderPath.c_str())),
-      _fragment_shader(std::make_unique<shader>(FRAGMENT, FragmentShaderPath.c_str())),
+    : _vertex_shader(std::make_unique<shader>(VERTEX, vertex_shader_path.c_str())),
+      _fragment_shader(std::make_unique<shader>(FRAGMENT, fragment_shader_path.c_str())),
       _id(std::make_unique<uint32_t>(glCreateProgram()))
 {
     attach_shaders();
@@ -112,13 +112,12 @@ void shader_program::set_uniform_int(std::string const& name, int val) const
     glUniform1i(location, val);
 }
 
-void shader_program::set_dynamic_color(std::string const& uniform_name) const
+
+void shader_program::set_uniform(std::string const& name, float val) const
 {
-    auto time_value = static_cast<float>(glfwGetTime());
-
-    auto green = static_cast<float>(cos(static_cast<double>(time_value)) * 0.5 + 0.5);
-    auto blue = static_cast<float>(sin(static_cast<double>(time_value)) * 0.5 + 0.5);
-    auto red = 1.0f;
-
-    set_uniform(uniform_name, color{red, green, blue});
+    int location = glGetUniformLocation(this->get(), name.c_str());
+    assert(location != -1);
+    glUniform1f(location, val);
 }
+
+

@@ -184,6 +184,8 @@ void inferonix_engine::run()
         auto& console = _window->get_layer<ui::dev_console>();
         _scene->get_editor_camera()->set_block_input(console.is_open());
 
+        utils::stop_watch::set_time_scale(console.is_open() || _state == EngineState::PAUSE ? 0.0f : 1.0f);
+
         _script_launcher.start(_scene->get_registry());
 
         if (console.is_open())

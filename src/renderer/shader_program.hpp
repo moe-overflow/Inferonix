@@ -1,6 +1,8 @@
 #pragma once
 
 #include "shader.hpp"
+#include "color.hpp"
+
 #include <memory>
 #include <string>
 
@@ -8,7 +10,6 @@
 
 namespace inferonix::renderer
 {
-
     class shader_program
     {
 
@@ -35,9 +36,8 @@ namespace inferonix::renderer
         void check_errors() const;
 
         void set_uniform(std::string const& name, color color) const;
-
         void set_uniform(std::string const& name, glm::mat4 mat) const;
-
+        void set_uniform(std::string const& name, float val) const;
         void set_uniform_int(std::string const& name, int val) const;
 
         [[nodiscard]] uint32_t get() const
@@ -45,7 +45,6 @@ namespace inferonix::renderer
             return *_id;
         }
 
-        void set_dynamic_color(std::string const& uniform_name) const;
 
     private:
         std::unique_ptr<shader> _vertex_shader;

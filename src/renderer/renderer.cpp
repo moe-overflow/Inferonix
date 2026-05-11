@@ -67,9 +67,6 @@ void renderer::render(scene::scene& scene)
     if (_grid)
         render_grid(scene, *_grid);
 
-    //auto const delta_time = _window_instance->GetDeltaTime();
-    //_main_camera->Update(delta_time);
-
     auto const view = scene.get_registry().view<mesh_component, transform_component, material_component>();
     for (auto entity : view)
     {
@@ -81,9 +78,6 @@ void renderer::render(scene::scene& scene)
         render_entity->shader_program_.use();
         render_entity->vertex_array_.bind();
 
-        const auto& color_ = view.get<material_component>(entity).color;
-        render_entity->shader_program_.set_uniform("my_color", color{color_.r, color_.g, color_.b});
-
 
         // uniforms
         render_entity->shader_program_.set_uniform(
@@ -93,13 +87,19 @@ void renderer::render(scene::scene& scene)
         render_entity->shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
         render_entity->shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
 
-        const auto& material = view.get<material_component>(entity);
-        render_entity->shader_program_.set_uniform("my_color", color {material.color.r, material.color.g, material.color.b});
+        auto const& [
+            color_x, albedo_map, use_texture, use_dynamic_color
+        ] = view.get<material_component>(entity);
+        render_entity->shader_program_.set_uniform("u_time", utils::stop_watch::get_time());
+        render_entity->shader_program_.set_uniform("color", color {
+            color_x.r, color_x.g, color_x.b
+        });
+        render_entity->shader_program_.set_uniform_int("use_dynamic_color", use_dynamic_color ? 1 : 0);
 
-        if (material.albedo_map && material.use_texture)
+
+        if (albedo_map && use_texture)
         {
-            material.albedo_map->bind(0); // Bind to texture slot 0
-            // Note: You need to add this set_uniform signature to shader_program.hpp!
+            albedo_map->bind(0);
             render_entity->shader_program_.set_uniform_int("albedo_map", 0);
             render_entity->shader_program_.set_uniform_int("use_texture", 1);
         }

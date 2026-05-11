@@ -32,6 +32,21 @@
       }
     },
     {
+      "Name": "MonkeyPlayer3",
+      "Components": {
+        "TransformComponent": {
+          "Position": [-20.0, 0.0, 0.0],
+          "Rotation": [30.0, 20.0, 10.0],
+          "Scale": [1, 1, 1]
+        },
+        "MeshComponent": {
+          "AssetID": "004c2f80-92d0-4d05-a1ca-45974ffff9b9",
+          "AssetPath": "resources/models/Monkey.obj",
+          "Color": "DynamicColor"
+        }
+      }
+    },
+    {
       "Name": "Dragon",
       "Components": {
         "TransformComponent": {

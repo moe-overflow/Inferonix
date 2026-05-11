@@ -65,9 +65,15 @@ void scene_serializer::deserialize(const std::string& filepath) const
             }
             else if (mesh_data.contains("Color"))
             {
-                auto& c = mesh_data["Color"];
-                material.color = glm::vec3{ c[0], c[1], c[2] };
-                material.use_texture = false;
+                if (auto& c = mesh_data["Color"]; c == "DynamicColor" )
+                {
+                    material.use_dynamic_color = true;
+                }
+                else // TODO: ensure color is valid
+                {
+                    material.color = glm::vec3{ c[0], c[1], c[2] };
+                    material.use_texture = false;
+                }
             }
             registry.emplace<material_component>(entity, material);
         }
