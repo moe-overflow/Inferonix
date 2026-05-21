@@ -4,7 +4,7 @@
 
 namespace inferonix::utils
 {
-    struct stop_watch final
+    struct time final
     {
         using time_point = std::chrono::steady_clock::time_point;
 
@@ -14,7 +14,7 @@ namespace inferonix::utils
             auto const duration = std::chrono::duration<float>{ current_time - _last_frame_time };
             _last_frame_time = current_time;
             _delta_time = duration.count();
-            _total_time += (_delta_time * _time_scale);
+            _total_time += _delta_time * _time_scale;
         }
 
         auto static get_delta_time() -> float { return _delta_time; }
