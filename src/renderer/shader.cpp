@@ -7,51 +7,31 @@
 
 using namespace inferonix::renderer;
 
-shader::shader(ShaderType const type, char const* src)
+shader::shader(ShaderType const type, std::string_view src)
     : _type{ type },
-      _id{ std::make_unique<uint32_t>(glCreateShader(type)) },
-      _src_stream{ std::make_unique<std::string>(read_from_file(src)) }
+      _id{ glCreateShader(type) },
+      _src_stream{ read_from_file(src) }
 {
     create();
 }
 
 shader::~shader()
 {
-    glDeleteShader(*_id);
+    glDeleteShader(_id);
 }
-
-shader::shader(shader&& other) noexcept
-    : _type(other._type),
-      _id(std::move(other._id)),
-      _src_stream(std::move(other._src_stream))
-{
-}
-
-shader& shader::operator=(shader&& other) noexcept
-{
-    if (this != &other)
-    {
-        using std::swap;
-        swap(_id, other._id);
-        swap(_src_stream, other._src_stream);
-        swap(_type, other._type);
-    }
-    return *this;
-}
-
 
 void shader::create() const
 {
-    auto const src = _src_stream->c_str();
-    glShaderSource(*_id, 1, &src, nullptr);
-    glCompileShader(*_id);
+    auto const src = _src_stream.c_str();
+    glShaderSource(_id, 1, &src, nullptr);
+    glCompileShader(_id);
 
     check_errors();
 }
 
-GLuint shader::get() const
+uint32_t shader::get() const
 {
-    return *_id;
+    return _id;
 }
 
 void shader::check_errors() const
@@ -59,26 +39,26 @@ void shader::check_errors() const
     // Checking run time errors after calling 'glCompileShader()'
     int result;
     char message[512];
-    glGetShaderiv(*_id, GL_COMPILE_STATUS, &result);
+    glGetShaderiv(_id, GL_COMPILE_STATUS, &result);
     if (!result)
     {
-        glGetShaderInfoLog(*_id, 512, nullptr, message);
+        glGetShaderInfoLog(_id, 512, nullptr, message);
         throw std::runtime_error("An error occurred when compiling shaders: {}" + std::string(message));
     }
 }
 
-std::string shader::read_from_file(std::string const& path)
+std::string shader::read_from_file(std::string_view path)
 {
     try
     {
-        std::string shader_code;
-        std::ifstream source;
+        auto shader_code = std::string{};
+        auto source = std::ifstream{};
         spdlog::info("Reading shaders source from file {}", path);
 
         if (!std::filesystem::exists(path))
             spdlog::error("Shader file could not be found!");
-        source.open(path);
-        std::stringstream source_stream;
+        source.open(path.data());
+        auto source_stream = std::stringstream{};
         source_stream << source.rdbuf();
         source.close();
         shader_code = source_stream.str();
