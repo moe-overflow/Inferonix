@@ -43,7 +43,7 @@ void scene_serializer::deserialize(const std::string& filepath) const
         if (entity_data["Components"].contains("MeshComponent"))
         {
             auto& mesh_data = entity_data["Components"]["MeshComponent"];
-            auto path = mesh_data["AssetPath"];
+            auto path = std::string(RESOURCES_PATH) + mesh_data["AssetPath"].get<std::string>();
             auto id = mesh_data["AssetID"];
 
             auto mesh = assets.load<renderer::mesh>(id, path);
@@ -53,7 +53,7 @@ void scene_serializer::deserialize(const std::string& filepath) const
             auto material = material_component{};
             if (mesh_data.contains("TexturePath") && mesh_data.contains("TextureID"))
             {
-                auto tex_path = mesh_data["TexturePath"];
+                auto tex_path = std::string(RESOURCES_PATH) + mesh_data["TexturePath"].get<std::string>();
                 auto tex_id = mesh_data["TextureID"];
                 auto texture = assets.load<renderer::texture>(tex_id, tex_path);
 
@@ -82,7 +82,7 @@ void scene_serializer::deserialize(const std::string& filepath) const
         {
             auto& script_data = entity_data["Components"]["ScriptComponent"];
             auto script = script_component{};
-            script.script_path = script_data["ScriptPath"];
+            script.script_path = std::string(RESOURCES_PATH) + script_data["ScriptPath"].get<std::string>();
             script.initialized = false;
             registry.emplace<script_component>(entity, std::move(script));
         }

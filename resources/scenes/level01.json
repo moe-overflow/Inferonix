@@ -11,7 +11,7 @@
         },
         "MeshComponent": {
           "AssetID": "004c2f80-92d0-4d05-a1ca-45974ee779b9",
-          "AssetPath": "resources/models/Monkey.obj",
+          "AssetPath": "models/Monkey.obj",
           "Color": [0.3, 0.934, 0.96]
         }
       }
@@ -26,7 +26,7 @@
         },
         "MeshComponent": {
           "AssetID": "004c2f80-92d0-4d05-a1ca-45974ee779b9",
-          "AssetPath": "resources/models/Monkey.obj",
+          "AssetPath": "models/Monkey.obj",
           "Color": [0.8, 0.534, 0.96]
         }
       }
@@ -41,7 +41,7 @@
         },
         "MeshComponent": {
           "AssetID": "004c2f80-92d0-4d05-a1ca-45974ffff9b9",
-          "AssetPath": "resources/models/Monkey.obj",
+          "AssetPath": "models/Monkey.obj",
           "Color": "DynamicColor"
         }
       }
@@ -56,25 +56,10 @@
         },
         "MeshComponent": {
           "AssetID": "ant_mesh",
-          "AssetPath": "resources/models/1/L1.obj",
+          "AssetPath": "models/1/L1.obj",
           "TextureID": "ant_tex",
-          "TexturePath": "resources/models/1/L2.png"
-        }
-      }
-    },
-    {
-      "Name": "Chair",
-      "Components": {
-        "TransformComponent": {
-          "Position": [0.0, 0.0, 0.0],
-          "Rotation": [1.0, 1.0, 1.0],
-          "Scale": [0.1, 0.1, 0.1]
-        },
-        "MeshComponent": {
-          "AssetID": "chair_mesh",
-          "AssetPath": "resources/models/Chair.obj",
-          "TextureID": "chair_tex",
-          "TexturePath": "resources/models/Chair.jpg"
+          "TexturePath": "models/1/L2.png",
+          "Color": "DynamicColor"
         }
       }
     }

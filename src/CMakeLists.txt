@@ -13,4 +13,9 @@ target_include_directories(
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+target_compile_definitions(InferonixEngine PRIVATE 
+        SHADERS_PATH=\"${CMAKE_SOURCE_DIR}/shaders/\"
+        RESOURCES_PATH=\"${CMAKE_SOURCE_DIR}/resources/\"
+)
+
 
