@@ -7,7 +7,7 @@ int main(int argc, char** argv)
     try
     {
         auto engine = inferonix::inferonix_engine{};
-        engine.init(RESOURCES_PATH "scenes/level01.json");
+        engine.init(std::string(RESOURCES_PATH) + "scenes/level01.json");
         engine.run();
     }
     catch (const std::exception& e)

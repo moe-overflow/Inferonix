@@ -3,7 +3,7 @@
 #include "spdlog/spdlog.h"
 #include "event/key_event.hpp"
 #include "scene/components.hpp"
-#include "util/stop_watch.hpp"
+#include "util/time.hpp"
 #include <utility>
 
 #include "frame_buffer.hpp"
@@ -90,7 +90,7 @@ void renderer::render(scene::scene& scene)
         auto const& [
             color_x, albedo_map, use_texture, use_dynamic_color
         ] = view.get<material_component>(entity);
-        render_entity->shader_program_.set_uniform("u_time", utils::stop_watch::get_time());
+        render_entity->shader_program_.set_uniform("u_time", utils::time::get_time());
         render_entity->shader_program_.set_uniform("color", color {
             color_x.r, color_x.g, color_x.b
         });

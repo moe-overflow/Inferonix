@@ -52,7 +52,7 @@ namespace inferonix::renderer
         [[nodiscard]] auto get_id() const -> uint32_t { return _id; }
 
     protected:
-        uint32_t _id;
+        uint32_t _id{};
         int _width{0}, _height{0}, _channels{0};
     };
 }
