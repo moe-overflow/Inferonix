@@ -18,4 +18,16 @@ target_compile_definitions(InferonixEngine PRIVATE
         RESOURCES_PATH=\"${CMAKE_SOURCE_DIR}/resources/\"
 )
 
+add_custom_command(TARGET InferonixEngine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets
+        $<TARGET_FILE_DIR:InferonixEngine>/assets
+)
+
+
+add_custom_command(TARGET InferonixEngine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/shaders
+        $<TARGET_FILE_DIR:InferonixEngine>/shaders
+)
 

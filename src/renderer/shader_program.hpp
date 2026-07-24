@@ -14,8 +14,8 @@ namespace inferonix::renderer
     {
 
     public:
-        constexpr static auto DEFAULT_VERTEX_SHADER = SHADERS_PATH "/vertex_shader.glsl";
-        constexpr static auto DEFAULT_FRAGMENT_SHADER = SHADERS_PATH "/fragment_shader.glsl";
+        constexpr static auto DEFAULT_VERTEX_SHADER =  "shaders/vertex_shader.glsl";
+        constexpr static auto DEFAULT_FRAGMENT_SHADER = "shaders/fragment_shader.glsl";
 
         explicit shader_program(
             std::string_view vertex_shader_path = DEFAULT_VERTEX_SHADER,
