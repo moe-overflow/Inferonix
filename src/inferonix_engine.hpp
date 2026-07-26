@@ -8,6 +8,7 @@
 #include "physics/physics.hpp"
 #include "util/command_registry.hpp"
 #include "inferonix_config.hpp"
+#include "util/logger.hpp"
 
 namespace inferonix
 {

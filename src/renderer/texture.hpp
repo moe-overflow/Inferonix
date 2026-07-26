@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <stb_image.h>
 #include <filesystem>
-
+#include <util/logger.hpp>
 
 namespace inferonix::renderer
 {

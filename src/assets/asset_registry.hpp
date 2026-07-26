@@ -6,6 +6,7 @@
 #include <any>
 #include <expected>
 #include <filesystem>
+#include <util/logger.hpp>
 
 namespace inferonix::asset
 {

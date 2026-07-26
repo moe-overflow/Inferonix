@@ -60,6 +60,10 @@
     {
       "name": "argparse",
       "version>=": "3.2"
+    },
+    {
+      "name": "gtest",
+      "version>=": "1.17.0"
     }
   ]
 
