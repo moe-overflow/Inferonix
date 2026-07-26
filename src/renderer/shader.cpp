@@ -1,7 +1,7 @@
 #include "shader.hpp"
 
+#include "inferonix_pch.hpp"
 #include "glad/glad.h"
-#include "spdlog/spdlog.h"
 #include <filesystem>
 #include <fstream>
 
@@ -53,7 +53,7 @@ std::string shader::read_from_file(std::string_view path)
     {
         auto shader_code = std::string{};
         auto source = std::ifstream{};
-        spdlog::info("Reading shaders source from file {}", path);
+        LOG(LOG_TYPE::INFO, "Reading shaders source from file {}", path);
 
         if (!std::filesystem::exists(path))
             spdlog::error("Shader file could not be found!");
@@ -67,7 +67,7 @@ std::string shader::read_from_file(std::string_view path)
     }
     catch (std::ifstream::failure const& e)
     {
-        spdlog::error("Error occurred while reading shaders from disk: {}", e.what());
+        LOG(LOG_TYPE::ERROR, "Error occurred while reading shaders from disk: {}", e.what());
         return "";
     }
 }

@@ -30,7 +30,7 @@ namespace inferonix::utils
         {
             if (command.empty()) return;
             auto const raw = std::string{ command };
-            spdlog::info("] {}", raw);
+            LOG(LOG_TYPE::INFO, "] {}", raw);
 
             auto stream = std::istringstream{ raw };
             std::string command_name;
@@ -48,7 +48,7 @@ namespace inferonix::utils
         {
             auto key = std::string{ command_name };
             if (_commands.contains(key)) _commands[key].action(args);
-            else spdlog::warn("Unknown command: '{}'", command_name);
+            else LOG(LOG_TYPE::WARNING, "Unknown command: '{}'", command_name);
 
         }
 

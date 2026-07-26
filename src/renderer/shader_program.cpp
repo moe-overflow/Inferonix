@@ -1,7 +1,8 @@
 #include "shader_program.hpp"
 
+#include "inferonix_pch.hpp"
 #include "GLFW/glfw3.h"
-#include "spdlog/spdlog.h"
+
 
 using namespace inferonix::renderer;
 
@@ -91,13 +92,13 @@ void shader_program::check_errors() const
     if (!result)
     {
         glGetProgramInfoLog(_id, 512, nullptr, message);
-        spdlog::error("An error occurred when compiling shaders: {}", message);
+        LOG(LOG_TYPE::ERROR, "An error occurred when compiling shaders: {}", message);
     }
 
     GLenum error = glGetError();
     if (error != GL_NO_ERROR)
     {
-        spdlog::error("OpenGL error: {}", error);
+        LOG(LOG_TYPE::ERROR, "OpenGL error: {}", error);
     }
 }
 

@@ -1,6 +1,6 @@
 #include "window.hpp"
 
-#include "spdlog/spdlog.h"
+#include "inferonix_pch.hpp"
 #include <stdexcept>
 
 #include "glad/glad.h"
@@ -54,7 +54,7 @@ void window::init_glfw()
     if (!_initialized)
         throw std::runtime_error("GLFW initialization failed!");
 
-    spdlog::info("GLFW was initialized successfully");
+    LOG(LOG_TYPE::INFO, "GLFW was initialized successfully");
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -68,12 +68,12 @@ void window::init_glfw()
 
     if (_instance == nullptr)
     {
-        spdlog::error("Error while creating Window");
+        LOG(LOG_TYPE::ERROR, "Error while creating Window");
         this->destroy();
         return;
     }
 
-    spdlog::info("Window was created successfully");
+    LOG(LOG_TYPE::INFO, "Window was created successfully");
 
     glfwMakeContextCurrent(_instance);
 
@@ -285,7 +285,8 @@ namespace
                 break;
 
             default:
-                spdlog::warn("Key code {} not known", glfw_key);
+                using namespace inferonix;
+                LOG(LOG_TYPE::WARNING, "Key code {} not known", glfw_key);
                 return;
         }
 

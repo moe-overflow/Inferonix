@@ -1,5 +1,7 @@
 #include "inferonix_engine.hpp"
 
+#include "inferonix_pch.hpp"
+
 #include "scene/components.hpp"
 #include "renderer/renderer.hpp"
 #include "scene/scene_serializer.hpp"
@@ -8,8 +10,10 @@
 #include "ui/dev_console.hpp"
 #include "ui/console_sink.hpp"
 #include "ui/toolbar.hpp"
-
 #include "util/time.hpp"
+
+#include <fmt/format.h>
+#include <argparse/argparse.hpp>
 
 using namespace inferonix;
 using namespace inferonix::window;
@@ -18,31 +22,22 @@ using namespace inferonix::scene;
 
 namespace
 {
-    auto window_settings_ = window_settings
-    {
-        .width = 1920,
-        .height = 1080,
-        .title = "Inferonix Engine",
-        .full_screen = false,
-        .v_sync = true
-    };
-
     auto log_scene_registry(registry& registry) -> void
     {
         const auto view = registry.view<tag_component>();
-        spdlog::info("Scene has following entities: ");
+        LOG(LOG_TYPE::INFO, "Scene has following entities: ");
         for (const auto entity : view)
         {
             const auto& tag = view.get<tag_component>(entity).tag;
             auto id = std::string{"no ID"};
             if (registry.any_of<id_component>(entity))
                 id = registry.get<id_component>(entity).id;
-            spdlog::info("We have entity: {}, with ID: {}", tag, id);
+            LOG(LOG_TYPE::INFO, "We have entity: {}, with ID: {}", tag, id);
 
             if (registry.any_of<transform_component>(entity))
             {
                 const auto& transform_ = registry.get<transform_component>(entity);
-                spdlog::info("Entity has transform: {}, {}, {}",
+                LOG(LOG_TYPE::INFO, "Entity has transform: {}, {}, {}",
                     transform_.position.x, transform_.position.y, transform_.position.z
                 );
             }
@@ -72,8 +67,7 @@ void inferonix_engine::init(const std::string_view scene_path)
 {
     add_window_layers();
     register_commands();
-    configure_console_sink();
-
+    attach_dev_console_log_sink();
     _renderer->setup();
     _physics_engine.init();
     _script_launcher.launch();
@@ -119,15 +113,12 @@ void inferonix_engine::run()
     }
 }
 
-void inferonix_engine::configure_console_sink() const
+void inferonix_engine::attach_dev_console_log_sink() const
 {
     // create a spdlog sink pointing to the dev console
-    auto log_callback = [this](const std::string& message) {
+    configure_console_sink([this](const std::string& message) -> void {
         _window->get_layer<ui::dev_console>().insert_log(message);
-    };
-    auto const custom_sink = std::make_shared<ui::console_sink>(log_callback);
-    custom_sink->set_pattern("[%Y-%m-%d %T] [%l] %v");
-    spdlog::default_logger()->sinks().push_back(custom_sink);
+    });
 }
 
 

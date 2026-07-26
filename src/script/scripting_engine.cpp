@@ -1,7 +1,8 @@
 #include "scripting_engine.hpp"
-#include "script_module.hpp"
 
-#include <spdlog/spdlog.h>
+#include "inferonix_pch.hpp"
+
+#include "script_module.hpp"
 #include <angelscript.h>
 #include <functional>
 #include <angelscript/scriptstdstring/scriptstdstring.h>
@@ -9,6 +10,7 @@
 #include <angelscript/scriptbuilder/scriptbuilder.h>
 #include <angelscript/scriptarray/scriptarray.h>
 
+using namespace inferonix;
 using namespace inferonix::script;
 
 namespace
@@ -28,7 +30,7 @@ namespace
                 severity = "INFO";
                 break;
         }
-        spdlog::error("[AngelScript] {} ({}): {}", severity, message->section, message->message);
+        LOG(LOG_TYPE::ERROR, "[AngelScript] {} ({}): {}", severity, message->section, message->message);
     }
 }
 
@@ -47,7 +49,7 @@ scripting_engine::scripting_engine() : _engine(asCreateScriptEngine())
     
     if (_engine->SetMessageCallback(asFunctionPtr(AngelscriptCallback), nullptr, asCALL_CDECL) < 0)
     {
-        spdlog::warn("Failed to set AngelScript message callback");
+        LOG(LOG_TYPE::WARNING, "Failed to set AngelScript message callback");
     }
 
     this->initialize();
@@ -68,7 +70,7 @@ scripting_engine& scripting_engine::operator=(scripting_engine&& other) noexcept
 
 void scripting_engine::initialize() const
 {
-    spdlog::info("Initializing scripting engine with std::string, math and array...");
+    LOG(LOG_TYPE::INFO, "Initializing scripting engine with std::string, math and array...");
     RegisterStdString(_engine.get());
     RegisterScriptMath(_engine.get());
     RegisterScriptArray(_engine.get(), true);
@@ -86,7 +88,7 @@ script_module scripting_engine::compile_script(std::string const& name, std::str
 {
     if (!_engine)
     {
-        spdlog::error("Cannot compile script: engine is null");
+        LOG(LOG_TYPE::ERROR, "Cannot compile script: engine is null");
         return {};
     }
 
@@ -95,25 +97,25 @@ script_module scripting_engine::compile_script(std::string const& name, std::str
 
     if (result < 0)
     {
-        spdlog::error("Failed to start module '{}'", name);
+        LOG(LOG_TYPE::ERROR, "Failed to start module '{}'", name);
         return {};
     }
 
     result = builder.AddSectionFromFile(path.c_str());
     if (result < 0)
     {
-        spdlog::error("Failed to add script file '{}'", path);
+        LOG(LOG_TYPE::ERROR, "Failed to add script file '{}'", path);
         return {};
     }
 
     result = builder.BuildModule();
     if (result < 0)
     {
-        spdlog::error("Failed to build module '{}'", name);
+        LOG(LOG_TYPE::ERROR, "Failed to build module '{}'", name);
         return {};
     }
 
-    spdlog::info("Successfully compiled script '{}' from '{}'", name, path);
+    LOG(LOG_TYPE::INFO, "Successfully compiled script '{}' from '{}'", name, path);
 
     auto module_deleter = [](asIScriptModule* module) {
         if (module)

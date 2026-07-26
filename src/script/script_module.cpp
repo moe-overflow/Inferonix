@@ -1,12 +1,14 @@
 #include "script_module.hpp"
+
+#include "inferonix_pch.hpp"
+
 #include "script_object.hpp"
 #include "scripting_engine.hpp"
 
-#include <spdlog/spdlog.h>
 #include <new>
 
-#include "../scene/components.hpp"
-#include "../input/input.hpp"
+#include "scene/components.hpp"
+#include "input/input.hpp"
 
 using namespace inferonix::script;
 
@@ -29,21 +31,21 @@ script_object script_module::CreateObject(std::string_view name) const
 {
     if (!_instance)
     {
-        spdlog::error("Cannot create object: module is null");
+        LOG(LOG_TYPE::ERROR, "Cannot create object: module is null");
         return script_object{};
     }
 
     asITypeInfo* type_info = _instance->GetTypeInfoByName(name.data());
     if (!type_info)
     {
-        spdlog::error("class '{}' not found in script module.", name);
+        LOG(LOG_TYPE::ERROR, "class '{}' not found in script module.", name);
 
         // DEBUG
-        spdlog::info("available types in module:");
+        LOG(LOG_TYPE::INFO, "available types in module:");
         for (uint32_t i = 0; i < _instance->GetObjectTypeCount(); ++i)
         {
             auto const* type = _instance->GetObjectTypeByIndex(i);
-            spdlog::info(" - {}", type->GetName());
+            LOG(LOG_TYPE::INFO, " - {}", type->GetName());
         }
         return script_object{};
     }
@@ -54,14 +56,14 @@ script_object script_module::CreateObject(std::string_view name) const
 
     if (!factory)
     {
-        spdlog::error("Failed to find default factory '{}' for class '{}'", factory_decl, name);
+        LOG(LOG_TYPE::ERROR, "Failed to find default factory '{}' for class '{}'", factory_decl, name);
 
         // DEBUG
-        spdlog::info("Available constructors:");
+        LOG(LOG_TYPE::INFO, "Available constructors:");
         for (uint32_t i = 0; i < type_info->GetFactoryCount(); ++i)
         {
             auto const* f = type_info->GetFactoryByIndex(i);
-            spdlog::info(" - {}", f->GetDeclaration());
+            LOG(LOG_TYPE::INFO, " - {}", f->GetDeclaration());
         }
         return script_object{};
     }
@@ -70,14 +72,14 @@ script_object script_module::CreateObject(std::string_view name) const
     asIScriptContext* ctx = _instance->GetEngine()->CreateContext();
     if (!ctx)
     {
-        spdlog::error("Failed to create script context");
+        LOG(LOG_TYPE::ERROR, "Failed to create script context");
         return script_object{};
     }
 
     int result = ctx->Prepare(factory);
     if (result < 0)
     {
-        spdlog::error("Failed to prepare script context (Code: {})", result);
+        LOG(LOG_TYPE::ERROR, "Failed to prepare script context (Code: {})", result);
         ctx->Release();
         return script_object{};
     }
@@ -85,7 +87,7 @@ script_object script_module::CreateObject(std::string_view name) const
     result = ctx->Execute();
     if (result < 0)
     {
-        spdlog::error("Failed to execute factory function (Code: {})", result);
+        LOG(LOG_TYPE::ERROR, "Failed to execute factory function (Code: {})", result);
         ctx->Release();
         return script_object{};
     }
@@ -99,7 +101,7 @@ script_object script_module::CreateObject(std::string_view name) const
 
     if (!obj)
     {
-        spdlog::error("Factory function returned null");
+        LOG(LOG_TYPE::ERROR, "Factory function returned null");
         return script_object{};
     }
 

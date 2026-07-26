@@ -18,12 +18,12 @@ namespace inferonix::renderer
         {
             // flip image to match OpenGL coordinate expectation => 0.0 on bottom
             stbi_set_flip_vertically_on_load(true);
-            spdlog::info("loading texture from file: {}", path.string());
+            LOG(LOG_TYPE::INFO, "Loading texture from file: {}", path.string());
             stbi_uc* data = stbi_load(path.string().c_str(), &_width, &_height, &_channels, 0);
 
             if (!data)
             {
-                spdlog::error("Failed to load texture: {} - Reason: {}", path.string(), stbi_failure_reason());
+                LOG(LOG_TYPE::ERROR, "Failed to load texture: {} - Reason: {}", path.string(), stbi_failure_reason());
                 return false;
             }
 

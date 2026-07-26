@@ -37,7 +37,7 @@ namespace inferonix
         void init(std::string_view scene_path);
         void run();
 
-        void configure_console_sink() const;
+        void attach_dev_console_log_sink() const;
 
 
     private:

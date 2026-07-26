@@ -86,3 +86,7 @@ target_sources(inferonix PRIVATE
 )
 target_include_directories(inferonix PRIVATE "${ANGELSCRIPT_INCLUDE_PATH}")
 
+target_precompile_headers(inferonix_lib PRIVATE
+        inferonix_pch.hpp
+)
+

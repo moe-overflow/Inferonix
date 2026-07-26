@@ -1,6 +1,6 @@
 #include "renderer.hpp"
 
-#include "spdlog/spdlog.h"
+#include "inferonix_pch.hpp"
 #include "event/key_event.hpp"
 #include "scene/components.hpp"
 #include "util/time.hpp"
@@ -177,7 +177,7 @@ void renderer::set_device_specs()
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_vertex_attributes);
     _device_specs.nr_attributes = max_vertex_attributes;
 
-    spdlog::info("Device Specifications: \n vendor: {}, \n renderer: {}, \n version: {}, \n shading language version: {}",
+    LOG(LOG_TYPE::INFO, "Device Specifications: \n vendor: {}, \n renderer: {}, \n version: {}, \n shading language version: {}",
         _device_specs.vendor, _device_specs.renderer, _device_specs.version, _device_specs.shading_language_version);
 }
 
@@ -196,9 +196,9 @@ void renderer::setup_opengl_debug()
         [[maybe_unused]] const void* userParam) -> void
         {
             if (severity == GL_DEBUG_SEVERITY_MEDIUM)
-                spdlog::warn("OpenGL warning({}): {}", id, message);
+                LOG(LOG_TYPE::WARNING, "OpenGL warning({}): {}", id, message);
             else if (severity == GL_DEBUG_SEVERITY_HIGH)
-                spdlog::error("OpenGL error({}): {}", id, message);
+                LOG(LOG_TYPE::ERROR, "OpenGL error({}): {}", id, message);
         },
         nullptr
     );

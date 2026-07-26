@@ -1,9 +1,9 @@
 #include "scripting_engine_launcher.hpp"
 
+#include "inferonix_pch.hpp"
+
 #include "script_module.hpp"
 #include "script_object.hpp"
-
-#include <spdlog/spdlog.h>
 
 using namespace inferonix::script;
 
@@ -40,7 +40,7 @@ void scripting_engine_launcher::start(scene::registry& scene_registry)
         if (component.initialized)
             continue;
 
-        spdlog::info("Loading script: {}", component.script_path);
+        LOG(LOG_TYPE::INFO, "Loading script: {}", component.script_path);
 
         // Extract class name from filename
         std::filesystem::path script_path(component.script_path);
@@ -58,7 +58,7 @@ void scripting_engine_launcher::start(scene::registry& scene_registry)
             auto module = _engine.compile_script(class_name, component.script_path);
             if (!module.IsValid())
             {
-                spdlog::error("Failed to compile script: {}", component.script_path);
+                LOG(LOG_TYPE::ERROR, "Failed to compile script: {}", component.script_path);
                 continue;
             }
             auto result = _module_storage.emplace(component.script_path, std::move(module));
@@ -69,7 +69,7 @@ void scripting_engine_launcher::start(scene::registry& scene_registry)
         auto script_object = p_module->CreateObject(class_name);
         if (!script_object.is_valid())
         {
-            spdlog::error("Failed to create script object for class: {}", class_name);
+            LOG(LOG_TYPE::ERROR , "Failed to create script object for class: {}", class_name);
             continue;
         }
 
@@ -85,7 +85,7 @@ void scripting_engine_launcher::start(scene::registry& scene_registry)
 
         component.script_object.call_start(static_cast<uint32_t>(entity));
 
-        spdlog::info("Script '{}' initialized for entity {}", class_name, static_cast<uint32_t>(entity));
+        LOG(LOG_TYPE::INFO, "Script '{}' initialized for entity {}", class_name, static_cast<uint32_t>(entity));
     }
 }
 

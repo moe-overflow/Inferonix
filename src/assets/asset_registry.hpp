@@ -6,7 +6,6 @@
 #include <any>
 #include <expected>
 #include <filesystem>
-#include <spdlog/spdlog.h>
 
 namespace inferonix::asset
 {
@@ -18,10 +17,14 @@ namespace inferonix::asset
         { t.load_from_file(path) } -> std::same_as<bool>;
     };
 
-    class asset_registry
+    class asset_registry final
     {
     public:
-        explicit asset_registry(registry& registry);
+        explicit asset_registry(registry& registry) : _registry(registry)
+        {
+            _registry.ctx().emplace<asset_registry*>(this);
+        }
+
         ~asset_registry() = default;
 
         asset_registry(const asset_registry&) = delete;
@@ -31,7 +34,7 @@ namespace inferonix::asset
         std::expected<std::shared_ptr<asset_type>, std::string>
         load(std::string const& id, std::filesystem::path const& path)
         {
-            spdlog::info("Attempting to load asset: {}", id);
+            LOG(LOG_TYPE::INFO, "Attempting to load asset: {}", id);
 
             if (auto const it = _assets.find(id); it != _assets.end())
             {
@@ -44,7 +47,7 @@ namespace inferonix::asset
                 spdlog::error("Failed to load asset: {}", id);
                 return std::unexpected(std::format("Failed to load asset {}", path.string()));
             }
-            spdlog::info("Loaded asset from {} successfully!", path.string());
+            LOG(LOG_TYPE::INFO, "Loaded asset from {} successfully!", path.string());
 
             _assets.emplace(id, asset);
             return asset;

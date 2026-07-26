@@ -1,7 +1,5 @@
 #include <inferonix_engine.hpp>
 
-#include <iostream>
-
 int main(int argc, char** argv)
 {
     try
@@ -12,10 +10,9 @@ int main(int argc, char** argv)
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << std::endl;
+        inferonix::LOG(inferonix::LOG_TYPE::ERROR, "Error: ", e.what());
         return -1;
     }
 }
-
 
 
