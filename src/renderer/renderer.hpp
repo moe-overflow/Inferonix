@@ -2,13 +2,14 @@
 
 #include "spdlog/spdlog.h"
 
-#include "../scene/camera.hpp"
-#include "../window/window.hpp"
+#include "scene/camera.hpp"
+#include "window/window.hpp"
 #include "shader_program.hpp"
 #include "vertex_array.hpp"
 #include "buffer.hpp"
-#include "../scene/components.hpp"
-#include "../scene/scene.hpp"
+#include "scene/components.hpp"
+#include "scene/scene.hpp"
+
 
 namespace inferonix::renderer
 {

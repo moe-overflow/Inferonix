@@ -1,8 +1,8 @@
 #pragma once
 
 #include "scripting_engine.hpp"
-#include "../scene/scene.hpp"
-#include "../scene/components.hpp"
+#include "scene/scene.hpp"
+#include "scene/components.hpp"
 
 #include <unordered_map>
 #include <filesystem>
