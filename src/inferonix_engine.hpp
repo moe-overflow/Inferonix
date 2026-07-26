@@ -7,6 +7,7 @@
 #include "script/scripting_engine_launcher.hpp"
 #include "physics/physics.hpp"
 #include "util/command_registry.hpp"
+#include "inferonix_config.hpp"
 
 namespace inferonix
 {
@@ -23,7 +24,7 @@ namespace inferonix
     class inferonix_engine final
     {
     public:
-        inferonix_engine();
+        explicit inferonix_engine(std::unique_ptr<inferonix_engine_config> const& config);
 
         inferonix_engine(inferonix_engine const&) = delete;
         inferonix_engine(inferonix_engine&&) = delete;
@@ -60,6 +61,9 @@ namespace inferonix
         void add_window_layers();
 
     };
+
+    auto parse_command_line(int argc, char** argv) -> std::unique_ptr<inferonix_engine_config>;
+
 
 }
 

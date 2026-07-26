@@ -6,8 +6,8 @@ int main(int argc, char** argv)
 {
     try
     {
-        auto engine = inferonix::inferonix_engine{};
-        engine.init(std::string(RESOURCES_PATH) + "scenes/level01.json");
+        auto const config = inferonix::parse_command_line(argc, argv);
+        auto engine = inferonix::inferonix_engine{ config };
         engine.run();
     }
     catch (const std::exception& e)

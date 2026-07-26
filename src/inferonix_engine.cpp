@@ -51,12 +51,14 @@ namespace
     }
 }
 
-inferonix_engine::inferonix_engine()
-    : _window(std::make_shared<window::window>(window_settings_)),
+inferonix_engine::inferonix_engine(std::unique_ptr<inferonix_engine_config> const& config)
+    : _window(std::make_shared<window::window>(config->window_settings)),
       _renderer(std::make_shared<renderer::renderer>(_window)),
       _scene(std::make_unique<scene::scene>()),
       _scene_serializer(std::make_unique<scene_serializer>(*_scene))
-{}
+{
+    this->init(config->scene_file.string());
+}
 
 inferonix_engine::~inferonix_engine()
 {
@@ -145,12 +147,24 @@ void inferonix_engine::add_window_layers()
 
 void inferonix_engine::register_commands()
 {
+
+    auto parse_bool_switch = [](std::string_view value) -> std::optional<bool>
+    {
+        if (value == "1" || value == "true" || value == "on")
+            return true;
+
+        if (value == "0" || value == "false" || value == "off")
+            return false;
+
+        return std::nullopt;
+    };
+
     _command_registry.register_command(
             "quit", "Exits the engine", [this](const auto& args)-> void { _window->close(); }
     );
 
     _command_registry.register_command(
-        "wireframe", "wireframe_mode", [this](const auto& args)-> void
+        "wireframe", "wireframe_mode", [this, parse_bool_switch](const auto& args)-> void
         {
             if (args.empty())
             {
@@ -158,22 +172,46 @@ void inferonix_engine::register_commands()
                 spdlog::info("Wireframe toggled");
                 return;
             }
-            const std::string& arg = args[0];
-            bool enable = false;
-            if (arg == "1" || arg == "true" || arg == "on")
-                enable = true;
-            else if (arg == "0" || arg == "false" || arg == "off")
-                enable = false;
-            else
+            auto value = parse_bool_switch(args[0]);
+            if (!value)
             {
-                spdlog::error("Invalid");
+                spdlog::error("Expected on/off, true/false or 1/0");
                 return;
             }
-            _renderer->set_wireframe_mode(enable);
-            spdlog::info("Wireframe mode set to {}", enable ? "ON" : "OFF");
+            _renderer->set_wireframe_mode(*value);
+            spdlog::info("Wireframe mode set to {}", *value ? "ON" : "OFF");
 
         }
     );
+}
+
+
+auto inferonix::parse_command_line(int argc, char** argv) -> std::unique_ptr<inferonix_engine_config>
+{
+    auto config = inferonix_engine_config{};
+
+    auto parser = argparse::ArgumentParser("Inferonix Engine");
+    parser.add_argument("--headless").default_value(false).implicit_value(true);
+    parser.add_argument("--scene");
+
+    parser.add_argument("--width").scan<'i', int>();
+    parser.add_argument("--height").scan<'i', int>();
+
+    parser.parse_args(argc, argv);
+
+    if (parser.is_used("--headless"))
+        config.headless = parser.get<bool>("--headless");
+
+    if (parser.is_used("--scene"))
+        config.scene_file = parser.get<std::string>("--scene");
+
+    if (parser.is_used("--width"))
+        config.window_settings.width = parser.get<int>("--width");
+
+    if (parser.is_used("--height"))
+        config.window_settings.height = parser.get<int>("--height");
+
+    return std::make_unique<inferonix_engine_config>(config);
 }
 
 
