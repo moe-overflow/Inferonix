@@ -13,7 +13,10 @@ namespace inferonix
             .height = 1080,
             .title = "Inferonix Engine",
             .full_screen = false,
-            .v_sync = true
+            .v_sync = true,
+
+            .font_family = "assets/fonts/Inter_18pt-Regular.ttf",
+            .font_size = 24.0f
         };
         std::filesystem::path scene_file = "assets/scenes/level01.json";
         bool headless { false };

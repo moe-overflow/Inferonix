@@ -94,19 +94,18 @@ void window::init_imgui() const
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_NavEnableKeyboard; // | ImGuiConfigFlags_ViewportsEnable;
 
     // font
-    /*
     {
         io.Fonts->Clear();
-        auto const font_file = RESOURCES_PATH "/fonts/IosevkaCharonMono-Light.ttf";
 
-        _settings.font = io.Fonts->AddFontFromFileTTF(
-            font_file,
+        auto text_config = ImFontConfig{};
+        _font = io.Fonts->AddFontFromFileTTF(
+            _settings.font_family.c_str(),
             _settings.font_size,
-            nullptr,
-            io.Fonts->GetGlyphRangesJapanese()
+            &text_config,
+            nullptr
         );
         io.Fonts->Build();
-    }*/
+    }
 
     auto const glsl_version = "#version 330";
     ImGui_ImplOpenGL3_Init(glsl_version);
@@ -159,12 +158,16 @@ float window::get_delta_time()
 void window::display() const
 {
 
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+    {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    }
 
     /**/
 
+
+    ImGui::PushFont(_font);
 
     for (const auto& layer : _layer_stack)
     {
@@ -175,6 +178,11 @@ void window::display() const
 
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2(static_cast<float>(_settings.width), static_cast<float>(_settings.height));
+
+    ImGui::PopFont();
+
+
+
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

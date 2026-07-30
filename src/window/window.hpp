@@ -7,6 +7,7 @@
 #include <chrono>
 
 class GLFWwindow;
+class ImFont;
 
 namespace inferonix::window
 {
@@ -18,6 +19,10 @@ namespace inferonix::window
         std::string title;
         bool full_screen;
         bool v_sync;
+
+        std::string font_family;
+        float font_size;
+
     };
 
     class window
@@ -81,9 +86,11 @@ namespace inferonix::window
 
     private:
         void init_glfw();
-        void init_imgui() const;
+        void init_imgui();
 
         static void set_input_pointer_functions(GLFWwindow* glfw_window);
+
+        ImFont* _font { nullptr }; 
 
     };
 
