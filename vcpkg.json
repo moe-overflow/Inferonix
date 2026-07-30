@@ -64,6 +64,17 @@
     {
       "name": "gtest",
       "version>=": "1.17.0"
+    },
+    {
+      "name": "imguizmo",
+      "version>=": "1.10"
+      
+    }
+  ],
+  "overrides": [
+    {
+      "name": "imguizmo",
+      "version": "2024-05-29#1"
     }
   ]
 

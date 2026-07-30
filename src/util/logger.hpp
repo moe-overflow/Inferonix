@@ -3,9 +3,8 @@
 #include <memory>
 #include <spdlog/spdlog.h>
 #include <fmt/format.h>
-#include "../window/window.hpp"
-#include "../ui/console_sink.hpp"
 
+#include "../ui/console_sink.hpp"
 namespace inferonix
 {
     inline auto configure_console_sink(const std::function<void(const std::string& message)>& log_callback) -> void

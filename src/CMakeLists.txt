@@ -10,7 +10,7 @@ find_package(Boost REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Jolt CONFIG REQUIRED)
 find_package(argparse CONFIG REQUIRED)
-
+find_package(imguizmo CONFIG REQUIRED)
 
 add_library(inferonix_lib STATIC)
 
@@ -48,6 +48,7 @@ target_link_libraries(inferonix_lib PUBLIC
         nlohmann_json::nlohmann_json
         Jolt::Jolt
         argparse::argparse
+        imguizmo::imguizmo
 )
 
 target_link_libraries(inferonix PUBLIC inferonix_lib)

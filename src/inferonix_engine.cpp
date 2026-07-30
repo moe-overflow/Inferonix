@@ -10,6 +10,8 @@
 #include "ui/dev_console.hpp"
 #include "ui/console_sink.hpp"
 #include "ui/toolbar.hpp"
+#include "ui/scene_hierarchy.hpp"
+
 #include "util/time.hpp"
 
 #include <fmt/format.h>
@@ -49,7 +51,7 @@ namespace
 inferonix_engine::inferonix_engine(std::unique_ptr<inferonix_engine_config> const& config)
     : _window(std::make_shared<window::window>(config->window_settings)),
       _renderer(std::make_shared<renderer::renderer>(_window)),
-      _scene(std::make_unique<scene::scene>()),
+      _scene(std::make_shared<scene::scene>()),
       _scene_serializer(std::make_unique<scene_serializer>(*_scene))
 {
     this->init(config->scene_file.string());
@@ -125,7 +127,6 @@ void inferonix_engine::attach_dev_console_log_sink() const
 void inferonix_engine::add_window_layers()
 {
     _window->add_layer<ui::dockspace>();
-    _window->add_layer<ui::scene_layer>(_renderer->get_frame_buffer());
     _window->add_layer<ui::dev_console>(
         [this](const std::string_view command) -> void { _command_registry.execute(command); }
     );
@@ -133,7 +134,8 @@ void inferonix_engine::add_window_layers()
         [this]() -> void { _state = EngineState::PLAY;  },
         [this]() -> void { _state = EngineState::PAUSE; }
     );
-
+    _window->add_layer<ui::scene_hierarchy>( _scene->get_registry() );
+    _window->add_layer<ui::scene_layer>(_renderer->get_frame_buffer(), _scene, _window->get_layer<ui::scene_hierarchy>());
 }
 
 void inferonix_engine::register_commands()

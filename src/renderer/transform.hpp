@@ -1,7 +1,8 @@
 #pragma once
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace inferonix::renderer
 {
@@ -23,6 +24,16 @@ namespace inferonix::renderer
             mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
             mat = glm::scale(mat, scale);
             return mat;
+        }
+
+        void set_from_matrix(const glm::mat4& mat)
+        {
+            auto rotation_quat = glm::quat{};
+            auto skew = glm::vec3{};
+            auto perspective = glm::vec4{};
+
+            glm::decompose(mat, scale, rotation_quat, position, skew, perspective);
+            rotation = glm::degrees(glm::eulerAngles(rotation_quat));
         }
 
         void translate(glm::vec3 const& delta)

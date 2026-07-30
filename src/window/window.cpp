@@ -1,20 +1,23 @@
 #include "window.hpp"
 
-#include "inferonix_pch.hpp"
-#include <stdexcept>
+#include <inferonix_pch.hpp>
 
-#include "glad/glad.h"
+#include <stdexcept>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "../event/key_event.hpp"
-#include "../event/mouse_event.hpp"
-#include "../event/window_event.hpp"
-#include "../input/key_codes.hpp"
-#include "../input/input.hpp"
+#include "event/key_event.hpp"
+#include "event/mouse_event.hpp"
+#include "event/window_event.hpp"
+#include "input/key_codes.hpp"
+#include "input/input.hpp"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
+#include <ImGuizmo.h>
+
 
 using namespace inferonix::window;
 using namespace inferonix::events;
@@ -85,7 +88,7 @@ void window::init_glfw()
     }
 }
 
-void window::init_imgui() const
+void window::init_imgui()
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -166,6 +169,7 @@ void window::display() const
 
     /**/
 
+    ImGuizmo::BeginFrame();
 
     ImGui::PushFont(_font);
 

@@ -44,7 +44,7 @@ namespace inferonix
     private:
         std::shared_ptr<window::window> _window;
         std::shared_ptr<renderer::renderer> _renderer;
-        std::unique_ptr<scene::scene> _scene;
+        std::shared_ptr<scene::scene> _scene;
 
         utils::command_registry _command_registry;
 
