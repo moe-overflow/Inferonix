@@ -169,6 +169,8 @@ void window::display() const
 
     /**/
 
+    _settings.dark_mode ? ImGui::StyleColorsDark() : ImGui::StyleColorsLight();
+
     ImGuizmo::BeginFrame();
 
     ImGui::PushFont(_font);

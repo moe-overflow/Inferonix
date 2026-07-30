@@ -23,6 +23,8 @@ namespace inferonix::window
         std::string font_family;
         float font_size;
 
+        bool dark_mode;
+
     };
 
     class window
@@ -74,6 +76,9 @@ namespace inferonix::window
                     return *std::dynamic_pointer_cast<T>(layer);
             throw std::runtime_error("layer not found");
         }
+
+        [[nodiscard]] auto dark_mode_enabled() const -> bool { return _settings.dark_mode; }
+        auto set_dark_mode(bool on) -> void { _settings.dark_mode = on; }
 
     private:
         bool _initialized = false;

@@ -176,6 +176,32 @@ void inferonix_engine::register_commands()
 
         }
     );
+
+    _command_registry.register_command(
+        "dark_mode", "Enables dark mode", [this, parse_bool_switch](const auto& args) -> void
+        {
+            if (args.empty())
+            {
+                const bool enabled = !_window->dark_mode_enabled();
+
+                _window->set_dark_mode(enabled);
+                _renderer->set_clear_color(enabled ? colors::black : colors::white);
+                return;
+            }
+
+            auto value = parse_bool_switch(args[0]);
+            if (!value)
+            {
+                spdlog::error("Expected on/off, true/false or 1/0");
+                return;
+            }
+
+            _window->set_dark_mode(*value);
+            _renderer->set_clear_color(*value ? colors::black : colors::white);
+        }
+    );
+
+
 }
 
 

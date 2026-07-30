@@ -87,6 +87,11 @@ namespace inferonix::renderer
 
         [[nodiscard]] auto get_frame_buffer()  { return _frame_buffer; }
 
+        auto set_clear_color(const color& color)
+        {
+            this->_clear_color = color;
+            glClearColor(_clear_color.r, _clear_color.g, _clear_color.b, 1);
+        }
 
     private:
         std::vector<std::unique_ptr<render_entity>> _render_entities;
@@ -103,6 +108,8 @@ namespace inferonix::renderer
         void setup_grid();
 
         std::shared_ptr<frame_buffer> _frame_buffer;
+
+        color _clear_color { colors::black };
 
     };
 }

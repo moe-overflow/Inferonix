@@ -16,7 +16,9 @@ namespace inferonix
             .v_sync = true,
 
             .font_family = "assets/fonts/Inter_18pt-Regular.ttf",
-            .font_size = 24.0f
+            .font_size = 24.0f,
+
+            .dark_mode = true
         };
         std::filesystem::path scene_file = "assets/scenes/level01.json";
         bool headless { false };
