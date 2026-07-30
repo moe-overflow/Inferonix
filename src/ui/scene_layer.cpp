@@ -35,6 +35,16 @@ void scene_layer::render_gizmos() const
     if (!registry.any_of<scene::transform_component>(selected_entity))
         return;
 
+    static ImGuizmo::OPERATION current_operation = ImGuizmo::TRANSLATE;
+    static ImGuizmo::MODE current_mode = ImGuizmo::LOCAL;
+
+    if (!ImGuizmo::IsUsing())
+    {
+        if (IsKeyPressed(ImGuiKey_B)) current_operation = ImGuizmo::TRANSLATE;
+        if (IsKeyPressed(ImGuiKey_N)) current_operation = ImGuizmo::ROTATE;
+        if (IsKeyPressed(ImGuiKey_M)) current_operation = ImGuizmo::SCALE;
+    }
+
     ImGuizmo::SetDrawlist();
     ImGuizmo::SetRect(
         GetWindowPos().x, GetWindowPos().y,
@@ -48,14 +58,21 @@ void scene_layer::render_gizmos() const
     auto& transform_component = registry.get<scene::transform_component>(selected_entity);
     auto transform_matrix = transform_component.get_matrix();
 
+    float snap_value = 0.5f;
+    if (current_operation == ImGuizmo::ROTATE)
+        snap_value = 45.0f;
+
+    bool const snap = GetIO().KeyCtrl;
+    float const snap_values[3] = { snap_value, snap_value, snap_value };
+
     ImGuizmo::Manipulate(
         glm::value_ptr(view_matrix),
         glm::value_ptr(projection_matrix),
-        ImGuizmo::TRANSLATE,
-        ImGuizmo::LOCAL,
+        current_operation,
+        current_mode,
         glm::value_ptr(transform_matrix),
         nullptr,
-        nullptr
+        snap ? snap_values : nullptr
     );
 
     if (ImGuizmo::IsUsing())

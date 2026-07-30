@@ -28,12 +28,15 @@ namespace inferonix::renderer
 
         void set_from_matrix(const glm::mat4& mat)
         {
-            auto rotation_quat = glm::quat{};
+            auto rotation_quat = glm::quat{ 1.0f, 0.0f, 0.0f, 0.0f };
             auto skew = glm::vec3{};
             auto perspective = glm::vec4{};
 
-            glm::decompose(mat, scale, rotation_quat, position, skew, perspective);
-            rotation = glm::degrees(glm::eulerAngles(rotation_quat));
+            if (glm::decompose(mat, scale, rotation_quat, position, skew, perspective))
+            {
+                rotation_quat = glm::conjugate(rotation_quat);
+                rotation = glm::degrees(glm::eulerAngles(rotation_quat));
+            }
         }
 
         void translate(glm::vec3 const& delta)
