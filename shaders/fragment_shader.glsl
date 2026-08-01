@@ -1,5 +1,7 @@
 #version 430 core
+
 layout (location = 0) out vec4 fragment_color;
+layout(location = 1) out int out_entity_id;
 
 in vec2 texture_coordinates_o;
 
@@ -8,9 +10,13 @@ uniform vec4 color;
 uniform sampler2D albedo_map;
 uniform bool use_texture;
 uniform bool use_dynamic_color;
+uniform int u_entity_id;
+
 
 void main()
 {
+    out_entity_id = u_entity_id;
+
     if (use_texture) {
         fragment_color = texture(albedo_map, texture_coordinates_o);
     } else if(use_dynamic_color) {

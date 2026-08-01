@@ -19,11 +19,14 @@ namespace
         // Alpha Blending (for handling transparency)
         {
             // calculate a color by mixing the new pixel with pixel already in buffer
-            glEnable(GL_BLEND);
+            glEnablei(GL_BLEND, 0);
 
             // use the alpha value of new color to determine opacity
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glBlendFuncSeparatei(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
         }
+
+        glDepthMask(GL_FALSE);
+        glDisable(GL_CULL_FACE);
 
         grid.shader_program_.use();
         grid.vertex_array_.bind();
@@ -36,8 +39,9 @@ namespace
         grid.vertex_array_.unbind();
         grid.shader_program_.unuse();
 
-        glDisable(GL_BLEND);
-
+        glEnable(GL_CULL_FACE);
+        glDepthMask(GL_TRUE);
+        glDisablei(GL_BLEND, 0);
     }
 }
 
@@ -61,8 +65,8 @@ void renderer::setup()
 void renderer::render(scene::scene& scene)
 {
     _frame_buffer->bind();
-
     clear();
+    _frame_buffer->clear_attachment(1, -1);
 
     if (_grid)
         render_grid(scene, *_grid);
@@ -96,6 +100,7 @@ void renderer::render(scene::scene& scene)
         });
         render_entity->shader_program_.set_uniform_int("use_dynamic_color", use_dynamic_color ? 1 : 0);
 
+        render_entity->shader_program_.set_uniform_int("u_entity_id", static_cast<int>(entity));
 
         if (albedo_map && use_texture)
         {
@@ -242,7 +247,7 @@ void renderer::setup_grid()
     auto layout = vertex_buffer_layout{};
     layout.push(FLOAT, 3); // position
     layout.push(FLOAT, 3); // normal
-    layout.push(FLOAT, 2);
+    layout.push(FLOAT, 2); // texture coordinates
 
     _grid->vertex_array_.bind();
     _grid->vertex_array_.add_vertex_buffer(_grid->vertex_buffer_, layout);

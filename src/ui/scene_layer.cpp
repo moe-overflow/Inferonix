@@ -11,6 +11,20 @@
 using namespace inferonix::ui;
 using namespace ImGui;
 
+namespace
+{
+    auto get_entity_at_pixel(const inferonix::renderer::frame_buffer& fb, int pixel_x, int pixel_y) -> int
+    {
+        const auto width = fb.get_settings().width;
+        const auto height = fb.get_settings().height;
+
+        if (pixel_x >= 0 && pixel_y >= 0 && pixel_x < width && pixel_y < height)
+            return fb.read_pixel(1, pixel_x, pixel_y);
+        return -1;
+    }
+
+}
+
 scene_layer::scene_layer(
         std::shared_ptr<renderer::frame_buffer> framebuffer,
         std::shared_ptr<scene::scene> scene,
@@ -22,7 +36,7 @@ scene_layer::scene_layer(
 {}
 
 
-void scene_layer::render_gizmos() const
+void scene_layer::render_gizmos(const std::pair<int, int>& viewport_min, const std::pair<int, int>& viewport_size) const
 {
     const auto selected_entity = entt::entity{ _hierarchy->get_selected_entity() };
     auto& registry = _scene->get_registry();
@@ -47,8 +61,10 @@ void scene_layer::render_gizmos() const
 
     ImGuizmo::SetDrawlist();
     ImGuizmo::SetRect(
-        GetWindowPos().x, GetWindowPos().y,
-        GetWindowSize().x, GetWindowSize().y
+        static_cast<float>(viewport_min.first),
+        static_cast<float>(viewport_min.second),
+        static_cast<float>(viewport_size.first),
+        static_cast<float>(viewport_size.second)
     );
 
     const auto camera = _scene->get_editor_camera();
@@ -88,16 +104,17 @@ void scene_layer::on_render()
     PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ .0f, .0f});
     Begin("Scene Layer");
 
-    auto const viewport_panel_size = GetContentRegionAvail();
-    if (viewport_panel_size.x > 0 &&
-        viewport_panel_size.y > 0 &&
-        (_framebuffer->get_settings().width != viewport_panel_size.x ||
-            _framebuffer->get_settings().height != viewport_panel_size.y)
-    )
+    const auto viewport_panel_size = GetContentRegionAvail();
+    const auto target_width = static_cast<int>(viewport_panel_size.x);
+    const auto target_height = static_cast<int>(viewport_panel_size.y);
+
+    if (target_width > 0 && target_height > 0 &&
+        (_framebuffer->get_settings().width != target_width ||
+         _framebuffer->get_settings().height != target_height))
     {
         _framebuffer->resize(
-            static_cast<uint32_t>(viewport_panel_size.x),
-            static_cast<uint32_t>(viewport_panel_size.y)
+            static_cast<uint32_t>(target_width),
+            static_cast<uint32_t>(target_height)
         );
     }
 
@@ -112,7 +129,36 @@ void scene_layer::on_render()
         ImVec2{ 1, 0 }
     );
 
-    render_gizmos();
+    // screen coordinates of cursor
+    const ImVec2 mouse_pos = GetMousePos();
+
+    // top-left of viewport image
+    const ImVec2 item_pos = GetItemRectMin();
+
+    // width and height of viewport image
+    const ImVec2 item_size = GetItemRectSize();
+
+    if (IsItemHovered() && IsMouseClicked(ImGuiMouseButton_Left) && !ImGuizmo::IsOver())
+    {
+        const float relative_x = mouse_pos.x - item_pos.x;
+        const float relative_y = mouse_pos.y - item_pos.y;
+
+        const int pixel_x = static_cast<int>(relative_x);
+        const int pixel_y = static_cast<int>(item_size.y - relative_y);
+
+        if (const int pixel_id = get_entity_at_pixel(*_framebuffer, pixel_x, pixel_y); pixel_id != -1)
+        {
+            if (auto const selected = static_cast<entt::entity>(pixel_id); _scene->get_registry().valid(selected))
+                _hierarchy->set_selected_entity(selected);
+        }
+        else
+            _hierarchy->set_selected_entity(entt::null);
+    }
+
+    render_gizmos(
+        { static_cast<int>(item_pos.x), static_cast<int>(item_pos.y) },
+        { static_cast<int>(item_size.x), static_cast<int>(item_size.y) }
+    );
 
     End();
     PopStyleVar();

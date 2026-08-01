@@ -40,7 +40,7 @@ namespace inferonix::ui
     void on_render() override;
 
     private:
-        void render_gizmos() const;
+        void render_gizmos(const std::pair<int, int>& viewport_min, const std::pair<int, int>& viewport_size) const;
 
     private:
         std::shared_ptr<renderer::frame_buffer> _framebuffer;
