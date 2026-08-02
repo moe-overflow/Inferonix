@@ -58,6 +58,8 @@ target_compile_definitions(inferonix_lib PRIVATE
         RESOURCES_PATH=\"${CMAKE_SOURCE_DIR}/resources/\"
 )
 
+target_compile_definitions(inferonix_lib PUBLIC GLM_ENABLE_EXPERIMENTAL)
+
 add_custom_command(TARGET inferonix POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/assets

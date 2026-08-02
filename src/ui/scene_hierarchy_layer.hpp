@@ -6,10 +6,10 @@
 
 namespace inferonix::ui
 {
-    class scene_hierarchy final : public layer
+    class scene_hierarchy_layer final : public layer
     {
     public:
-        explicit scene_hierarchy(entt::registry& registry) : _registry(registry)
+        explicit scene_hierarchy_layer(entt::registry& registry) : _registry(registry)
         {}
 
 

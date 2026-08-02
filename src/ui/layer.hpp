@@ -8,7 +8,7 @@
 
 namespace inferonix::ui
 {
-    class scene_hierarchy;
+    class scene_hierarchy_layer;
 
     class layer
     {
@@ -34,7 +34,7 @@ namespace inferonix::ui
         explicit scene_layer(
             std::shared_ptr<renderer::frame_buffer> framebuffer,
             std::shared_ptr<scene::scene> scene,
-            scene_hierarchy& hierarchy_layer
+            scene_hierarchy_layer& hierarchy_layer
         );
 
     void on_render() override;
@@ -45,7 +45,7 @@ namespace inferonix::ui
     private:
         std::shared_ptr<renderer::frame_buffer> _framebuffer;
         std::shared_ptr<scene::scene> _scene;
-        scene_hierarchy* _hierarchy;
+        scene_hierarchy_layer* _hierarchy;
     };
 
 

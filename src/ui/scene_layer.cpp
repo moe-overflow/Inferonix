@@ -6,7 +6,7 @@
 
 #include <renderer/frame_buffer.hpp>
 #include <scene/components.hpp>
-#include <ui/scene_hierarchy.hpp>
+#include <ui/scene_hierarchy_layer.hpp>
 
 using namespace inferonix::ui;
 using namespace ImGui;
@@ -28,7 +28,7 @@ namespace
 scene_layer::scene_layer(
         std::shared_ptr<renderer::frame_buffer> framebuffer,
         std::shared_ptr<scene::scene> scene,
-        scene_hierarchy& hierarchy_layer
+        scene_hierarchy_layer& hierarchy_layer
     ) :
         _framebuffer(std::move(framebuffer)),
         _scene(std::move(scene)),

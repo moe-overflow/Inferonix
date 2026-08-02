@@ -5,5 +5,6 @@ target_sources(inferonix_lib PRIVATE
         layer.hpp
         scene_layer.cpp
         toolbar.hpp
+        properties_layer.hpp
 )
 
