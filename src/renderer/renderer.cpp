@@ -14,7 +14,7 @@ using namespace inferonix::scene;
 
 namespace
 {
-    void render_grid(scene const& scene, render_entity const& grid)
+    void render_grid(scene const& scene, render_entity& grid)
     {
         // Alpha Blending (for handling transparency)
         {
@@ -43,6 +43,43 @@ namespace
         glDepthMask(GL_TRUE);
         glDisablei(GL_BLEND, 0);
     }
+
+    auto set_entity_uniforms(
+        shader_program& shader,
+        const scene& scene,
+        transform_component const& transform,
+        material_component const& material,
+        entity entity
+    )  -> void
+    {
+        shader.set_uniform("model", transform.get_matrix());
+        shader.set_uniform("view", scene.get_editor_camera()->get_view());
+        shader.set_uniform("projection", scene.get_editor_camera()->get_projection());
+
+        shader.set_uniform("u_time", inferonix::utils::time::get_time());
+
+        shader.set_uniform("color", color{
+            material.color.r,
+            material.color.g,
+            material.color.b
+        });
+
+        shader.set_uniform("use_dynamic_color", material.use_dynamic_color ? 1 : 0);
+        shader.set_uniform("u_entity_id", static_cast<int>(entity));
+
+        if (material.albedo_map && material.use_texture)
+        {
+            material.albedo_map->bind(0);
+            shader.set_uniform("albedo_map", 0);
+            shader.set_uniform("use_texture", 1);
+        }
+        else
+        {
+            shader.set_uniform("use_texture", 0);
+        }
+    }
+
+
 }
 
 renderer::renderer(std::shared_ptr<window::window> window) :
@@ -57,7 +94,7 @@ void renderer::setup()
 #endif
 
     set_device_specs();
-    set_clear_color(.1f, .1f, .1f, 1.0f);
+    set_clear_color( {.1f, .1f, .1f, 1.0f} );
     glEnable(GL_DEPTH_TEST);
     setup_grid();
 }
@@ -82,36 +119,13 @@ void renderer::render(scene::scene& scene)
         render_entity->shader_program_.use();
         render_entity->vertex_array_.bind();
 
-
-        // uniforms
-        render_entity->shader_program_.set_uniform(
-            "model",
-            view.get<transform_component>(entity).get_matrix()
+        set_entity_uniforms(
+            render_entity->shader_program_,
+            scene,
+            view.get<transform_component>(entity),
+            view.get<material_component>(entity),
+            entity
         );
-        render_entity->shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
-        render_entity->shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
-
-        auto const& [
-            color_x, albedo_map, use_texture, use_dynamic_color
-        ] = view.get<material_component>(entity);
-        render_entity->shader_program_.set_uniform("u_time", utils::time::get_time());
-        render_entity->shader_program_.set_uniform("color", color {
-            color_x.r, color_x.g, color_x.b
-        });
-        render_entity->shader_program_.set_uniform_int("use_dynamic_color", use_dynamic_color ? 1 : 0);
-
-        render_entity->shader_program_.set_uniform_int("u_entity_id", static_cast<int>(entity));
-
-        if (albedo_map && use_texture)
-        {
-            albedo_map->bind(0);
-            render_entity->shader_program_.set_uniform_int("albedo_map", 0);
-            render_entity->shader_program_.set_uniform_int("use_texture", 1);
-        }
-        else
-        {
-            render_entity->shader_program_.set_uniform_int("use_texture", 0);
-        }
 
         glDrawElements(
             GL_TRIANGLES,
@@ -133,8 +147,8 @@ void renderer::create_render_entity(entity const& entity, mesh_component& mesh)
     auto render_entity_ = std::make_unique<render_entity>();
 
     render_entity_->vertex_array_.bind();
-    render_entity_->vertex_buffer_.bind();
 
+    render_entity_->vertex_buffer_.bind();
     render_entity_->vertex_buffer_.buffer_data(mesh.GetVertices());
 
     render_entity_->index_buffer_.bind();
@@ -145,7 +159,6 @@ void renderer::create_render_entity(entity const& entity, mesh_component& mesh)
     layout.push(FLOAT, 3); // normal
     layout.push(FLOAT, 2); // texture
     render_entity_->vertex_array_.add_vertex_buffer(render_entity_->vertex_buffer_, layout);
-
 
     render_entity_->vertex_array_.set_index_buffer(render_entity_->index_buffer_);
     render_entity_->vertex_buffer_.unbind();
@@ -161,9 +174,9 @@ void renderer::create_render_entity(entity const& entity, mesh_component& mesh)
 
 }
 
-void renderer::set_clear_color(float r, float g, float b, float a)
+void renderer::set_clear_color(color& color)
 {
-    glClearColor(r, g, b, a);
+    glClearColor(color.r, color.g, color.b, color.a);
 }
 
 void renderer::clear()

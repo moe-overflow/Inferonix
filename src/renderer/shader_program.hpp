@@ -3,13 +3,21 @@
 #include "shader.hpp"
 #include "color.hpp"
 
-#include <memory>
 #include <string>
+#include <concepts>
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace inferonix::renderer
 {
+    template<typename T>
+    concept uniform =
+        std::same_as<T, float> ||
+        std::same_as<T, int> ||
+        std::same_as<T, glm::mat4> ||
+        std::same_as<color, T>;
+
     class shader_program final
     {
 
@@ -34,14 +42,28 @@ namespace inferonix::renderer
         void unuse() const;
 
         void attach_shaders() const;
-        void link() const;
 
-        void check_errors() const;
+        [[nodiscard]] std::expected<void, std::string> link() const;
 
-        void set_uniform(std::string_view name, color color) const;
-        void set_uniform(std::string_view name, glm::mat4 mat) const;
-        void set_uniform(std::string_view name, float val) const;
-        void set_uniform_int(std::string_view name, int val) const;
+
+    private:
+        [[nodiscard]] GLint get_uniform_location(std::string_view name);
+
+    public:
+        template<uniform T>
+        auto set_uniform(std::string_view name, const T& value) -> void
+        {
+            const auto location = get_uniform_location(name);
+            if constexpr (std::is_same_v<T, int>)
+                glUniform1i(location, value);
+            else if constexpr (std::is_same_v<T, float>)
+                glUniform1f(location, value);
+            else if constexpr (std::is_same_v<T, glm::mat4>)
+                glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+            else if constexpr (std::is_same_v<T, color>)
+                glUniform4f(location, value.r, value.g, value.b, 1.0f);
+        }
+
 
         [[nodiscard]] uint32_t get() const
         {
@@ -50,9 +72,11 @@ namespace inferonix::renderer
 
 
     private:
-        std::unique_ptr<shader> _vertex_shader;
-        std::unique_ptr<shader> _fragment_shader;
+        shader _vertex_shader;
+        shader _fragment_shader;
         uint32_t _id{};
+
+        std::unordered_map<std::string, GLint> _uniform_cache;
     };
 
 }

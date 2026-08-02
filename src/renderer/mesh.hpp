@@ -4,7 +4,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include <spdlog/spdlog.h>
 #include <glm/glm.hpp>
 
 namespace inferonix::renderer
@@ -29,17 +28,16 @@ namespace inferonix::renderer
 
         bool load_from_file(std::filesystem::path const& path)
         {
-            spdlog::info(fmt::format("Loading Mesh {}", path.string()));
+            LOG(LOG_TYPE::INFO, "Loading Mesh {}", path.string());
 
             auto importer = Assimp::Importer{};
-
             constexpr uint32_t flags = { aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices };
 
             auto* const scene = importer.ReadFile(path, flags);
 
             if (!scene || !scene->mRootNode)
             {
-                spdlog::error(fmt::format("Error while loading model: {}", importer.GetErrorString()));
+                LOG(LOG_TYPE::ERROR, "Error while loading model: {}", importer.GetErrorString());
                 return false;
             }
 
@@ -62,8 +60,7 @@ namespace inferonix::renderer
 
                 _vertices.push_back(vertex_);
             }
-            spdlog::info(fmt::format("Number of vertices: {}", mesh->mNumVertices));
-
+            LOG(LOG_TYPE::INFO, "Number of vertices: {}", mesh->mNumVertices);
 
             for (uint64_t i{ 0 }; i < mesh->mNumFaces; i++)
             {
@@ -71,7 +68,7 @@ namespace inferonix::renderer
                 for (uint64_t j{ 0 }; j < face.mNumIndices; j++)
                     _indices.push_back(face.mIndices[j]);
             }
-            spdlog::info(fmt::format("Number of indices: {}", mesh->mNumFaces));
+            LOG(LOG_TYPE::INFO, "Number of indices: {}", mesh->mNumFaces);
             return true;
         }
 

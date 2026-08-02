@@ -1,7 +1,5 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
-
 #include "scene/camera.hpp"
 #include "window/window.hpp"
 #include "shader_program.hpp"
@@ -39,7 +37,6 @@ namespace inferonix::renderer
         static void setup_opengl_debug();
 
     public:
-
         renderer(renderer const&) = delete;
         renderer(renderer&&) = delete;
 
@@ -67,7 +64,7 @@ namespace inferonix::renderer
         void create_render_entity(scene::entity const& entity, scene::mesh_component& mesh);
 
     public:
-        static void set_clear_color(float r, float g, float b, float a);
+        static void set_clear_color(color& color);
 
         static void clear();
 
@@ -85,9 +82,12 @@ namespace inferonix::renderer
 
         void on_event(events::event& event) override;
 
-        [[nodiscard]] auto get_frame_buffer()  { return _frame_buffer; }
+        [[nodiscard]] auto get_frame_buffer() -> std::shared_ptr<frame_buffer>
+        {
+            return _frame_buffer;
+        }
 
-        auto set_clear_color(const color& color)
+        auto set_clear_color(const color& color) -> void
         {
             this->_clear_color = color;
             glClearColor(_clear_color.r, _clear_color.g, _clear_color.b, 1);
@@ -102,7 +102,6 @@ namespace inferonix::renderer
         bool _wireframe_mode{ false };
 
         graphics_profile _device_specs{};
-
 
         std::unique_ptr<render_entity> _grid;
         void setup_grid();

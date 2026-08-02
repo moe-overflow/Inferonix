@@ -45,15 +45,15 @@ namespace inferonix::renderer
         void bind() const override;
         void unbind() const override;
 
-        void buffer_data(std::vector<vertex> const& vertices);
+        void buffer_data(std::span<const vertex> vertices);
 
-        [[nodiscard]] size_t Size() const
+        [[nodiscard]] size_t size() const
         {
             return _size;
         }
 
     private:
-        uint32_t _size{0};
+        size_t _size{0};
     };
 
     class index_buffer final : public buffer

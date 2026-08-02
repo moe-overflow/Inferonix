@@ -1,35 +1,21 @@
 #include "shader_program.hpp"
 
 #include "inferonix_pch.hpp"
-#include "GLFW/glfw3.h"
 
 
 using namespace inferonix::renderer;
 
-namespace
-{
-    auto try_retrieve_uniform_location(std::string_view uniform_name, uint32_t id) -> uint32_t
-    {
-        auto const location = glGetUniformLocation(id, std::string(uniform_name).c_str());
-        assert(location != -1);
-        return location;
-    }
-}
-
 shader_program::shader_program(std::string_view vertex_shader_path, std::string_view fragment_shader_path)
-    : _vertex_shader(std::make_unique<shader>(VERTEX, vertex_shader_path.data())),
-      _fragment_shader(std::make_unique<shader>(FRAGMENT, fragment_shader_path.data())),
+    : _vertex_shader(VERTEX, vertex_shader_path.data()),
+      _fragment_shader(FRAGMENT, fragment_shader_path.data()),
       _id(glCreateProgram())
 {
     attach_shaders();
-    link();
-    check_errors();
+    if (const auto link_result = link(); !link_result)
+        throw std::runtime_error("Failed to link shader program");
 
-    glDetachShader(_id, _vertex_shader->get());
-    // glDeleteShader(_vertex_shader->get());
-
-    glDetachShader(_id, _fragment_shader->get());
-    // glDeleteShader(_fragment_shader->get());
+    glDetachShader(_id, _vertex_shader.get());
+    glDetachShader(_id, _fragment_shader.get());
 }
 
 shader_program::shader_program(shader_program&& other) noexcept
@@ -57,8 +43,8 @@ shader_program& shader_program::operator=(shader_program&& other) noexcept
 
 shader_program::~shader_program()
 {
-    glUseProgram(0);
-    glDeleteProgram(_id);
+    if (_id)
+        glDeleteProgram(_id);
 }
 
 
@@ -74,54 +60,38 @@ void shader_program::unuse() const
 
 void shader_program::attach_shaders() const
 {
-    glAttachShader(_id, _vertex_shader->get());
-    glAttachShader(_id, _fragment_shader->get());
+    glAttachShader(_id, _vertex_shader.get());
+    glAttachShader(_id, _fragment_shader.get());
 }
 
-void shader_program::link() const
+std::expected<void, std::string> shader_program::link() const
 {
     glLinkProgram(_id);
+
+    auto success = GLint{};
+    glGetProgramiv(_id, GL_LINK_STATUS, &success);
+
+    if (success)
+        return {};
+
+    auto length = GLint{};
+    glGetProgramiv(_id, GL_INFO_LOG_LENGTH, &length);
+
+    auto log = std::string(length, '\0');
+    glGetProgramInfoLog(_id, length, nullptr, log.data());
+
+    return std::unexpected(std::move(log));
 }
 
-void shader_program::check_errors() const
+GLint shader_program::get_uniform_location(std::string_view name)
 {
-    // Checking compile time errors after calling 'glCompileShader()'
-    int result;
-    char message[512];
-    glGetProgramiv(_id, GL_LINK_STATUS, &result);
-    if (!result)
-    {
-        glGetProgramInfoLog(_id, 512, nullptr, message);
-        LOG(LOG_TYPE::ERROR, "An error occurred when compiling shaders: {}", message);
-    }
+    if (auto const it = _uniform_cache.find(name.data()); it != _uniform_cache.end())
+        return it->second;
 
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR)
-    {
-        LOG(LOG_TYPE::ERROR, "OpenGL error: {}", error);
-    }
+    auto location = GLint { glGetUniformLocation(_id, name.data()) };
+    _uniform_cache.emplace(name, location);
+    return location;
 }
 
-void shader_program::set_uniform(std::string_view name, color const color) const
-{
-    glUniform4f(try_retrieve_uniform_location(name, this->get()), color.r, color.g, color.b, 1.0f);
-}
-
-void shader_program::set_uniform(std::string_view name, glm::mat4 mat) const
-{
-    glUniformMatrix4fv(try_retrieve_uniform_location(name, this->get()), 1, GL_FALSE, &mat[0][0]);
-}
-
-
-void shader_program::set_uniform_int(std::string_view name, int val) const
-{
-    glUniform1i(try_retrieve_uniform_location(name, this->get()), val);
-}
-
-
-void shader_program::set_uniform(std::string_view name, float val) const
-{
-    glUniform1f(try_retrieve_uniform_location(name, this->get()), val);
-}
 
 

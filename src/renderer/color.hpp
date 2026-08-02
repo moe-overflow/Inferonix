@@ -4,7 +4,7 @@ namespace inferonix::renderer
 {
     struct color
     {
-        float r, g, b;
+        float r, g, b, a{1};
     };
 
     namespace colors

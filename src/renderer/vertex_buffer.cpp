@@ -15,7 +15,9 @@ void vertex_buffer::unbind() const
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void vertex_buffer::buffer_data(std::vector<vertex> const& vertices)
+
+void vertex_buffer::buffer_data(std::span<const vertex> vertices)
 {
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertex), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_STATIC_DRAW);
+    _size = vertices.size();
 }

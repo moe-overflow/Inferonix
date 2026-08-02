@@ -5,7 +5,7 @@
 namespace inferonix::renderer
 {
 
-    class vertex_array
+    class vertex_array final
     {
 
     public:

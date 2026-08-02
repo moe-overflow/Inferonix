@@ -11,7 +11,7 @@ namespace inferonix::renderer
         FRAGMENT = GL_FRAGMENT_SHADER,
     };
 
-    class shader
+    class shader final
     {
     public:
         shader() = delete;
