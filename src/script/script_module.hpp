@@ -6,7 +6,7 @@
 #include <angelscript.h>
 #include <unordered_map>
 
-namespace inferonix::renderer
+namespace inferonix::math
 {
     struct transform;
 }
@@ -40,7 +40,7 @@ namespace inferonix::script
         void register_globals(asIScriptEngine* engine);
 
         // Storage for entity to transform mapping
-        extern std::unordered_map<uint32_t, renderer::transform*> g_entity_transforms;
+        extern std::unordered_map<uint32_t, math::transform*> g_entity_transforms;
     }
 
 }

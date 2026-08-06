@@ -116,7 +116,7 @@ bool script_module::IsValid() const
 namespace inferonix::script::detail
 {
     // storage for entity to transform mapping
-    std::unordered_map<uint32_t, renderer::transform*> g_entity_transforms;
+    std::unordered_map<uint32_t, math::transform*> g_entity_transforms;
 
 
     void construct_vec_3default(void* memory)
@@ -272,7 +272,7 @@ namespace inferonix::script::detail
 
         r = engine->RegisterObjectType("Transform", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
         r = engine->RegisterObjectMethod("Transform", "void Translate(const vec3 &in)",
-            asFUNCTION(+[](inferonix::renderer::transform* t, const glm::vec3& v) {
+            asFUNCTION(+[](inferonix::math::transform* t, const glm::vec3& v) {
                 if (t) t->translate(v);
             }), asCALL_CDECL_OBJFIRST
         ); assert(r >= 0);
@@ -285,7 +285,7 @@ namespace inferonix::script::detail
             }), asCALL_CDECL);
 
         engine->RegisterGlobalFunction("Transform@ GetTransform(uint entity)",
-            asFUNCTION(+[](uint32_t entity) -> inferonix::renderer::transform* {
+            asFUNCTION(+[](uint32_t entity) -> inferonix::math::transform* {
                 auto it = g_entity_transforms.find(entity);
                 return (it != g_entity_transforms.end()) ? it->second : nullptr;
             }), asCALL_CDECL);

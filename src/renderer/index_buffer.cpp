@@ -14,14 +14,14 @@ void index_buffer::unbind() const
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void index_buffer::buffer_data(std::vector<uint32_t>& indices)
+void index_buffer::buffer_data(const std::vector<uint32_t>& indices)
 {
     _count = indices.size();
-    spdlog::info("Buffering data (count = {}) for index buffer {}", _id, _count);
+    LOG(LOG_TYPE::INFO, "Buffering data (count = {}) for index buffer {}", _id, _count);
     glBufferData(
             GL_ELEMENT_ARRAY_BUFFER,
-            static_cast<GLsizeiptr>(_count * sizeof(unsigned int)),
-            reinterpret_cast<GLvoid*>(indices.data()),
+            indices.size() * sizeof(uint32_t),
+            indices.data(),
             GL_STATIC_DRAW
     );
 }

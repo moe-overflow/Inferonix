@@ -20,12 +20,20 @@ namespace inferonix::renderer
         int nr_attributes;
     };
 
-    struct render_entity
+    struct gpu_mesh
     {
-        shader_program shader_program_;
         vertex_array vertex_array_;
         vertex_buffer vertex_buffer_;
         index_buffer index_buffer_;
+
+        uint32_t material_index = 0;
+        std::shared_ptr<texture> albedo;
+    };
+
+    struct render_entity
+    {
+        shader_program shader_program_;
+        std::vector<gpu_mesh> meshes;
     };
 
     class renderer final : public events::event_listener
@@ -54,14 +62,14 @@ namespace inferonix::renderer
             set_wireframe_mode(!_wireframe_mode);
         }
 
-        void set_wireframe_mode(bool enable)
+        void set_wireframe_mode(const bool enable)
         {
             _wireframe_mode = enable;
             glPolygonMode(GL_FRONT_AND_BACK, _wireframe_mode ? GL_LINE : GL_FILL);
         }
 
     private:
-        void create_render_entity(scene::entity const& entity, scene::mesh_component& mesh);
+        void create_render_entity(const scene::entity& entity, scene::mesh_component& mesh_component);
 
     public:
         static void set_clear_color(color& color);

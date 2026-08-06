@@ -16,7 +16,8 @@ namespace inferonix::renderer
         std::same_as<T, float> ||
         std::same_as<T, int> ||
         std::same_as<T, glm::mat4> ||
-        std::same_as<color, T>;
+        std::same_as<color, T> ||
+        std::same_as<T, bool>;
 
     class shader_program final
     {
@@ -62,6 +63,8 @@ namespace inferonix::renderer
                 glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
             else if constexpr (std::is_same_v<T, color>)
                 glUniform4f(location, value.r, value.g, value.b, 1.0f);
+            else if constexpr (std::is_same_v<T, bool>)
+                glUniform1i(location, value ? 1 : 0);
         }
 
 

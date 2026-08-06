@@ -8,6 +8,7 @@
 
 #include "frame_buffer.hpp"
 #include "color.hpp"
+#include "scene/model.hpp"
 
 using namespace inferonix::renderer;
 using namespace inferonix::scene;
@@ -29,26 +30,31 @@ namespace
         glDisable(GL_CULL_FACE);
 
         grid.shader_program_.use();
-        grid.vertex_array_.bind();
 
-        grid.shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
-        grid.shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
+        for (auto& grid_gpu_mesh : grid.meshes)
+        {
+            grid_gpu_mesh.vertex_array_.bind();
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+            grid.shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
+            grid.shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
 
-        grid.vertex_array_.unbind();
-        grid.shader_program_.unuse();
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+            grid_gpu_mesh.vertex_array_.unbind();
+            grid.shader_program_.unuse();
+        }
 
         glEnable(GL_CULL_FACE);
         glDepthMask(GL_TRUE);
         glDisablei(GL_BLEND, 0);
     }
 
-    auto set_entity_uniforms(
+    auto assign_entity_uniforms(
         shader_program& shader,
         const scene& scene,
         transform_component const& transform,
-        material_component const& material,
+        material_component const& override_material,
+        material const& imported_material,
         entity entity
     )  -> void
     {
@@ -58,24 +64,21 @@ namespace
 
         shader.set_uniform("u_time", inferonix::utils::time::get_time());
 
-        shader.set_uniform("color", color{
-            material.color.r,
-            material.color.g,
-            material.color.b
-        });
+        shader.set_uniform("color", imported_material.base_color);
 
-        shader.set_uniform("use_dynamic_color", material.use_dynamic_color ? 1 : 0);
+        shader.set_uniform("use_dynamic_color", override_material.use_dynamic_color ? 1 : 0);
         shader.set_uniform("u_entity_id", static_cast<int>(entity));
 
-        if (material.albedo_map && material.use_texture)
+        if (imported_material.albedo_texture)
         {
-            material.albedo_map->bind(0);
+            imported_material.albedo_texture->bind(0);
             shader.set_uniform("albedo_map", 0);
-            shader.set_uniform("use_texture", 1);
+            shader.set_uniform("use_texture", true);
         }
         else
         {
-            shader.set_uniform("use_texture", 0);
+            shader.set_uniform("use_texture", false);
+            shader.set_uniform("color", imported_material.base_color);
         }
     }
 
@@ -117,24 +120,32 @@ void renderer::render(scene::scene& scene)
 
         auto const& render_entity = _render_entities[entity_index];
         render_entity->shader_program_.use();
-        render_entity->vertex_array_.bind();
 
-        set_entity_uniforms(
-            render_entity->shader_program_,
-            scene,
-            view.get<transform_component>(entity),
-            view.get<material_component>(entity),
-            entity
-        );
+        for (auto& gpu_mesh : render_entity->meshes)
+        {
+            gpu_mesh.vertex_array_.bind();
 
-        glDrawElements(
-            GL_TRIANGLES,
-            render_entity->index_buffer_.count(),
-            GL_UNSIGNED_INT,
-            nullptr
-        );
+            auto const& mesh_component_ref = view.get<mesh_component>(entity);
+            auto const& imported_material = mesh_component_ref.model_asset->materials()[gpu_mesh.material_index];
 
-        render_entity->vertex_array_.unbind();
+            assign_entity_uniforms(
+                render_entity->shader_program_,
+                scene,
+                view.get<transform_component>(entity),
+                view.get<material_component>(entity),
+                imported_material,
+                entity
+            );
+
+            glDrawElements(
+                GL_TRIANGLES,
+                gpu_mesh.index_buffer_.count(),
+                GL_UNSIGNED_INT,
+                nullptr
+            );
+
+            gpu_mesh.vertex_array_.unbind();
+        }
         render_entity->shader_program_.unuse();
 
     }
@@ -142,32 +153,38 @@ void renderer::render(scene::scene& scene)
     _frame_buffer->unbind();
 }
 
-void renderer::create_render_entity(entity const& entity, mesh_component& mesh)
+void renderer::create_render_entity(const entity& entity, mesh_component& mesh_component)
 {
     auto render_entity_ = std::make_unique<render_entity>();
+    render_entity_->meshes.reserve(mesh_component.model_asset->meshes().size());
+    for (auto const& [_vertices, _indices, material_index] : mesh_component.model_asset->meshes())
+    {
+        auto& gpu_m = render_entity_->meshes.emplace_back();
 
-    render_entity_->vertex_array_.bind();
+        gpu_m.vertex_array_.bind();
+        gpu_m.vertex_buffer_.bind();
+        gpu_m.vertex_buffer_.buffer_data(_vertices);
 
-    render_entity_->vertex_buffer_.bind();
-    render_entity_->vertex_buffer_.buffer_data(mesh.GetVertices());
+        gpu_m.index_buffer_.bind();
+        gpu_m.index_buffer_.buffer_data(_indices);
 
-    render_entity_->index_buffer_.bind();
-    render_entity_->index_buffer_.buffer_data(mesh.GetIndices());
+        gpu_m.material_index = material_index;
 
-    vertex_buffer_layout layout;
-    layout.push(FLOAT, 3); // position
-    layout.push(FLOAT, 3); // normal
-    layout.push(FLOAT, 2); // texture
-    render_entity_->vertex_array_.add_vertex_buffer(render_entity_->vertex_buffer_, layout);
+        vertex_buffer_layout layout;
+        layout.push(FLOAT, 3); // position
+        layout.push(FLOAT, 3); // normal
+        layout.push(FLOAT, 2); // texture
 
-    render_entity_->vertex_array_.set_index_buffer(render_entity_->index_buffer_);
-    render_entity_->vertex_buffer_.unbind();
-    render_entity_->vertex_array_.unbind();
+        gpu_m.vertex_array_.add_vertex_buffer(gpu_m.vertex_buffer_, layout);
+        gpu_m.vertex_array_.set_index_buffer(gpu_m.index_buffer_);
+
+        gpu_m.vertex_buffer_.unbind();
+        gpu_m.vertex_array_.unbind();
+    }
 
     /**/
 
-    auto const entity_index = static_cast<uint32_t>(entity);
-    if (entity_index >= _render_entities.size())
+    if (auto const entity_index = static_cast<uint32_t>(entity); entity_index >= _render_entities.size())
         _render_entities.resize(entity_index + 1);
 
     _render_entities[static_cast<uint32_t>(entity)] = std::move(render_entity_);
@@ -248,25 +265,26 @@ void renderer::setup_grid()
         {{ 50.0f, 0.0f,  50.0f}, {0.0f, 1.0f, 0.0f}},
         {{-50.0f, 0.0f,  50.0f}, {0.0f, 1.0f, 0.0f}}
     };
-    auto indices = std::vector<uint32_t> { 0, 1, 2, 2, 3, 0 };
+    const auto indices = std::vector<uint32_t> { 0, 1, 2, 2, 3, 0 };
 
+    _grid->meshes.emplace_back();
+    auto& mesh = _grid->meshes.back();
 
-    _grid->vertex_buffer_.bind();
-    _grid->vertex_buffer_.buffer_data(vertices);
+    mesh.vertex_buffer_.bind();
+    mesh.vertex_buffer_.buffer_data(vertices);
 
-    _grid->index_buffer_.bind();
-    _grid->index_buffer_.buffer_data(indices);
+    mesh.index_buffer_.bind();
+    mesh.index_buffer_.buffer_data(indices);
 
     auto layout = vertex_buffer_layout{};
     layout.push(FLOAT, 3); // position
     layout.push(FLOAT, 3); // normal
     layout.push(FLOAT, 2); // texture coordinates
 
-    _grid->vertex_array_.bind();
-    _grid->vertex_array_.add_vertex_buffer(_grid->vertex_buffer_, layout);
-    _grid->vertex_array_.set_index_buffer(_grid->index_buffer_);
+    mesh.vertex_array_.bind();
+    mesh.vertex_array_.add_vertex_buffer(mesh.vertex_buffer_, layout);
+    mesh.vertex_array_.set_index_buffer(mesh.index_buffer_);
 
-    _grid->vertex_array_.unbind();
 }
 
 

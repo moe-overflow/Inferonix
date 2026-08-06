@@ -1,60 +1,210 @@
 #pragma once
 
+#include <assimp/texture.h>
 #include <glad/glad.h>
-#include <glm/glm.hpp>
 #include <stb_image.h>
-#include <filesystem>
-#include <util/logger.hpp>
 
+#include <filesystem>
+
+#include "util/logger.hpp"
+
+namespace inferonix::asset{ class asset_registry; }
 namespace inferonix::renderer
 {
-    class texture final
+class texture final
+{
+public:
+    texture() = default;
+
+    ~texture()
     {
-    public:
-        texture() = default;
-        ~texture() = default;
+        if (_id)
+            glDeleteTextures(1, &_id);
+    }
 
-        auto load_from_file(std::filesystem::path const& path) -> bool
+    texture(const texture&) = delete;
+    texture& operator=(const texture&) = delete;
+
+    texture(texture&& other) noexcept
+    {
+        _id = std::exchange(other._id, 0);
+    }
+
+    texture& operator=(texture&& other) noexcept
+    {
+        if (this != &other)
         {
-            // flip image to match OpenGL coordinate expectation => 0.0 on bottom
-            stbi_set_flip_vertically_on_load(true);
-            LOG(LOG_TYPE::INFO, "Loading texture from file: {}", path.string());
-            stbi_uc* data = stbi_load(path.string().c_str(), &_width, &_height, &_channels, 0);
+            if (_id)
+                glDeleteTextures(1, &_id);
 
-            if (!data)
-            {
-                LOG(LOG_TYPE::ERROR, "Failed to load texture: {} - Reason: {}", path.string(), stbi_failure_reason());
-                return false;
-            }
-
-            glGenTextures(1, &_id);
-            glBindTexture(GL_TEXTURE_2D, _id);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            auto format = (_channels == 4) ? GL_RGBA : GL_RGB;
-            glTexImage2D(GL_TEXTURE_2D, 0, format, _width, _height, 0, format, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-            stbi_image_free(data);
-            return true;
+            _id = std::exchange(other._id, 0);
         }
 
-        auto bind(uint32_t slot) const -> void
+        return *this;
+    }
+
+    bool load(const std::filesystem::path& path, [[maybe_unused]] asset::asset_registry& registry)
+    {
+        stbi_set_flip_vertically_on_load(true);
+
+        int width;
+        int height;
+        int channels;
+
+        stbi_uc* pixels = stbi_load(
+            path.string().c_str(),
+            &width,
+            &height,
+            &channels,
+            0);
+
+        if (!pixels)
         {
-            glActiveTexture(GL_TEXTURE0 + slot);
-            glBindTexture(GL_TEXTURE_2D, _id);
+            LOG(LOG_TYPE::ERROR,
+                "Failed to load texture '{}': {}",
+                path.string(),
+                stbi_failure_reason());
+
+            return false;
         }
 
-        auto unbind() -> void const;
+        create_gl_texture(
+            pixels,
+            width,
+            height,
+            channels);
 
-        [[nodiscard]] auto get_id() const -> uint32_t { return _id; }
+        stbi_image_free(pixels);
 
-    protected:
-        uint32_t _id{};
-        int _width{0}, _height{0}, _channels{0};
-    };
+        return true;
+    }
+
+    bool load_from_assimp(const aiTexture* embedded)
+    {
+        if (!embedded)
+            return false;
+
+        int width;
+        int height;
+        int channels;
+
+        unsigned char* pixels = nullptr;
+
+        if (embedded->mHeight == 0)
+        {
+            pixels = stbi_load_from_memory(
+                reinterpret_cast<unsigned char*>(embedded->pcData),
+                embedded->mWidth,
+                &width,
+                &height,
+                &channels,
+                0);
+        }
+        else
+        {
+            width = embedded->mWidth;
+            height = embedded->mHeight;
+            channels = 4;
+
+            pixels = new unsigned char[width * height * 4];
+
+            memcpy(
+                pixels,
+                embedded->pcData,
+                width * height * 4);
+        }
+
+        if (!pixels)
+        {
+            LOG(LOG_TYPE::ERROR,
+                "Failed to decode embedded texture.");
+
+            return false;
+        }
+
+        create_gl_texture(
+            pixels,
+            width,
+            height,
+            channels);
+
+        if (embedded->mHeight == 0)
+            stbi_image_free(pixels);
+        else
+            delete[] pixels;
+
+        return true;
+    }
+
+    void bind(GLuint slot = 0) const
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, _id);
+    }
+
+    static void unbind()
+    {
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    [[nodiscard]]
+    GLuint id() const
+    {
+        return _id;
+    }
+
+private:
+    void create_gl_texture(
+        const unsigned char* pixels,
+        int width,
+        int height,
+        int channels)
+    {
+        GLenum format = channels == 4 ? GL_RGBA : GL_RGB;
+
+        glGenTextures(1, &_id);
+
+        glBindTexture(
+            GL_TEXTURE_2D,
+            _id);
+
+        glTexParameteri(
+            GL_TEXTURE_2D,
+            GL_TEXTURE_WRAP_S,
+            GL_REPEAT);
+
+        glTexParameteri(
+            GL_TEXTURE_2D,
+            GL_TEXTURE_WRAP_T,
+            GL_REPEAT);
+
+        glTexParameteri(
+            GL_TEXTURE_2D,
+            GL_TEXTURE_MIN_FILTER,
+            GL_LINEAR_MIPMAP_LINEAR);
+
+        glTexParameteri(
+            GL_TEXTURE_2D,
+            GL_TEXTURE_MAG_FILTER,
+            GL_LINEAR);
+
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            format,
+            width,
+            height,
+            0,
+            format,
+            GL_UNSIGNED_BYTE,
+            pixels);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+private:
+    GLuint _id = 0;
+};
 }
-
-

@@ -12,7 +12,8 @@
 
 namespace inferonix
 {
-    namespace scene {
+    namespace scene 
+    {
         class scene_serializer;
     }
 

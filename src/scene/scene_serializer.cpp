@@ -1,6 +1,7 @@
 #include "scene_serializer.hpp"
 
 #include "components.hpp"
+#include "scene/model.hpp"
 
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -46,9 +47,10 @@ void scene_serializer::deserialize(const std::string& filepath) const
             auto path = mesh_data["AssetPath"].get<std::string>();
             auto id = mesh_data["AssetID"];
 
-            auto mesh = assets.load<renderer::mesh>(id, path);
-            if (mesh)
-                registry.emplace<mesh_component>(entity, *mesh.value());
+            if (auto loaded_model = assets.load<model>(id, path))
+                registry.emplace<mesh_component>(entity, mesh_component{
+                    .model_asset = loaded_model.value(),
+                });
 
             auto material = material_component{};
             if (mesh_data.contains("TexturePath") && mesh_data.contains("TextureID"))

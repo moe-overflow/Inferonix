@@ -11,7 +11,6 @@ target_sources(inferonix_lib PRIVATE
         shader_program.hpp
         shader_program.cpp
         texture.hpp
-        transform.hpp
         vertex_array.cpp
         vertex_array.hpp
         vertex_buffer.cpp

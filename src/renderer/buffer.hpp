@@ -3,7 +3,7 @@
 #include "glad/glad.h"
 #include <vector>
 
-#include "mesh.hpp"
+#include "vertex.hpp"
 
 namespace inferonix::renderer
 {
@@ -65,7 +65,7 @@ namespace inferonix::renderer
         void bind() const override;
         void unbind() const override;
 
-        void buffer_data(std::vector<uint32_t>& indices);
+        void buffer_data(const std::vector<uint32_t>& indices);
 
         [[nodiscard]] int32_t count() const
         {

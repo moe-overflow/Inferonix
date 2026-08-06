@@ -3,11 +3,11 @@
 #include <string>
 #include <memory>
 
-#include "../renderer/mesh.hpp"
-#include "../renderer/transform.hpp"
-#include "../renderer/texture.hpp"
+#include "math/transform.hpp"
+#include "renderer/texture.hpp"
+#include "scene/model.hpp"
 #include "camera.hpp"
-#include "../script/script_object.hpp"
+#include "script/script_object.hpp"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/BodyID.h>
@@ -35,7 +35,11 @@ namespace inferonix::scene
         tag_component(const std::string& tag) : tag(tag) {}
     };
 
-    using mesh_component = renderer::mesh;
+    struct mesh_component
+    {
+        std::shared_ptr<model> model_asset;
+    };
+
 
     struct material_component
     {
@@ -45,12 +49,12 @@ namespace inferonix::scene
         bool use_dynamic_color { false };
     };
 
-    struct transform_component : public renderer::transform
+    struct transform_component : public math::transform
     {
-        transform_component() : renderer::transform() {}
+        transform_component() : math::transform() {}
         
-        transform& get_transform() { return *this; }
-        [[nodiscard]] const transform& get_transform() const { return *this; }
+        math::transform& get_transform() { return *this; }
+        [[nodiscard]] const math::transform& get_transform() const { return *this; }
     };
 
     struct shader_component
