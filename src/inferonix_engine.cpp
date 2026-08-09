@@ -101,7 +101,7 @@ void inferonix_engine::run()
         if (console.is_open())
             _state = EngineState::PAUSE;
 
-        auto const dt = utils::time::get_delta_time();
+        auto const dt = std::min(utils::time::get_delta_time(), .1f);
         if(_state == EngineState::PLAY)
         {
             _script_launcher.update(_scene->get_registry(), dt);
