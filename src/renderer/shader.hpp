@@ -9,6 +9,7 @@ namespace inferonix::renderer
     {
         VERTEX = GL_VERTEX_SHADER,
         FRAGMENT = GL_FRAGMENT_SHADER,
+        COMPUTE = GL_COMPUTE_SHADER
     };
 
     class shader final

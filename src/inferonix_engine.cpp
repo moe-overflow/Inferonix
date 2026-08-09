@@ -50,7 +50,7 @@ namespace
     }
 }
 
-inferonix_engine::inferonix_engine(std::unique_ptr<inferonix_engine_config> const& config)
+inferonix_engine::inferonix_engine(const std::unique_ptr<inferonix_engine_config>& config)
     : _window(std::make_shared<window::window>(config->window_settings)),
       _renderer(std::make_shared<renderer::renderer>(_window)),
       _scene(std::make_shared<scene::scene>()),
@@ -72,7 +72,7 @@ void inferonix_engine::init(const std::string_view scene_path)
     add_window_layers();
     register_commands();
     attach_dev_console_log_sink();
-    _renderer->setup();
+    _renderer->setup(*_scene);
     _physics_engine.init();
     _script_launcher.launch();
     _scene_serializer->deserialize(scene_path.data());
@@ -106,6 +106,7 @@ void inferonix_engine::run()
         {
             _script_launcher.update(_scene->get_registry(), dt);
             _physics_engine.update(_scene->get_registry(), dt);
+            _renderer->update_simulations(*_scene, dt);
         }
 
         _scene->get_editor_camera()->update(dt);

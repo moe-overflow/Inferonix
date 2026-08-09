@@ -7,6 +7,8 @@
 #include "buffer.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
+#include "particle_renderer.hpp"
+#include "scene/components.hpp"
 
 
 namespace inferonix::renderer
@@ -55,7 +57,7 @@ namespace inferonix::renderer
 
         void render(scene::scene& scene);
 
-        void setup();
+        void setup(const scene::scene& scene);
 
         void toggle_wireframe_mode()
         {
@@ -69,7 +71,20 @@ namespace inferonix::renderer
         }
 
     private:
-        void create_render_entity(const scene::entity& entity, scene::mesh_component& mesh_component);
+        auto create_render_entity(const scene::entity& entity, const scene::mesh_component& mesh_component) -> void;
+
+        auto static assign_entity_uniforms(
+            shader_program& shader,
+            const scene::scene& scene,
+            const scene::transform_component& transform,
+            const scene::material_component& override_material,
+            const scene::material& imported_material,
+            scene::entity entity
+    )  -> void;
+
+        auto static render_grid(const scene::scene& scene, render_entity& grid) -> void;
+
+        auto setup_particle_renderer(const scene::scene& scene) const -> void;
 
     public:
         static void set_clear_color(color& color);
@@ -101,11 +116,20 @@ namespace inferonix::renderer
             glClearColor(_clear_color.r, _clear_color.g, _clear_color.b, 1);
         }
 
+        auto update_simulations(scene::scene& scene, float dt) const -> void
+        {
+            if (_particle_renderer)
+                for (const auto sim_view = scene.get_registry().view<scene::simulation_component>(); const auto entity : sim_view)
+                    _particle_renderer->dispatch_compute(sim_view.get<scene::simulation_component>(entity), dt);
+        }
+
     private:
         std::vector<std::unique_ptr<render_entity>> _render_entities;
 
         std::shared_ptr<scene::camera> _main_camera;
         std::shared_ptr<window::window> _window_instance{};
+
+        std::unique_ptr<particle_renderer> _particle_renderer;
 
         bool _wireframe_mode{ false };
 

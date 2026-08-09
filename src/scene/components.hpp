@@ -7,6 +7,8 @@
 #include "renderer/texture.hpp"
 #include "scene/model.hpp"
 #include "camera.hpp"
+#include "renderer/compute_shader.hpp"
+#include "renderer/shader_storage_buffer.hpp"
 #include "script/script_object.hpp"
 
 #include <Jolt/Jolt.h>
@@ -83,6 +85,15 @@ namespace inferonix::scene
     struct box_collider_component
     {
         glm::vec3 half_extents = {0.5f, 0.5f, 0.5f};
+    };
+
+    struct simulation_component
+    {
+        struct particle final { glm::vec4 position{0.0f}; glm::vec4 velocity{0.0f}; };
+        std::vector<particle> particles;
+        renderer::shader_storage_buffer storage_buffer;
+        renderer::compute_shader compute_shader;
+        uint32_t workgroup_size { 256 };
     };
 
 }

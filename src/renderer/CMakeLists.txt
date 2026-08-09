@@ -3,7 +3,6 @@ target_sources(inferonix_lib PRIVATE
         frame_buffer.hpp
         frame_buffer.cpp
         index_buffer.cpp
-        mesh.hpp
         renderer.cpp
         renderer.hpp
         shader.cpp
