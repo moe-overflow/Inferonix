@@ -32,6 +32,7 @@ namespace inferonix::renderer
         {
 
             _shader_program.use();
+            _shader_program.set_uniform("model", model_matrix);
             _shader_program.set_uniform("view", view_matrix);
             _shader_program.set_uniform("projection", projection_matrix);
 
@@ -63,7 +64,7 @@ namespace inferonix::renderer
         auto dispatch_compute(const scene::simulation_component& simulation_component, float dt) -> void
         {
             _compute_program.use();
-            _compute_program.set_uniform("u_delta_time", dt);
+            _compute_program.set_uniform("delta_time", dt);
             _compute_program.set_uniform("total_particles", static_cast<int>(simulation_component.particles.size()));
 
             // bind the SSBO to binding point 0 for the compute shader
@@ -73,7 +74,7 @@ namespace inferonix::renderer
             glDispatchCompute(num_work_groups, 1, 1);
 
             // Ensure compute shader is done writing before vertex shader starts reading the buffer
-            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
         }
 
     private:

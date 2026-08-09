@@ -98,15 +98,21 @@ void scene_serializer::deserialize(const std::string& filepath) const
 
             {
                 simulation.particles.resize(particle_count);
+
+                // todo: move to util
+                auto random_device = std::random_device{};
+                auto generator = std::mt19937{ random_device() };
+                auto random = std::uniform_real_distribution {0.0f, 1.0f };
+
                 for (auto& [position, velocity] : simulation.particles)
                 {
                     position = glm::vec4(
-                        static_cast<float>(rand()) / RAND_MAX * 10.0f - 5.0f,
-                        static_cast<float>(rand()) / RAND_MAX * 10.0f,
-                        static_cast<float>(rand()) / RAND_MAX * 10.0f - 5.0f,
+                        random(generator) * 10.0f - 5.0f,
+                        random(generator) * 10.0f,
+                        random(generator) * 10.0f - 5.0f,
                         1.0f
                     );
-                    velocity = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+                    velocity = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
                 }
                 simulation.storage_buffer.buffer_data(std::span<const simulation_component::particle>{simulation.particles});
                 if(auto result = simulation.compute_shader.load_from_file(compute_path); !result)
