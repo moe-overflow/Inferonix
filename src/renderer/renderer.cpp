@@ -13,93 +13,25 @@
 using namespace inferonix::renderer;
 using namespace inferonix::scene;
 
-namespace
-{
-    void render_grid(scene const& scene, render_entity& grid)
-    {
-        // Alpha Blending (for handling transparency)
-        {
-            // calculate a color by mixing the new pixel with pixel already in buffer
-            glEnablei(GL_BLEND, 0);
-
-            // use the alpha value of new color to determine opacity
-            glBlendFuncSeparatei(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-        }
-
-        glDepthMask(GL_FALSE);
-        glDisable(GL_CULL_FACE);
-
-        grid.shader_program_.use();
-
-        for (auto& grid_gpu_mesh : grid.meshes)
-        {
-            grid_gpu_mesh.vertex_array_.bind();
-
-            grid.shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
-            grid.shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
-
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-            grid_gpu_mesh.vertex_array_.unbind();
-            grid.shader_program_.unuse();
-        }
-
-        glEnable(GL_CULL_FACE);
-        glDepthMask(GL_TRUE);
-        glDisablei(GL_BLEND, 0);
-    }
-
-    auto assign_entity_uniforms(
-        shader_program& shader,
-        const scene& scene,
-        transform_component const& transform,
-        material_component const& override_material,
-        material const& imported_material,
-        entity entity
-    )  -> void
-    {
-        shader.set_uniform("model", transform.get_matrix());
-        shader.set_uniform("view", scene.get_editor_camera()->get_view());
-        shader.set_uniform("projection", scene.get_editor_camera()->get_projection());
-
-        shader.set_uniform("u_time", inferonix::utils::time::get_time());
-
-        shader.set_uniform("color", imported_material.base_color);
-
-        shader.set_uniform("use_dynamic_color", override_material.use_dynamic_color ? 1 : 0);
-        shader.set_uniform("u_entity_id", static_cast<int>(entity));
-
-        if (imported_material.albedo_texture)
-        {
-            imported_material.albedo_texture->bind(0);
-            shader.set_uniform("albedo_map", 0);
-            shader.set_uniform("use_texture", true);
-        }
-        else
-        {
-            shader.set_uniform("use_texture", false);
-            shader.set_uniform("color", imported_material.base_color);
-        }
-    }
-
-
-}
-
 renderer::renderer(std::shared_ptr<window::window> window) :
     _window_instance(std::move(window)),
+    _particle_renderer(std::make_unique<particle_renderer>()),
     _frame_buffer(std::make_shared<frame_buffer>(frame_buffer::frame_buffer_settings(1920, 1080)))
 {}
 
-void renderer::setup()
+void renderer::setup(const scene::scene& scene)
 {
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
 #ifndef NDEBUG
     setup_opengl_debug();
 #endif
 
     set_device_specs();
     set_clear_color( {.1f, .1f, .1f, 1.0f} );
-    glEnable(GL_DEPTH_TEST);
     setup_grid();
+    setup_particle_renderer(scene);
 }
 
 void renderer::render(scene::scene& scene)
@@ -111,8 +43,9 @@ void renderer::render(scene::scene& scene)
     if (_grid)
         render_grid(scene, *_grid);
 
-    auto const view = scene.get_registry().view<mesh_component, transform_component, material_component>();
-    for (auto entity : view)
+    for (const auto view = scene.get_registry().view<mesh_component, transform_component, material_component>();
+         auto entity : view
+    )
     {
         auto const entity_index = static_cast<uint32_t>(entity);
         if (entity_index >= _render_entities.size() || !_render_entities[entity_index])
@@ -137,23 +70,31 @@ void renderer::render(scene::scene& scene)
                 entity
             );
 
-            glDrawElements(
-                GL_TRIANGLES,
-                gpu_mesh.index_buffer_.count(),
-                GL_UNSIGNED_INT,
-                nullptr
-            );
-
+            glDrawElements(GL_TRIANGLES, gpu_mesh.index_buffer_.count(), GL_UNSIGNED_INT, nullptr);
             gpu_mesh.vertex_array_.unbind();
         }
         render_entity->shader_program_.unuse();
 
     }
 
+    if (_particle_renderer)
+    {
+        for (
+            const auto simulation_view = scene.get_registry().view<simulation_component, transform_component>();
+            const auto entity : simulation_view
+        )
+        {
+            auto& simulation = simulation_view.get<simulation_component>(entity);
+            auto& transform = simulation_view.get<transform_component>(entity);
+            const auto camera = scene.get_editor_camera();
+            _particle_renderer->render(simulation, transform.get_matrix(), camera->get_view(), camera->get_projection());
+        }
+    }
+
     _frame_buffer->unbind();
 }
 
-void renderer::create_render_entity(const entity& entity, mesh_component& mesh_component)
+void renderer::create_render_entity(const entity& entity, const mesh_component& mesh_component)
 {
     auto render_entity_ = std::make_unique<render_entity>();
     render_entity_->meshes.reserve(mesh_component.model_asset->meshes().size());
@@ -251,6 +192,19 @@ void renderer::on_event(events::event& event)
     }
 }
 
+void renderer::setup_particle_renderer(const scene::scene& scene) const
+{
+    _particle_renderer->setup(
+            SHADERS_PATH "/particle_vertex.glsl",
+            SHADERS_PATH "/particle_fragment.glsl",
+            SHADERS_PATH "/particle_simulation.glsl"
+        );
+
+    for (auto const simulation_view = scene.get_registry().view<simulation_component>(); auto const entity : simulation_view)
+        _particle_renderer->initialize_buffers(simulation_view.get<simulation_component>(entity));
+}
+
+
 void renderer::setup_grid()
 {
     _grid = std::make_unique<render_entity>();
@@ -287,5 +241,70 @@ void renderer::setup_grid()
 
 }
 
+auto renderer::assign_entity_uniforms(
+    shader_program& shader,
+    const scene::scene& scene,
+    const transform_component& transform,
+    const material_component& override_material,
+    const material& imported_material,
+    entity entity
+)  -> void
+{
+    shader.set_uniform("model", transform.get_matrix());
+    shader.set_uniform("view", scene.get_editor_camera()->get_view());
+    shader.set_uniform("projection", scene.get_editor_camera()->get_projection());
 
+    shader.set_uniform("u_time", utils::time::get_time());
+
+    shader.set_uniform("color", imported_material.base_color);
+
+    shader.set_uniform("use_dynamic_color", override_material.use_dynamic_color ? 1 : 0);
+    shader.set_uniform("u_entity_id", static_cast<int>(entity));
+
+    if (imported_material.albedo_texture)
+    {
+        imported_material.albedo_texture->bind(0);
+        shader.set_uniform("albedo_map", 0);
+        shader.set_uniform("use_texture", true);
+    }
+    else
+    {
+        shader.set_uniform("use_texture", false);
+        shader.set_uniform("color", imported_material.base_color);
+    }
+}
+
+void renderer::render_grid(const scene::scene& scene, render_entity& grid)
+{
+    // Alpha Blending (for handling transparency)
+    {
+        // calculate a color by mixing the new pixel with pixel already in buffer
+        glEnablei(GL_BLEND, 0);
+
+        // use the alpha value of new color to determine opacity
+        glBlendFuncSeparatei(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+    }
+
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
+
+    grid.shader_program_.use();
+
+    for (auto& grid_gpu_mesh : grid.meshes)
+    {
+        grid_gpu_mesh.vertex_array_.bind();
+
+        grid.shader_program_.set_uniform("view", scene.get_editor_camera()->get_view());
+        grid.shader_program_.set_uniform("projection", scene.get_editor_camera()->get_projection());
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+        grid_gpu_mesh.vertex_array_.unbind();
+        grid.shader_program_.unuse();
+    }
+
+    glEnable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
+    glDisablei(GL_BLEND, 0);
+}
 

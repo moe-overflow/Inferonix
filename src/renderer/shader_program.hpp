@@ -5,14 +5,15 @@
 
 #include <string>
 #include <concepts>
+#include <filesystem>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace inferonix::renderer
 {
-    template<typename T>
-    concept uniform =
+    // todo: instead of int or float, use convertible to allow every thing that has to do with numbers
+    template<typename T> concept uniform =
         std::same_as<T, float> ||
         std::same_as<T, int> ||
         std::same_as<T, glm::mat4> ||
@@ -23,13 +24,16 @@ namespace inferonix::renderer
     {
 
     public:
-        constexpr static auto DEFAULT_VERTEX_SHADER =  "shaders/vertex_shader.glsl";
-        constexpr static auto DEFAULT_FRAGMENT_SHADER = "shaders/fragment_shader.glsl";
+        constexpr static auto DEFAULT_VERTEX_SHADER_PATH =  "shaders/vertex_shader.glsl";
+        constexpr static auto DEFAULT_FRAGMENT_SHADER_PATH = "shaders/fragment_shader.glsl";
+
+        shader_program();
 
         explicit shader_program(
-            std::string_view vertex_shader_path = DEFAULT_VERTEX_SHADER,
-            std::string_view fragment_shader_path = DEFAULT_FRAGMENT_SHADER
+            const std::filesystem::path& vertex_shader_path, const std::filesystem::path& fragment_shader_path
         );
+
+        explicit shader_program(const std::filesystem::path& compute_shader_path);
 
         ~shader_program();
 
@@ -75,8 +79,10 @@ namespace inferonix::renderer
 
 
     private:
-        shader _vertex_shader;
-        shader _fragment_shader;
+        std::optional<shader> _vertex_shader;
+        std::optional<shader> _fragment_shader;
+        std::optional<shader> _compute_shader;
+
         uint32_t _id{};
 
         std::unordered_map<std::string, GLint> _uniform_cache;
