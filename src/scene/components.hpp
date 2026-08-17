@@ -89,11 +89,16 @@ namespace inferonix::scene
 
     struct simulation_component
     {
-        struct particle final { glm::vec4 position{0.0f}; glm::vec4 velocity{0.0f}; };
+        struct alignas(16) particle final {
+            glm::vec4 position{0.0f};
+            glm::vec4 velocity{0.0f};
+            glm::vec4 age_lifetime{0.0f, 5.0f, 0.0f, 0.0f};
+        };
         std::vector<particle> particles;
         renderer::shader_storage_buffer storage_buffer;
         renderer::compute_shader compute_shader;
         uint32_t workgroup_size { 256 };
+        float drag{ 1.5f };
     };
 
 }
