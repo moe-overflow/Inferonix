@@ -56,7 +56,7 @@ namespace inferonix
 
         std::unique_ptr<scene::scene_serializer> _scene_serializer;
 
-        EngineState _state{ EngineState::PLAY };
+        EngineState _state{ EngineState::PAUSE };
         bool _was_console_open{ false };
 
         void register_commands();

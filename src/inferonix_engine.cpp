@@ -91,15 +91,19 @@ void inferonix_engine::run()
         utils::time::update();
         window::window::poll_events();
 
-        auto& console = _window->get_layer<ui::dev_console>();
-        _scene->get_editor_camera()->set_block_input(console.is_open());
+        {
+            auto& console = _window->get_layer<dev_console>();
+            _scene->get_editor_camera()->set_block_input(console.is_open());
 
-        utils::time::set_time_scale(console.is_open() || _state == EngineState::PAUSE ? 0.0f : 1.0f);
+            utils::time::set_time_scale(console.is_open() || _state == EngineState::PAUSE ? 0.0f : 1.0f);
+
+            if (console.is_open())
+                _state = EngineState::PAUSE;
+        }
+
 
         _script_launcher.start(_scene->get_registry());
 
-        if (console.is_open())
-            _state = EngineState::PAUSE;
 
         auto const dt = std::min(utils::time::get_delta_time(), .1f);
         if(_state == EngineState::PLAY)

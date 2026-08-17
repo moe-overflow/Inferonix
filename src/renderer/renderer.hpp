@@ -57,7 +57,7 @@ namespace inferonix::renderer
 
         void render(scene::scene& scene);
 
-        void setup(const scene::scene& scene);
+        void setup(scene::scene& scene);
 
         void toggle_wireframe_mode()
         {
@@ -80,14 +80,14 @@ namespace inferonix::renderer
             const scene::material_component& override_material,
             const scene::material& imported_material,
             scene::entity entity
-    )  -> void;
+        )  -> void;
 
         auto static render_grid(const scene::scene& scene, render_entity& grid) -> void;
 
-        auto setup_particle_renderer(const scene::scene& scene) const -> void;
+        auto setup_particle_renderer(scene::scene& scene) const -> void;
 
     public:
-        static void set_clear_color(color& color);
+        void set_clear_color(const color& color);
 
         static void clear();
 
@@ -110,17 +110,16 @@ namespace inferonix::renderer
             return _frame_buffer;
         }
 
-        auto set_clear_color(const color& color) -> void
-        {
-            this->_clear_color = color;
-            glClearColor(_clear_color.r, _clear_color.g, _clear_color.b, 1);
-        }
-
         auto update_simulations(scene::scene& scene, float dt) const -> void
         {
             if (_particle_renderer)
-                for (const auto sim_view = scene.get_registry().view<scene::simulation_component>(); const auto entity : sim_view)
-                    _particle_renderer->dispatch_compute(sim_view.get<scene::simulation_component>(entity), dt);
+                for (const auto simulation_view = scene.get_registry().view<scene::simulation_component>();
+                     const auto entity : simulation_view
+                )
+                {
+                    auto& simulation = simulation_view.get<scene::simulation_component>(entity);
+                    _particle_renderer->dispatch_compute(simulation, dt);
+                }
         }
 
     private:
