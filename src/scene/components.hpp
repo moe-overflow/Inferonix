@@ -7,7 +7,6 @@
 #include "renderer/texture.hpp"
 #include "scene/model.hpp"
 #include "camera.hpp"
-#include "renderer/compute_shader.hpp"
 #include "renderer/shader_storage_buffer.hpp"
 #include "script/script_object.hpp"
 
