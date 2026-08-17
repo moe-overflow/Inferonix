@@ -96,8 +96,8 @@ namespace inferonix::scene
         };
         std::vector<particle> particles;
         renderer::shader_storage_buffer storage_buffer;
-        renderer::compute_shader compute_shader;
-        uint32_t workgroup_size { 256 };
+        uint32_t workgroup_size{ 64 };
+        uint32_t binding_point{ 0 };
         float drag{ 1.5f };
     };
 
