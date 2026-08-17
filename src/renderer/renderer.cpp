@@ -19,7 +19,7 @@ renderer::renderer(std::shared_ptr<window::window> window) :
     _frame_buffer(std::make_shared<frame_buffer>(frame_buffer::frame_buffer_settings(1920, 1080)))
 {}
 
-void renderer::setup(const scene::scene& scene)
+void renderer::setup(scene::scene& scene)
 {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
@@ -80,7 +80,7 @@ void renderer::render(scene::scene& scene)
     if (_particle_renderer)
     {
         for (
-            const auto simulation_view = scene.get_registry().view<simulation_component, transform_component>();
+            auto simulation_view = scene.get_registry().view<simulation_component, transform_component>();
             const auto entity : simulation_view
         )
         {
@@ -132,9 +132,10 @@ void renderer::create_render_entity(const entity& entity, const mesh_component& 
 
 }
 
-void renderer::set_clear_color(color& color)
+void renderer::set_clear_color(const color& color)
 {
-    glClearColor(color.r, color.g, color.b, color.a);
+    _clear_color = color;
+    glClearColor(_clear_color.r, _clear_color.g, _clear_color.b, 1);
 }
 
 void renderer::clear()
@@ -159,7 +160,6 @@ void renderer::set_device_specs()
 
 void renderer::setup_opengl_debug()
 {
-    glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback([] (
@@ -192,15 +192,15 @@ void renderer::on_event(events::event& event)
     }
 }
 
-void renderer::setup_particle_renderer(const scene::scene& scene) const
+void renderer::setup_particle_renderer(scene::scene& scene) const
 {
     _particle_renderer->setup(
-            SHADERS_PATH "/particle_vertex.glsl",
-            SHADERS_PATH "/particle_fragment.glsl",
-            SHADERS_PATH "/particle_simulation.glsl"
-        );
+        SHADERS_PATH "/particle_vertex.glsl",
+        SHADERS_PATH "/particle_fragment.glsl",
+        SHADERS_PATH "/particle_simulation.glsl"
+    );
 
-    for (auto const simulation_view = scene.get_registry().view<simulation_component>(); auto const entity : simulation_view)
+    for (const auto simulation_view = scene.get_registry().view<simulation_component>(); auto const entity : simulation_view)
         _particle_renderer->initialize_buffers(simulation_view.get<simulation_component>(entity));
 }
 
@@ -208,12 +208,10 @@ void renderer::setup_particle_renderer(const scene::scene& scene) const
 void renderer::setup_grid()
 {
     _grid = std::make_unique<render_entity>();
-    _grid->shader_program_ = shader_program{
-        SHADERS_PATH "/grid_vertex.glsl",
-        SHADERS_PATH "/grid_fragment.glsl"
-    };
+    _grid->shader_program_ = shader_program{ SHADERS_PATH "/grid_vertex.glsl", SHADERS_PATH "/grid_fragment.glsl" };
 
-    auto const vertices = std::vector<vertex>{
+    auto const vertices = std::vector<vertex>
+    {
         {{-50.0f, 0.0f, -50.0f}, {0.0f, 1.0f, 0.0f}},
         {{ 50.0f, 0.0f, -50.0f}, {0.0f, 1.0f, 0.0f}},
         {{ 50.0f, 0.0f,  50.0f}, {0.0f, 1.0f, 0.0f}},

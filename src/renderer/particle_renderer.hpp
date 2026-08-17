@@ -24,31 +24,28 @@ namespace inferonix::renderer
         }
 
         auto render(
-            const scene::simulation_component& simulation_component,
-            [[maybe_unused]] const glm::mat4& model_matrix,
+            scene::simulation_component& simulation,
+            const glm::mat4& model_matrix,
             const glm::mat4& view_matrix,
             const glm::mat4& projection_matrix
         ) -> void
         {
-
             _shader_program.use();
             _shader_program.set_uniform("model", model_matrix);
             _shader_program.set_uniform("view", view_matrix);
             _shader_program.set_uniform("projection", projection_matrix);
 
-            glEnable(GL_PROGRAM_POINT_SIZE); // required for gl_PointSize
-
-            simulation_component.storage_buffer.bind_base(0);
+            simulation.storage_buffer.bind_base(simulation.binding_point);
             _vertex_array.bind();
-            glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(simulation_component.particles.size()));
+            glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(simulation.particles.size()));
             _vertex_array.unbind();
         }
 
-        auto initialize_buffers(const scene::simulation_component& simulation_component) const -> void
+        auto initialize_buffers(const scene::simulation_component& simulation) const -> void
         {
             using particle = scene::simulation_component::particle;
             _vertex_array.bind();
-            simulation_component.storage_buffer.bind();
+            simulation.storage_buffer.bind();
 
             glEnableVertexAttribArray(0);
             glVertexAttribPointer(
@@ -57,24 +54,22 @@ namespace inferonix::renderer
             );
 
             _vertex_array.unbind();
-            simulation_component.storage_buffer.unbind();
-
+            simulation.storage_buffer.unbind();
         }
 
-        auto dispatch_compute(const scene::simulation_component& simulation_component, float dt) -> void
+        auto dispatch_compute(scene::simulation_component& simulation, float dt) -> void
         {
             _compute_program.use();
             _compute_program.set_uniform("delta_time", dt);
-            _compute_program.set_uniform("total_particles", static_cast<int>(simulation_component.particles.size()));
+            _compute_program.set_uniform("total_particles", static_cast<int>(simulation.particles.size()));
             _compute_program.set_uniform("drag", simulation.drag);
 
-            // bind the SSBO to binding point 0 for the compute shader
-            simulation_component.storage_buffer.bind_base(0);
+            simulation.storage_buffer.bind_base(simulation.binding_point);
 
-            const auto num_work_groups = (simulation_component.particles.size() + 63) / 64; // local_size_x = 64
-            glDispatchCompute(num_work_groups, 1, 1);
+            const auto num_work_groups =
+                (simulation.particles.size() + simulation.workgroup_size - 1) / simulation.workgroup_size;
+            glDispatchCompute(static_cast<GLuint>(num_work_groups), 1, 1);
 
-            // Ensure compute shader is done writing before vertex shader starts reading the buffer
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
         }
 
@@ -84,4 +79,3 @@ namespace inferonix::renderer
         vertex_array _vertex_array;
     };
 }
-
