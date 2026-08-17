@@ -53,6 +53,40 @@ namespace inferonix::ui
                     SetNextItemWidth(-1.f);
                     DragFloat3("##Scale", glm::value_ptr(transform.scale), 0.05f);
                 }
+
+                if (_scene->get_registry().any_of<scene::simulation_component>(entity))
+                {
+                    auto& simulation = _scene->get_registry().get<scene::simulation_component>(entity);
+                    if (CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
+                    {
+                        {
+                            Text("Particle count");
+                            SetNextItemWidth(-1.f);
+
+                            auto current_count = static_cast<uint32_t>(simulation.particles.size());
+                            constexpr uint32_t min = 0;
+                            constexpr uint32_t max = 30000;
+
+                            if (DragScalar("##Particle count", ImGuiDataType_U32, &current_count, 5.f, &min, &max, "%u"))
+                                simulation.particles.resize(current_count);
+                        }
+
+                        {
+                            Text("Drag");
+                            SetNextItemWidth(-1.f);
+                            DragFloat("##Drag", &simulation.drag, .5f, -200.f, 200.f);
+                        }
+
+                        {
+                            Text("Binding Point");
+                            SetNextItemWidth(-1.f);
+                            DragScalar("##Binding Point", ImGuiDataType_U32, &simulation.binding_point, .5f);
+                        }
+
+                    }
+
+
+                }
             }
         }
 
