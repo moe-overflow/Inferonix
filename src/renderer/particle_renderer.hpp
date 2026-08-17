@@ -66,6 +66,7 @@ namespace inferonix::renderer
             _compute_program.use();
             _compute_program.set_uniform("delta_time", dt);
             _compute_program.set_uniform("total_particles", static_cast<int>(simulation_component.particles.size()));
+            _compute_program.set_uniform("drag", simulation.drag);
 
             // bind the SSBO to binding point 0 for the compute shader
             simulation_component.storage_buffer.bind_base(0);
