@@ -2,6 +2,7 @@
 
 #include "components.hpp"
 #include "scene/model.hpp"
+#include "util/random.hpp"
 
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -92,31 +93,42 @@ void scene_serializer::deserialize(const std::string& filepath) const
         if (entity_data["Components"].contains("SimulationComponent"))
         {
             auto& simulation_data = entity_data["Components"]["SimulationComponent"];
-            auto compute_path = simulation_data["ComputeShader"].get<std::string>();
             auto particle_count = simulation_data["ParticleCount"].get<uint32_t>();
             auto simulation = simulation_component{};
+            if (simulation_data.contains("Drag"))
+                simulation.drag = simulation_data["Drag"].get<float>();
 
             {
                 simulation.particles.resize(particle_count);
+                float lifetime = 5.0f;
+                if (simulation_data.contains("Lifetime"))
+                    lifetime = simulation_data["Lifetime"].get<float>();
 
-                // todo: move to util
-                auto random_device = std::random_device{};
-                auto generator = std::mt19937{ random_device() };
-                auto random = std::uniform_real_distribution {0.0f, 1.0f };
-
-                for (auto& [position, velocity] : simulation.particles)
+                for (auto& [position, velocity, age_lifetime] : simulation.particles)
                 {
                     position = glm::vec4(
-                        random(generator) * 10.0f - 5.0f,
-                        random(generator) * 10.0f,
-                        random(generator) * 10.0f - 5.0f,
+                        util::random(0.0f, 1.0f) * .5f - .25f,
+                        util::random(0.0f, 1.0f) * .5f - .25f,
+                        util::random(0.0f, 1.0f) * .5f - .25f,
                         1.0f
                     );
-                    velocity = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+
+                    velocity = glm::vec4(
+                        util::random(0.0f, 1.0f) * 0.4f - 0.2f,
+                        util::random(0.0f, 1.0f) * 0.4f + 0.1f,
+                        util::random(0.0f, 1.0f) * 0.4f - 0.2f,
+                        0.0f
+                    );
+
+                    // mix initial ages so particles don't die all at once
+                    age_lifetime = glm::vec4(
+                        util::random(0.0f, 1.0f) * lifetime,
+                        lifetime,
+                        0.0f,
+                        0.0f
+                    );
                 }
                 simulation.storage_buffer.buffer_data(std::span<const simulation_component::particle>{simulation.particles});
-                if(auto result = simulation.compute_shader.load_from_file(compute_path); !result)
-                    LOG(LOG_TYPE::ERROR, "{}", result.error());
             }
 
             registry.emplace<simulation_component>(entity, std::move(simulation));
