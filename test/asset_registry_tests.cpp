@@ -1,6 +1,18 @@
 #include <gtest/gtest.h>
 #include <assets/asset_registry.hpp>
+#include <scene/model.hpp>
 #include <entt/entt.hpp>
+
+#include <filesystem>
+#include <string>
+
+namespace
+{
+    auto asset_path(const char* relative) -> std::filesystem::path
+    {
+        return std::filesystem::path{TEST_ASSETS_DIR} / relative;
+    }
+}
 
 TEST(AssetRegistry, RegistersItself)
 {
@@ -10,114 +22,78 @@ TEST(AssetRegistry, RegistersItself)
     ASSERT_EQ(stored, &assets);
 }
 
-namespace
-{
-    struct test_asset
-    {
-        bool load_from_file(const std::filesystem::path&)
-        {
-            return true;
-        }
-    };
-
-    struct counting_asset
-    {
-        static inline int load_count = 0;
-
-        bool load_from_file(const std::filesystem::path&)
-        {
-            ++load_count;
-            return true;
-        }
-    };
-
-    struct failing_asset
-    {
-        bool load_from_file(const std::filesystem::path&)
-        {
-            return false;
-        }
-    };
-
-}
-
-TEST(AssetRegistry, LoadsNewAssetSuccessfully)
+TEST(AssetRegistry, LoadsModelSuccessfully)
 {
     auto registry = entt::registry{};
     auto assets = inferonix::asset::asset_registry {registry};
-
-    auto result = assets.load<test_asset>(
-        "player",
-        "player.asset"
-    );
+    const auto result = assets.load<inferonix::scene::model>("triangle", asset_path("models/Triangle.obj"));
 
     ASSERT_TRUE(result.has_value());
     ASSERT_NE(result.value(), nullptr);
 }
 
-TEST(AssetRegistry, ReturnsCachedAsset)
+TEST(AssetRegistry, ReturnsCachedModel)
 {
     auto registry = entt::registry{};
     auto assets = inferonix::asset::asset_registry {registry};
-    auto const first = assets.load<test_asset>("player", "player.asset");
-    auto const second = assets.load<test_asset>("player", "player.asset");
+
+    auto const first = assets.load<inferonix::scene::model>("triangle", asset_path("models/Triangle.obj"));
+    auto const second = assets.load<inferonix::scene::model>("triangle", asset_path("models/Triangle.obj"));
 
     ASSERT_TRUE(first.has_value());
     ASSERT_TRUE(second.has_value());
-
     ASSERT_EQ(first.value(), second.value());
-
 }
 
-TEST(AssetRegistry, DoesNotReloadCachedAsset)
-{
-    counting_asset::load_count = 0;
-
-    auto registry = entt::registry{};
-    auto assets = inferonix::asset::asset_registry {registry};
-
-    auto const first = assets.load<counting_asset>("texture","texture.asset" );
-    auto const second = assets.load<counting_asset>("texture", "texture.asset");
-
-    ASSERT_TRUE(first.has_value());
-    ASSERT_TRUE(second.has_value());
-    ASSERT_EQ(counting_asset::load_count, 1);
-}
-
-TEST(AssetRegistry, FailsWhenAssetCannotBeLoaded)
+TEST(AssetRegistry, LoadsDistinctIdsIndependently)
 {
     auto registry = entt::registry{};
     auto assets = inferonix::asset::asset_registry {registry};
 
-    auto result = assets.load<failing_asset>(
-        "broken_asset",
-        "missing.file"
-    );
+    auto const a = assets.load<inferonix::scene::model>("triangle", asset_path("models/Triangle.obj"));
+    auto const b = assets.load<inferonix::scene::model>("monkey", asset_path("models/Monkey.obj"));
+
+    ASSERT_TRUE(a.has_value());
+    ASSERT_TRUE(b.has_value());
+    ASSERT_NE(a.value(), b.value());
+}
+
+TEST(AssetRegistry, FailsWhenModelCannotBeLoaded)
+{
+    auto registry = entt::registry{};
+    auto assets = inferonix::asset::asset_registry {registry};
+
+    auto result = assets.load<inferonix::scene::model>("missing", asset_path("models/does_not_exist.obj"));
 
     ASSERT_FALSE(result.has_value());
-    ASSERT_NE(result.error().empty(), true);
+    ASSERT_FALSE(result.error().empty());
 }
 
+TEST(AssetRegistry, FailsWhenTextureCannotBeLoaded)
+{
+    auto registry = entt::registry{};
+    auto assets = inferonix::asset::asset_registry {registry};
+    auto result = assets.load<inferonix::renderer::texture>("missing_tex", asset_path("textures/does_not_exist.png"));
+
+    ASSERT_FALSE(result.has_value());
+    ASSERT_FALSE(result.error().empty());
+}
 
 TEST(AssetRegistry, CanRetrieveLoadedAsset)
 {
     auto registry = entt::registry{};
     auto assets = inferonix::asset::asset_registry {registry};
 
-    auto const loaded = assets.load<test_asset>(
-        "player",
-        "player.asset"
-    );
+    auto const loaded = assets.load<inferonix::scene::model>("triangle", asset_path("models/Triangle.obj"));
 
     ASSERT_TRUE(loaded.has_value());
-    ASSERT_EQ(assets.get<test_asset>("player"), loaded.value());
+    ASSERT_EQ(assets.get<inferonix::scene::model>("triangle"), loaded.value());
 }
-
 
 TEST(AssetRegistry, ReturnsNullForUnknownAsset)
 {
     auto registry = entt::registry{};
     auto assets = inferonix::asset::asset_registry {registry};
-    auto const result = assets.get<test_asset>("does_not_exist");
+    auto const result = assets.get<inferonix::scene::model>("does_not_exist");
     ASSERT_EQ(result, nullptr);
 }
