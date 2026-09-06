@@ -6,5 +6,6 @@ target_sources(inferonix_lib PRIVATE
         scene_layer.cpp
         toolbar.hpp
         properties_layer.hpp
+        stats_overlay.hpp
 )
 

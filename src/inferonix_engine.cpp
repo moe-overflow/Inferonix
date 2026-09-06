@@ -12,6 +12,7 @@
 #include "ui/toolbar.hpp"
 #include "ui/scene_hierarchy_layer.hpp"
 #include "ui/properties_layer.hpp"
+#include "ui/stats_overlay.hpp"
 
 #include "util/time.hpp"
 
@@ -139,6 +140,7 @@ void inferonix_engine::add_window_layers()
     _window->add_layer<scene_hierarchy_layer>( _scene->get_registry() );
     _window->add_layer<scene_layer>(_renderer->get_frame_buffer(), _scene, _window->get_layer<scene_hierarchy_layer>());
     _window->add_layer<properties_layer>(this->_scene, _window->get_layer<scene_hierarchy_layer>());
+    _window->add_layer<stats_overlay>();
 }
 
 void inferonix_engine::register_commands()
@@ -157,6 +159,14 @@ void inferonix_engine::register_commands()
 
     _command_registry.register_command(
             "quit", "Exits the engine", [this](const auto& args)-> void { _window->close(); }
+    );
+
+    _command_registry.register_command(
+        "showfps", "Toggle FPS overlay", [](const auto& args) -> void
+        {
+            stats_overlay::toggle();
+            LOG(LOG_TYPE::INFO, "FPS overlay {}", stats_overlay::is_visible() ? "ON" : "OFF");
+        }
     );
 
     _command_registry.register_command(
